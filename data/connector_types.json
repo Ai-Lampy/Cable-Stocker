@@ -1,0 +1,90 @@
+{
+  "source": "New generator seed dataset derived from reference/examples/christie_lites_cable.json; not a Lampy runtime schema.",
+  "items": [
+    {
+      "id": "connector-1",
+      "name": "XLR-3",
+      "aliases": []
+    },
+    {
+      "id": "connector-2",
+      "name": "XLR-4",
+      "aliases": []
+    },
+    {
+      "id": "connector-3",
+      "name": "XLR-5",
+      "aliases": []
+    },
+    {
+      "id": "connector-4",
+      "name": "XLR-7",
+      "aliases": []
+    },
+    {
+      "id": "connector-5",
+      "name": "RJ45",
+      "aliases": []
+    },
+    {
+      "id": "connector-6",
+      "name": "etherCON",
+      "aliases": []
+    },
+    {
+      "id": "connector-7",
+      "name": "Quad Fiber",
+      "aliases": []
+    },
+    {
+      "id": "connector-8",
+      "name": "WW 12-Pin",
+      "aliases": []
+    },
+    {
+      "id": "connector-9",
+      "name": "Socapex 19-Pin",
+      "aliases": []
+    },
+    {
+      "id": "connector-10",
+      "name": "CEE 32A 3ø",
+      "aliases": []
+    },
+    {
+      "id": "connector-11",
+      "name": "CEE 63A 3ø",
+      "aliases": []
+    },
+    {
+      "id": "connector-12",
+      "name": "CEE 125A 3ø",
+      "aliases": []
+    },
+    {
+      "id": "connector-13",
+      "name": "powerCON TRUE1",
+      "aliases": []
+    },
+    {
+      "id": "connector-14",
+      "name": "13A Plug",
+      "aliases": []
+    },
+    {
+      "id": "connector-15",
+      "name": "13A Socket",
+      "aliases": []
+    },
+    {
+      "id": "connector-16",
+      "name": "Socapex 7-Pin",
+      "aliases": []
+    },
+    {
+      "id": "connector-17",
+      "name": "Tajimi",
+      "aliases": []
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Create, edit and export Lampy vendor cable stock locally in your browser.">
+  <title>Lampy · Cable Stock Generator</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2326372c'/%3E%3Cpath d='M20 14v36h27v-9H30V14' fill='%23a6c96a'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/app.css">
+  <script defer src="vendor/xlsx.full.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="#vendor" aria-label="Lampy Cable Stock home"><span class="brand-mark">L</span><span>LAMPY<small>CABLE STOCK GENERATOR</small></span></a>
+    <div class="header-actions">
+      <span id="save-status" role="status">Loading references…</span>
+      <button id="settings-button">Settings</button>
+      <div class="errors-control"><button id="errors-button" aria-describedby="recent-issues">Errors <span id="error-count" class="badge">0</span></button><div id="recent-issues" class="issue-tooltip" role="tooltip"></div></div>
+      <button id="import-button">Import</button>
+      <button id="export-button" class="primary">Review & export</button>
+    </div>
+  </header>
+  <section class="vendor-strip" aria-label="Selected vendor"><div id="vendor-logo"></div><div><strong id="vendor-name">Your cable stock</strong><span id="vendor-summary">Choose a vendor to begin</span></div><span class="local-pill">LOCAL WORKSPACE</span></section>
+  <nav id="category-nav" class="tabs" aria-label="Vendor and cable categories"></nav>
+  <main id="main"><p>Loading your workspace…</p></main>
+  <footer class="site-footer">
+    <div class="footer-columns"><div><strong class="footer-brand">AI-Lampy</strong><p>Your vendor cable stock.<br>Organised in one place.</p><a href="mailto:info@ailampy.com">info@ailampy.com</a></div><div><h2>WORKSPACE</h2><button data-page="vendor">Vendor</button><button data-page="settings">Reference settings</button><button data-page="errors">Errors & warnings</button></div><div><h2>YOUR FILES</h2><p>Drafts stay in this browser.<br>Download a backup to keep them.</p><button id="backup-button">Save project backup</button></div><div><h2>INFORMATION</h2><a href="README.md" target="_blank" rel="noopener">User guide</a><a href="CHANGELOG.md" target="_blank" rel="noopener">Change history</a><span id="app-version"></span></div></div>
+    <div class="footer-bottom"><span>© 2026 AI-Lampy</span><span>Available lengths only · No stock quantities</span></div>
+  </footer>
+  <dialog id="dialog"><div id="dialog-content"></div></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <input id="file-input" type="file" accept=".json,.xlsx" hidden>
+  <div id="datalists"></div>
+</body>
+</html>

@@ -1,0 +1,109 @@
+LAMPY CABLE STOCK JSON GENERATOR — PROJECT SETUP INSTRUCTIONS
+==============================================================
+For the user: complete these steps before handing the project folder to the builder.
+
+1. EXTRACT THE ZIP
+Extract the handover ZIP into a project folder. Keep BUILD_BRIEF.md, README.md,
+PROJECT_SETUP_INSTRUCTIONS.txt and reference/lighting_vendors.json in place.
+
+2. ADD YOUR EXISTING FILES
+Create the folders below if missing. Copy files, do not rename originals.
+The categories/cable-types/connector-types JSON files are optional if they
+do not exist yet; the builder will derive starting references from your one
+working cable-stock JSON and confirm the eventual canonical filenames.
+
+Expected handover folder:
+
+Lampy_Cable_Generator_Handover/
+|-- BUILD_BRIEF.md
+|-- README.md
+|-- PROJECT_SETUP_INSTRUCTIONS.txt
+|-- reference/
+|   |-- lighting_vendors.json        [ALREADY INCLUDED]
+|   |-- manifest.json                [YOU ADD: actual working manifest]
+|   |-- categories.json              [YOU ADD IF EXISTING; name provisional]
+|   |-- cable_types.json             [YOU ADD IF EXISTING; name provisional]
+|   |-- connector_types.json         [YOU ADD IF EXISTING; name provisional]
+|   `-- examples/
+|       `-- <actual-vendor-stock-filename>.json  [YOU ADD: one working example]
+`-- images/
+    `-- vendor/
+        |-- 4Wall.png                [YOU ADD]
+        |-- adlib.png                 [YOU ADD]
+        |-- christie_lites.png       [YOU ADD]
+        `-- ...other vendor logos     [YOU ADD]
+
+Do not create empty JSON placeholder files. If you do not have the three
+optional reference JSONs, leave them absent and tell the builder.
+The 15 vendor names and paths are already in reference/lighting_vendors.json.
+Keep exact logo filenames and capitalisation, including .png extension.
+The image directory is images/vendor/, NOT images/lighting_vendors/.
+
+3. CHECK THE INPUTS
+[ ] One complete, working, unchanged vendor cable-stock JSON is included.
+[ ] Actual manifest.json is included, preserving all existing entries.
+[ ] Any existing category/cable-type/connector reference files are included.
+[ ] Vendor logo images are under images/vendor/ with matching case.
+[ ] BUILD_BRIEF.md and this TXT file are present.
+[ ] No live GitHub credentials, passwords or tokens are included.
+
+4. GIVE THIS PROMPT TO THE BUILDER
+Copy everything between START PROMPT and END PROMPT into the builder chat.
+
+======================== START PROMPT ========================
+
+Build V1 of the Lampy Cable Stock JSON Generator using the files in this
+project folder. Read BUILD_BRIEF.md completely before changing or creating
+files, then read README.md, PROJECT_SETUP_INSTRUCTIONS.txt, and all JSON
+reference/examples supplied. The brief is the authoritative requirements
+document. Preserve the real Lampy JSON schemas and filenames.
+
+You have the first 10 minutes to ask me all essential questions or request
+necessary access, preferably in one batch. After that, proceed independently
+without routine messages or questions. If an external approval or genuine
+blocker arises, do not bypass it; complete independent work and report it.
+
+The one existing vendor cable-stock JSON is the authoritative example.
+The actual manifest.json must remain a catalogues array with vendor/file
+entries only. The simplified lighting_vendors.json is already supplied.
+Vendor logos are under images/vendor/. Do not modify the original input
+examples. If optional category/cable/connector reference JSONs are absent,
+derive appropriate seed datasets and label them as newly created.
+
+The exact spreadsheet UI reference is:
+https://ailampy.com/tracker/inventory
+Specifically: Tool Tracker > Inventory > Table View. It is a private
+Codex-built site, not a GitHub repository. Inspect only if access is
+available; never bypass authentication or modify the live site.
+
+This is the initial V1 build, so full local testing, including browser
+testing, is authorised. Future releases require my explicit approval
+for browser testing. Do not create, inspect, commit, push, upload to,
+or deploy on GitHub without my separate explicit request for inspection;
+all uploads and deployment remain my responsibility.
+
+Implement V1 only. Do not implement or scaffold any V2 ideas.
+Create root UPDATES.md and CHANGELOG.md as specified in the brief.
+Use app version v1.0.0 for the first completed release.
+
+When finished, give me in this chat:
+- The complete folder/file tree for manual GitHub upload.
+- All completed files and their exact destinations.
+- Previous/new app version, changes made, files to upload,
+  new files created, files deleted.
+- Test results, unresolved issues, compatibility limitations,
+  and the CHANGELOG entry.
+
+Do not open a separate completion document. Do not claim deployment
+passed when nothing has been deployed.
+
+========================= END PROMPT =========================
+
+5. IMPORTANT NOTES
+- One working vendor cable-stock JSON is enough to start.
+- The manifest example in the brief illustrates structure, not your
+  full production manifest. Supply the actual file.
+- The builder should use your supplied images directly.
+- The builder must deliver the first-build folder structure and ready-to-
+  upload files, but you alone decide when and where to upload them.
+- V2 is for future discussion only.

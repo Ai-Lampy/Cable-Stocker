@@ -1,0 +1,199 @@
+{
+  "source": "New generator seed dataset derived from reference/examples/christie_lites_cable.json; not a Lampy runtime schema.",
+  "items": [
+    {
+      "id": "cable-1",
+      "name": "XLR-3",
+      "aliases": [
+        "DMX 3-pin"
+      ],
+      "category": "Data",
+      "direction": "male-female",
+      "connectors": {
+        "male": "XLR-3",
+        "female": "XLR-3"
+      }
+    },
+    {
+      "id": "cable-2",
+      "name": "XLR-4",
+      "aliases": [],
+      "category": "Data",
+      "direction": "male-female",
+      "connectors": {
+        "male": "XLR-4",
+        "female": "XLR-4"
+      }
+    },
+    {
+      "id": "cable-3",
+      "name": "XLR-5",
+      "aliases": [
+        "DMX 5-pin"
+      ],
+      "category": "Data",
+      "direction": "male-female",
+      "connectors": {
+        "male": "XLR-5",
+        "female": "XLR-5"
+      }
+    },
+    {
+      "id": "cable-4",
+      "name": "XLR-5 Black",
+      "aliases": [],
+      "category": "Data",
+      "direction": "male-female",
+      "connectors": {
+        "male": "XLR-5",
+        "female": "XLR-5"
+      }
+    },
+    {
+      "id": "cable-5",
+      "name": "XLR-7",
+      "aliases": [],
+      "category": "Data",
+      "direction": "male-female",
+      "connectors": {
+        "male": "XLR-7",
+        "female": "XLR-7"
+      }
+    },
+    {
+      "id": "cable-6",
+      "name": "Ethernet",
+      "aliases": [],
+      "category": "Data",
+      "direction": "bidirectional",
+      "connectors": {
+        "end": "RJ45"
+      }
+    },
+    {
+      "id": "cable-7",
+      "name": "Ethercon",
+      "aliases": [
+        "EtherCON"
+      ],
+      "category": "Data",
+      "direction": "bidirectional",
+      "connectors": {
+        "end": "etherCON"
+      }
+    },
+    {
+      "id": "cable-8",
+      "name": "OpticalCON Quad Fiber",
+      "aliases": [],
+      "category": "Data",
+      "direction": "bidirectional",
+      "connectors": {
+        "end": "Quad Fiber"
+      }
+    },
+    {
+      "id": "cable-9",
+      "name": "Whirlwind 12-Pair",
+      "aliases": [],
+      "category": "Data",
+      "direction": "male-female",
+      "connectors": {
+        "male": "WW 12-Pin",
+        "female": "WW 12-Pin"
+      }
+    },
+    {
+      "id": "cable-10",
+      "name": "Socapex 19-Pin",
+      "aliases": [
+        "Socapex"
+      ],
+      "category": "Multi",
+      "direction": "male-female",
+      "connectors": {
+        "male": "Socapex 19-Pin",
+        "female": "Socapex 19-Pin"
+      }
+    },
+    {
+      "id": "cable-11",
+      "name": "32A 3ø",
+      "aliases": [],
+      "category": "Mains",
+      "direction": "male-female",
+      "connectors": {
+        "male": "CEE 32A 3ø",
+        "female": "CEE 32A 3ø"
+      }
+    },
+    {
+      "id": "cable-12",
+      "name": "63A 3ø",
+      "aliases": [],
+      "category": "Mains",
+      "direction": "male-female",
+      "connectors": {
+        "male": "CEE 63A 3ø",
+        "female": "CEE 63A 3ø"
+      }
+    },
+    {
+      "id": "cable-13",
+      "name": "125A 3ø",
+      "aliases": [],
+      "category": "Mains",
+      "direction": "male-female",
+      "connectors": {
+        "male": "CEE 125A 3ø",
+        "female": "CEE 125A 3ø"
+      }
+    },
+    {
+      "id": "cable-14",
+      "name": "TRUE 1",
+      "aliases": [
+        "TRUE1"
+      ],
+      "category": "TRS",
+      "direction": "male-female",
+      "connectors": {
+        "male": "powerCON TRUE1",
+        "female": "powerCON TRUE1"
+      }
+    },
+    {
+      "id": "cable-15",
+      "name": "13A",
+      "aliases": [],
+      "category": "TRS",
+      "direction": "male-female",
+      "connectors": {
+        "male": "13A Plug",
+        "female": "13A Socket"
+      }
+    },
+    {
+      "id": "cable-16",
+      "name": "Socapex 7-Pin",
+      "aliases": [],
+      "category": "Motor",
+      "direction": "male-female",
+      "connectors": {
+        "male": "Socapex 7-Pin",
+        "female": "Socapex 7-Pin"
+      }
+    },
+    {
+      "id": "cable-17",
+      "name": "Tajimi Motor Control",
+      "aliases": [],
+      "category": "Motor",
+      "direction": "male-female",
+      "connectors": {
+        "male": "Tajimi",
+        "female": "Tajimi"
+      }
+    }
+  ]
+}

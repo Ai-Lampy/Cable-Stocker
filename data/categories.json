@@ -1,0 +1,38 @@
+{
+  "source": "New generator seed dataset derived from reference/examples/christie_lites_cable.json; not a Lampy runtime schema.",
+  "items": [
+    {
+      "id": "cat-1",
+      "name": "Data",
+      "aliases": []
+    },
+    {
+      "id": "cat-2",
+      "name": "Multi",
+      "aliases": []
+    },
+    {
+      "id": "cat-3",
+      "name": "Mains",
+      "aliases": []
+    },
+    {
+      "id": "cat-4",
+      "name": "TRS",
+      "aliases": []
+    },
+    {
+      "id": "cat-5",
+      "name": "Motor",
+      "aliases": []
+    },
+    {
+      "id": "cat-looms",
+      "name": "Stock / Pre-Made Looms",
+      "aliases": [
+        "Pre-made Looms",
+        "Stock Looms"
+      ]
+    }
+  ]
+}
