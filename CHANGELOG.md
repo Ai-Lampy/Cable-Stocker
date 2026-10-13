@@ -1,5 +1,38 @@
 # Changelog
 
+## v1.1.0 — 2026-10-13
+
+Previous version: v1.0.1. Local feature release, ready for user upload; not deployed by the builder.
+
+### Changes
+
+- Automatically add Lighting Vendors entries to Vendor Manifest. Preserve existing paths; generate lowercase underscore filenames for missing vendors and avoid path collisions.
+- Add a visible category dropdown with typed custom names. Recognised names/aliases populate associated cable types and connector defaults, leaving lengths empty.
+- Add generator-only adaptor markers. Show direction editing only for marked adaptors; retain existing Lampy direction values and connector schemas.
+- Add Save to every table, including committing a pending cell before saving locally. Invalid cells and storage failures remain visible.
+- Add Length colour Settings with vendor, unit, length and three colour fields, using the supplied Lampy palette. Reject ambiguous aliases and unsupported colours; show matching colour bands on length chips.
+- Add separate length_colours.json download and preserve existing saved references across the upgrade.
+- Preserve adaptor markers through project backups and Excel. Older workbooks without the optional adaptor column remain importable.
+
+### Files
+
+Updated: `js/app.js`, `js/model.js`, `js/grid.js`, `js/excel.js`, `js/version.js`, `css/app.css`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`.
+
+Created: `data/length_colours.json` (new generator dataset, initially empty).
+
+Supplied dependency to upload: `reference/colour_options.json` (unchanged user-provided Lampy palette).
+
+Deleted: none. Original reference JSONs, brief/setup instructions and logos unchanged.
+
+### Validation and limitations
+
+- 63 automated tests passed, including vendor synchronisation/collisions, category seeding, adaptor changes/backups/Excel, legacy workbooks, palette aliases and duplicate colour assignments.
+- Approved local Chromium testing verified all 15 manifest vendors and a newly added vendor, Save of a pending cell, category dropdown/autofill/custom entry, adaptor-only direction, reference adaptor controls, colour validation/save/reload/export, length bands, adaptor Excel round trip, loom-component Save and no console errors.
+- Save uses local browser storage. Downloads are still required for independent backups and manual hosting updates.
+- Renaming/removing a Lighting Vendors entry does not delete old manifest entries. Review unused entries manually; generated paths do not create cable-stock files.
+- Adaptor markers and length-colour settings are generator metadata. Existing runtime direction fields are preserved. Colour assignments use a separate generator JSON, not vendor project/Excel backups or Lampy cable-stock JSON.
+- No GitHub upload or deployment performed. Firefox, Safari and native Excel/LibreOffice were not tested. Existing V1 schema compatibility limits remain.
+
 ## v1.0.1 — 2026-10-13
 
 Previous version: v1.0.0. Local patch release, ready for user upload; not deployed by the builder.

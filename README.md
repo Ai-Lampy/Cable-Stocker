@@ -18,8 +18,8 @@ For manual GitHub Pages upload, retain the complete folder structure and use thi
 
 1. Select a vendor, or enter a new vendor name. New vendors start in metres. Imported feet remain feet.
 2. Confirm the output filename. The supplied manifest confirms `christie_lites_cable.json` for Christie Lites UK. Its Lampy Paperwork destination is `json/cable/christie_lites_cable.json`.
-3. Add categories with **+**. Search names and aliases or enter a new category. The selected wording remains in vendor data.
-4. Add a row. Double-click a cell or press F2 to edit it through the cell-content bar. Press Enter or **Apply cell** to commit. Selecting a cable reference on a new row prefills connectors. Vendor overrides remain editable.
+3. Add categories with **+**. Choose a name/alias from the dropdown or type a category. Recognised categories start with their associated cable types and connector defaults, with empty lengths. Custom categories start empty. The selected category wording remains in vendor data; adding an existing category does not replace its rows.
+4. Ordinary cables hide direction controls. Mark a row **Adaptor** to edit its direction. Existing direction fields remain in Lampy JSON for compatibility. Add a row. Double-click a cell or press F2 to edit it through the cell-content bar. Press Enter or **Apply cell** to commit. Selecting a cable reference on a new row prefills connectors. Vendor overrides remain editable.
 5. Use **Edit lengths**. Type a positive number and press Enter for each chip. Paste separated lists. Backspace removes the last chip when the input is empty. **Copy Lengths** stores a set inside the app. **Apply / Paste Lengths** offers Replace, Merge or Cancel. No unit conversion occurs.
 6. Open **Review & export**. Errors do not block JSON previews, copying or downloads. A downloaded file with errors is not labelled valid.
 
@@ -32,14 +32,16 @@ Plain cable-stock JSON import previews compare against your current draft by mat
 | Output | Purpose | Contents |
 | --- | --- | --- |
 | Lampy cable-stock JSON | File read by Lampy Paperwork | Exact source schema: `vendor`, `cables`, and retained imported custom fields. No editor IDs or preferences. |
-| `*.lampy-project.json` | Reopen all generator work | Cable stock, composite looms, generator vendor version, filename, row identities and imported baseline. **Not** a Lampy Paperwork input. |
-| `.xlsx` | Spreadsheet editing and backup | Cable categories, looms/components, vendor metadata, custom fields and stable row keys. |
+| `*.lampy-project.json` | Reopen vendor work | Cable stock, composite looms, adaptor markers, generator vendor version, filename, row identities and imported baseline. **Not** a Lampy Paperwork input. |
+| `.xlsx` | Spreadsheet editing and backup | Cable categories, adaptor markers, looms/components, vendor metadata, custom fields and stable row keys. |
 
 The supplied cable-stock example has **no loom structure or version field**. V1 keeps newly authored looms and the generator vendor version in project/Excel backups. It warns before a Lampy download that excludes them. Imported runtime version fields and other custom fields stay untouched and can be edited under Custom metadata. The app does not claim Lampy Paperwork can consume composite looms. No unsupported runtime fields were invented.
 
 Vendor versions such as `v2` and `v2.1` are independent of the app version. Major/minor buttons require confirmation. A category JSON preview/download is a labelled fragment, not a complete vendor file.
 
 ## Tables
+
+Every cable, Settings and loom-component table has **Save**. It commits the cell currently being edited and saves the workspace in this browser. Invalid cell input prevents that save and displays a message. Save does not upload or rewrite the hosted files. Download project/Excel backups for vendor work and separate JSON files for Settings data.
 
 - Arrows, Enter, Tab and Shift+Tab move between cells. Shift+arrows or Shift+click extends a range. Ctrl/⌘ A selects the table.
 - Ctrl/⌘ C and Ctrl/⌘ V copy/paste rectangular Excel-compatible TSV. Quoted multiline cells are supported. Toolbar Copy/Paste uses clipboard permission when available.
@@ -59,8 +61,9 @@ Use app-generated workbooks/templates. Import accepts `.xlsx`, not legacy `.xls`
 
 Cable worksheet columns, in order:
 
-`key`, `name`, `direction`, `start_connector`, `end_connector`, `lengths`, `connectors_json`, `custom_json`
+`key`, `name`, `direction`, `start_connector`, `end_connector`, `lengths`, `connectors_json`, `custom_json`, `adaptor`
 
+- `adaptor` is `yes` or `no` and stores generator-only editing behaviour. Older workbooks without this column still import. Direction remains in the workbook to preserve the source JSON even when hidden in ordinary cable tables.
 - Keep `key` unchanged for existing rows. Leave it blank for a new row. Duplicate keys are rejected.
 - `lengths` contains numeric comma-separated values with decimal dots, such as `5, 10, 12.5`. It is not a stock quantity.
 - Bidirectional cables use `connectors.end`. Start and end cells display the same connector.
@@ -79,6 +82,16 @@ Single-category exports include mapping and metadata so imports know their scope
 
 Excel's 32,767-character limit applies to each cell. Oversized row metadata requires project JSON as the lossless alternative. Desktop Microsoft Excel and LibreOffice were not used for native-application validation; binary read/write and local-browser re-import were tested.
 
+## Vendor manifest and length colours
+
+Lighting Vendors automatically adds missing vendors to Vendor Manifest on startup and after edits. Existing catalogue paths remain untouched. New paths use `json/cable/<vendor_name>_cable.json`, with lowercase underscores and numbered suffixes for collisions. Removing or renaming a vendor does not delete its older manifest entry automatically. Review those entries manually. This creates lookup entries, not the referenced cable-stock files. Download `manifest.json` to retain the expanded catalogue; the supplied original stays unchanged.
+
+Settings → **Length colour** assigns a vendor, unit (`m` or `ft`), positive length, and **Colour 1 / Colour 2 / Colour 3** per row. Different vendors and units can use different codes for the same number. Duplicate vendor/unit/length rows appear in Errors. Blank colour fields mean No Colour.
+
+Colours resolve exclusively through the unchanged `reference/colour_options.json`. Full names, unambiguous aliases and palette hex codes are accepted; ambiguous abbreviations such as `G`, `B` and `P` require a full name. Assignments store the palette's exact hex values. Matching length chips display three colour bands. A colour assignment never converts or changes cable lengths.
+
+Download assignments as **length_colours.json** and place them in `data/length_colours.json`. This is a new generator dataset, not an invented Lampy cable-stock extension. Like other Settings references, it is separate from vendor project/Excel backups. Existing saved references are retained when upgrading from v1.0.1.
+
 ## References and exact destinations
 
 | File | Role / destination |
@@ -86,12 +99,14 @@ Excel's 32,767-character limit applies to each cell. Oversized row metadata requ
 | `reference/lighting_vendors.json` | Original simplified 15-vendor reference; replace here after a Settings download. |
 | `reference/manifest.json` | Original authoritative lookup. Replace the generator copy here; apply to Lampy Paperwork only at your existing manifest location. |
 | `reference/examples/christie_lites_cable.json` | Read-only original. Generated output belongs separately in Lampy Paperwork at `json/cable/christie_lites_cable.json`. |
+| `reference/colour_options.json` | Supplied Lampy Paperwork palette; keep unchanged at this path. |
+| `data/length_colours.json` | **New generator dataset** for vendor/unit/length colour assignments. Place Settings download here. |
 | `data/categories.json` | **New generator seed dataset**. Place Settings download here. |
 | `data/cable_types.json` | **New generator seed dataset**. Place Settings download here. |
 | `data/connector_types.json` | **New generator seed dataset**. Place Settings download here. |
 | `images/vendor/*` | 15 unchanged original logos. Preserve path and filename case. |
 
-The three new dataset filenames were approved for generator use. They do not claim pre-existing Lampy production paths. The supplied manifest has one Christie entry, preserved in full. Its location in the separate Lampy Paperwork deployment was not inspected or guessed.
+The original three seed dataset filenames were approved for generator use; length_colours.json is the new generator-only assignment dataset. They do not claim pre-existing Lampy production paths. The supplied manifest has one Christie entry, preserved in full. Its location in the separate Lampy Paperwork deployment was not inspected or guessed.
 
 Settings downloads use the exact basename without timestamps. Your browser may add a duplicate-download suffix; restore the canonical name before manually replacing a reference. Browsers cannot overwrite project files themselves.
 
@@ -107,10 +122,12 @@ Run `node --test tests/core.test.mjs` with Node 22+ recommended. Tests use gener
 
 Target current Chromium, Firefox and Safari with ES modules, native dialog, structuredClone, localStorage and CSS zoom. Browser tests used Codex Chromium. Older browsers, mobile drag gestures and native Excel/LibreOffice behaviour are not certified. Clipboard buttons depend on permission; keyboard copy/paste is the fallback.
 
-Tool Tracker Inventory Table View and footer were inspected read-only. No changes were made to that reference site. The user authorised the initial GitHub upload separately and configured GitHub Pages. The deployed v1.0.0 was subsequently tested. The v1.0.1 fix was tested locally with fresh browser-test approval and awaits the user's upload; those local checks do not verify its deployment. Future browser testing requires fresh approval, per `BUILD_BRIEF.md`.
+Tool Tracker Inventory Table View and footer were inspected read-only. No changes were made to that reference site. The user authorised the initial GitHub upload separately and configured GitHub Pages. The deployed v1.0.0 was subsequently tested. The v1.0.1 fix was uploaded by the user and verified live. The v1.1.0 features were tested locally with fresh browser-test approval and await the user's upload; local checks do not verify their deployment. Future browser testing requires fresh approval, per `BUILD_BRIEF.md`.
 
 Bundled library: SheetJS CE 0.20.3 from its official CDN, with Apache 2.0 licence in `vendor/SHEETJS-LICENSE.txt`. Documentation: https://docs.sheetjs.com/docs/getting-started/installation/standalone/.
 
 ## Upload inventory
 
 Upload the root HTML/docs/package files and `.nojekyll`, plus `css/`, `js/`, `data/`, `reference/`, `images/vendor/`, `vendor/` and `tests/`, retaining every filename and subfolder. The chat handover provides the complete file tree. Exclude Finder `.DS_Store` files and locally downloaded test outputs. No V2 modules or placeholders are included.
+
+For v1.1.0, upload all changed application files together, plus `data/length_colours.json` and the supplied `reference/colour_options.json`. Refresh the browser fully after deployment so it loads the updated modules.

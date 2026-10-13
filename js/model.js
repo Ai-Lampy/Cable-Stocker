@@ -34,6 +34,7 @@ export function restoreProject(value) {
   if (value.format !== 'lampy-cable-generator-project' || value.formatVersion !== 1) throw new Error('Unsupported generator project format.');
   checkStock(value.stock);
   const p = clone(value);
+  if (p.adaptors !== undefined && (!object(p.adaptors) || Object.values(p.adaptors).some(v=>v!==true))) throw new Error('Invalid adaptor markers.');
   if (!Array.isArray(p.looms) || !object(p.rowIds)) throw new Error('Incomplete generator project.');
   for (const [cat, rows] of Object.entries(p.stock.cables)) {
     if (!Array.isArray(p.rowIds[cat]) || p.rowIds[cat].length !== rows.length || new Set(p.rowIds[cat]).size !== rows.length) throw new Error(`Invalid row keys in ${cat}.`);
@@ -70,6 +71,48 @@ export function referenceMatch(entries, text) {
 }
 export function defaultCable(ref, wording) {
   return {name: wording || ref?.name || '', direction: ref?.direction || 'male-female', connectors: clone(ref?.connectors || {male: '', female: ''}), lengths: []};
+}
+export function syncVendorManifest(refs) {
+  const entries=refs.manifest.catalogues, names=new Set(entries.map(x=>String(x.vendor).trim().toLowerCase()));
+  const paths=new Set(entries.map(x=>String(x.file).toLowerCase()));
+  for(const vendor of refs.lighting_vendors.vendors){
+    const name=String(vendor.name||'').trim();if(!name||names.has(name.toLowerCase()))continue;
+    const stem=name.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')||'vendor';
+    let file=`json/cable/${stem}_cable.json`,n=2;
+    while(paths.has(file.toLowerCase()))file=`json/cable/${stem}_${n++}_cable.json`;
+    entries.push({vendor:name,file});names.add(name.toLowerCase());paths.add(file.toLowerCase());
+  }
+  return entries;
+}
+export function categoryCables(name, refs) {
+  const category=referenceMatch(refs.categories.items,name);
+  if(!category)return [];
+  return refs.cable_types.items.filter(c=>referenceMatch(refs.categories.items,c.category)?.id===category.id).map(c=>({row:defaultCable(c),adaptor:c.adaptor===true}));
+}
+export function isCableAdaptor(project, category, index) {
+  return project.adaptors?.[project.rowIds[category]?.[index]]===true;
+}
+export function setCableAdaptor(project, category, index, value) {
+  project.adaptors ||= {};const id=project.rowIds[category][index];
+  if(value)project.adaptors[id]=true;else delete project.adaptors[id];
+}
+export function resolveColour(value, palette) {
+  const text=String(value??'').trim(),key=text.toLowerCase();
+  if(!text||[palette.noColour.name,...palette.noColour.aliases].some(x=>x.toLowerCase()===key))return '';
+  const matches=Object.entries(palette.colours).filter(([hex,c])=>hex.toLowerCase()===key||c.names.some(n=>n.toLowerCase()===key));
+  if(matches.length!==1)throw new Error(matches.length?'Ambiguous colour alias. Use a full colour name.':'Choose a colour from colour_options.json.');
+  return matches[0][0];
+}
+export function validateLengthColours(data,palette) {
+  const issues=[],seen=new Set();
+  const add=(row,field,message)=>issues.push({level:'error',category:'Settings: length_colours',row,field,message,fix:'Choose a vendor, unit, positive length and colours from the supplied palette.'});
+  data.items.forEach((r,i)=>{
+    if(typeof r.vendor!=='string'||!r.vendor.trim())add(i,'vendor','Vendor is required.');
+    if(!['m','ft'].includes(r.unit))add(i,'unit','Choose m or ft.');
+    if(typeof r.length!=='number'||!Number.isFinite(r.length)||r.length<=0)add(i,'length','Length must be a positive number.');
+    const key=JSON.stringify([String(r.vendor).trim().toLowerCase(),r.unit,r.length]);if(seen.has(key))add(i,'length','Duplicate vendor, unit and length.');seen.add(key);
+    for(const field of ['colour1','colour2','colour3'])try{resolveColour(r[field],palette);}catch(e){add(i,field,e.message);}
+  });return issues;
 }
 export function getCell(row, key) {
   if (key === 'start') return row.connectors?.male ?? row.connectors?.end ?? '';
@@ -137,7 +180,7 @@ export function changes(project, baseline = project.baseline) {
     if (!same(ids.filter(id => oldIds.includes(id)), oldIds.filter(id => ids.includes(id)))) result.push({category:cat,kind:'modified',name:'Row order'});
     rows.forEach((row, i) => {
       const old = oldIds.indexOf(ids[i]);
-      if (old < 0 || !same(row, oldRows[old])) result.push({category:cat,kind:old < 0 ? 'added':'modified',name:row.name || `Row ${i + 1}`});
+      if (old < 0 || !same(row, oldRows[old]) || !!project.adaptors?.[ids[i]] !== !!baseline.adaptors?.[oldIds[old]]) result.push({category:cat,kind:old < 0 ? 'added':'modified',name:row.name || `Row ${i + 1}`});
     });
     oldRows.forEach((row, i) => { if (!ids.includes(oldIds[i])) result.push({category:cat,kind:'removed',name:row.name || `Row ${i+1}`}); });
   }
@@ -197,6 +240,7 @@ export function validateReferences(refs) {
   const issues = [];
   const add = (category,row,field,message) => issues.push({level:'error',category:`Settings: ${category}`,row,field,message,fix:'Correct this reference cell, or undo the edit.'});
   for (const [key, data] of Object.entries(refs)) {
+    if (key === 'length_colours') continue;
     const rows = data.catalogues || data.vendors || data.items || [];
     const seen = new Map();
     rows.forEach((row,i) => {
@@ -246,6 +290,7 @@ export function mergeProjects(current, incoming, partial = false) {
       if (target < 0) target = result.stock.cables[cat].findIndex((r,j) => r.name === row.name && !matched.has(j));
       if (target < 0) { target=result.stock.cables[cat].length; result.stock.cables[cat].push(clone(row)); result.rowIds[cat].push(id); }
       else result.stock.cables[cat][target] = clone(row);
+      setCableAdaptor(result,cat,target,isCableAdaptor(incoming,cat,i));
       matched.add(target);
     });
   }

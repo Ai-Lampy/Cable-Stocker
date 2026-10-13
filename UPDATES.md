@@ -7,6 +7,13 @@
 
 ## Completed
 
+- v1.1.0: Lighting Vendors adds missing manifest entries with user-approved generated filenames and preserves existing paths.
+- Category dropdown with typed entries and automatic cable-type/connector seeding for recognised categories.
+- Adaptor checkbox and adaptor-only direction editing; existing runtime direction values retained.
+- Save button on every cable, reference, colour and loom-component table.
+- Length colour Settings with vendor/unit/length and three palette-only colours, local saving and separate JSON download.
+- Existing draft/reference migration and adaptor project/Excel round trips tested.
+
 - v1.0.1: Fixed false additions/removals in plain JSON import previews; added seven regression tests and verified identical/changed imports, cancellation and accepted-import baselines in local Chromium.
 - Initial cable-stock-only application, v1.0.0.
 - Vendor selection, logos, unit choice, independent generator vendor version and custom metadata.
@@ -20,8 +27,9 @@
 ## Notes
 
 - BUILD_BRIEF.md remains authoritative. Read this file before subsequent changes.
-- The user separately authorised the first GitHub upload and configured GitHub Pages. This v1.0.1 update is local only; the user will upload the changed files.
-- Browser testing was explicitly authorised for this v1.0.1 fix. Every future update still needs fresh explicit browser-test approval.
+- The user separately authorised the first GitHub upload and configured GitHub Pages. This v1.1.0 update is local only; the user will upload the changed files.
+- Browser testing was explicitly authorised for this v1.1.0 update. Every future update still needs fresh explicit browser-test approval.
+- The supplied colour_options.json is unchanged. New length_colours.json stores generator-only assignments; no unsupported colour/adaptor fields enter Lampy runtime JSON.
 - Application version is defined in js/version.js. Vendor version is separate.
 - No production manifest location outside the supplied reference path was inferred.
 

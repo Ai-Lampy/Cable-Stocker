@@ -1,6 +1,6 @@
-import {clone, parseJSON, parseLengths, projectFromStock, snapshot, uid, object, safeKey} from './model.js';
+import {clone, parseJSON, parseLengths, projectFromStock, snapshot, uid, object, safeKey, isCableAdaptor, setCableAdaptor} from './model.js';
 
-export const CABLE_COLUMNS = ['key','name','direction','start_connector','end_connector','lengths','connectors_json','custom_json'];
+export const CABLE_COLUMNS = ['key','name','direction','start_connector','end_connector','lengths','connectors_json','custom_json','adaptor'];
 const LOOM_COLUMNS = ['key','name','lengths','description','custom_json'];
 const COMPONENT_COLUMNS = ['loom_key','component_key','type','count','connectors_json','lengths','custom_json'];
 const RESERVED = ['_Metadata','_Categories','_Components'];
@@ -30,9 +30,9 @@ export function toWorkbook(project,X,{category=null,blank=false}={}) {
     sourceRows[cat]={};
     if(!blank)(project.stock.cables[cat]||[]).forEach((r,i)=>{sourceRows[cat][project.rowIds[cat][i]]=clone(r);rows.push([
       project.rowIds[cat][i],r.name??'',r.direction??'',r.connectors?.male??r.connectors?.end??'',r.connectors?.female??r.connectors?.end??'',
-      Array.isArray(r.lengths)?r.lengths.join(', '):json(r.lengths),json(r.connectors ?? {}),json(omit(r,['name','direction','connectors','lengths']))
+      Array.isArray(r.lengths)?r.lengths.join(', '):json(r.lengths),json(r.connectors ?? {}),json(omit(r,['name','direction','connectors','lengths'])),isCableAdaptor(project,cat,i)?'yes':'no'
     ]);});
-    addSheet(X,book,name,rows,[39,25,19,23,23,45,48,48]);
+    addSheet(X,book,name,rows,[39,25,19,23,23,45,48,48,12]);
   }
   const includeLooms=(!category&&(project.looms.length>0||project.loomTab||blank))||category==='Stock / Pre-Made Looms';
   if(includeLooms){
@@ -51,11 +51,11 @@ export function toWorkbook(project,X,{category=null,blank=false}={}) {
   addSheet(X,book,'_Metadata',meta,[22,65]);return book;
 }
 function rowsOf(book,name,X) {return X.utils.sheet_to_json(book.Sheets[name],{header:1,defval:'',raw:true,blankrows:false});}
-function records(book,name,X,required) {
+function records(book,name,X,required,optional=[]) {
   const [headers,...rows]=rowsOf(book,name,X);if(!headers)return [];
   if(new Set(headers).size!==headers.length)throw new Error(`Duplicate column headers in ${name}.`);
   for(const h of required)if(!headers.includes(h))throw new Error(`${name} is missing the documented ${h} column. Use the app template.`);
-  const unexpected=headers.filter(h=>h&&!required.includes(h));
+  const unexpected=headers.filter(h=>h&&!required.includes(h)&&!optional.includes(h));
   if(unexpected.length)throw new Error(`${name} has unknown columns: ${unexpected.join(', ')}. Move custom data into custom_json to preserve it.`);
   return rows.filter(row=>row.some(v=>v!=='')).map(row=>Object.fromEntries(headers.map((h,i)=>[h,row[i]??''])));
 }
@@ -90,7 +90,7 @@ export function fromWorkbook(book,X,current) {
       for(const row of records(book,map.sheet,X,LOOM_COLUMNS))p.looms.push({...custom(row.custom_json,['id','name','lengths','description','components'],'Loom custom fields'),id:String(row.key||uid()),name:String(row.name),lengths:importedLengths(row.lengths),description:String(row.description),components:[]});
     }else if(map.kind==='cables'){
       p.stock.cables[map.category]=[];p.rowIds[map.category]=[];
-      for(const row of records(book,map.sheet,X,CABLE_COLUMNS)){
+      for(const row of records(book,map.sheet,X,CABLE_COLUMNS.filter(c=>c!=='adaptor'),['adaptor'])){
         const base=metadata?.sourceRows?.[map.category]?.[row.key];
         const result=base?clone(base):{};
         const jsonChanged=!base||String(row.connectors_json)!==json(base.connectors??{});
@@ -115,6 +115,8 @@ export function fromWorkbook(book,X,current) {
         Object.assign(result,custom(row.custom_json,['name','direction','lengths','connectors'],'Cable custom fields'));
         p.stock.cables[map.category].push(result);
         p.rowIds[map.category].push(String(row.key||uid()));
+        if(row.adaptor!==undefined&&!['','yes','no','true','false'].includes(String(row.adaptor).toLowerCase()))throw new Error('Adaptor must be yes or no.');
+        setCableAdaptor(p,map.category,p.rowIds[map.category].length-1,['yes','true'].includes(String(row.adaptor).toLowerCase()));
       }
       if(new Set(p.rowIds[map.category]).size!==p.rowIds[map.category].length)throw new Error(`Duplicate row keys in ${map.category}.`);
     }else throw new Error(`Unknown category kind: ${map.kind}.`);
@@ -136,6 +138,6 @@ export function fromWorkbook(book,X,current) {
 export function replaceWorkbook(current,incoming,partial,mappings) {
   if(!partial){const result=clone(incoming);result.baseline=clone(current.baseline);return result;}
   const result=clone(current);
-  for(const map of mappings){if(map.kind==='looms')result.looms=clone(incoming.looms);else{result.stock.cables[map.category]=clone(incoming.stock.cables[map.category]);result.rowIds[map.category]=clone(incoming.rowIds[map.category]);}}
+  for(const map of mappings){if(map.kind==='looms')result.looms=clone(incoming.looms);else{result.stock.cables[map.category]=clone(incoming.stock.cables[map.category]);result.rowIds[map.category]=clone(incoming.rowIds[map.category]);result.stock.cables[map.category].forEach((_,i)=>setCableAdaptor(result,map.category,i,isCableAdaptor(incoming,map.category,i)));}}
   return result;
 }

@@ -106,3 +106,57 @@ test('manifest filename mismatch is reported without rewriting it',()=>{const p=
 test('grid rejects duplicate lengths and non-object JSON cells atomically',()=>{assert.throws(()=>parseCell('1,1',{type:'lengths'}),/Duplicate/);assert.throws(()=>parseCell('[]',{type:'json'}),/JSON object/);});
 test('non-finite JSON values are rejected instead of becoming null on export',()=>assert.throws(()=>M.parseJSON('{"length":1e400}'),/finite/));
 test('all HTML script, stylesheet and documentation paths resolve locally',()=>{const html=fs.readFileSync(`${root}index.html`,'utf8');for(const match of html.matchAll(/(?:src|href)="([^"]+)"/g)){const path=match[1];if(!/^(?:[a-z]+:|#)/i.test(path))assert(fs.existsSync(`${root}${path}`),path);}for(const name of ['app','excel','grid','model','version']){const js=fs.readFileSync(`${root}js/${name}.js`,'utf8');for(const m of js.matchAll(/from '(.+?)'/g))assert(fs.existsSync(`${root}js/${m[1]}`),m[1]);}});
+test('vendor manifest sync includes every vendor and preserves original entries',()=>{
+  const r=M.clone(refs),first=M.clone(r.manifest.catalogues[0]);M.syncVendorManifest(r);
+  assert.equal(r.manifest.catalogues.length,15);assert.deepEqual(r.manifest.catalogues[0],first);
+  assert.equal(r.manifest.catalogues.find(x=>x.vendor==='Adlib').file,'json/cable/adlib_cable.json');
+  const once=M.clone(r.manifest);M.syncVendorManifest(r);assert.deepEqual(r.manifest,once);
+  assert(r.manifest.catalogues.every(x=>Object.keys(x).join(',')==='vendor,file'));
+});
+test('generated manifest paths handle collisions and never overwrite existing paths',()=>{
+  const r={lighting_vendors:{vendors:[{name:'A B'},{name:'A-B'},{name:'Existing'},{name:''}]},manifest:{catalogues:[{vendor:'Existing',file:'json/custom.json'}]}};
+  M.syncVendorManifest(r);assert.deepEqual(r.manifest.catalogues.map(x=>x.file),['json/custom.json','json/cable/a_b_cable.json','json/cable/a_b_2_cable.json']);
+});
+test('known category and alias seed associated cable types, custom category stays empty',()=>{
+  const r=M.clone(refs);r.categories.items[0].aliases.push('Control');
+  const seeded=M.categoryCables('Control',r);assert.equal(seeded.length,9);
+  assert(seeded.every(x=>x.row.lengths.length===0));assert.deepEqual(seeded[0].row.connectors,source.cables.Data[0].connectors);
+  seeded[0].row.connectors.male='Changed';assert.equal(r.cable_types.items[0].connectors.male,'XLR-3');
+  assert.deepEqual(M.categoryCables('Unlisted',r),[]);
+});
+test('adaptor marker is generator-only, tracked in changes and restored in backups',()=>{
+  const p=fresh();M.setCableAdaptor(p,'Data',0,true);assert(M.isCableAdaptor(p,'Data',0));
+  assert.deepEqual(M.runtimeJSON(p),source);assert.equal(M.changes(p)[0].kind,'modified');
+  assert(M.isCableAdaptor(M.restoreProject(JSON.parse(JSON.stringify(p))),'Data',0));
+  M.setCableAdaptor(p,'Data',0,false);assert.deepEqual(M.changes(p),[]);
+});
+test('adaptor marker survives full and partial Excel replacement and merge',()=>{
+  const p=fresh();M.setCableAdaptor(p,'Data',0,true);
+  const full=roundtrip(p);assert(M.isCableAdaptor(full.project,'Data',0));assert.deepEqual(full.project.stock,source);
+  const partial=roundtrip(p,{category:'Data'}),replaced=replaceWorkbook(fresh(),partial.project,true,partial.categories);
+  assert(M.isCableAdaptor(replaced,'Data',0));assert(M.isCableAdaptor(M.mergeProjects(fresh(),full.project),'Data',0));
+});
+test('legacy Excel without adaptor column remains importable',()=>{
+  const p=fresh(),book=toWorkbook(p,X);delete book.Sheets.Data.I1;
+  for(let i=2;i<=10;i++)delete book.Sheets.Data[`I${i}`];
+  const result=fromWorkbook(book,X,p);assert.deepEqual(result.project.stock,source);
+});
+test('adaptor Excel input rejects unknown values',()=>{const p=fresh(),book=toWorkbook(p,X);book.Sheets.Data.I2={t:'s',v:'maybe'};assert.throws(()=>fromWorkbook(book,X,p),/Adaptor/);});
+const palette=JSON.parse(fs.readFileSync(`${root}reference/colour_options.json`));
+test('colours resolve only to supplied Lampy hex values and no-colour aliases',()=>{
+  assert.equal(M.resolveColour('Red',palette),'#FF0000');assert.equal(M.resolveColour('Cyan',palette),'#008EE6');assert.equal(M.resolveColour('Clear',palette),'');
+  assert.equal(M.resolveColour('#9c54ff',palette),'#9C54FF');
+  assert.throws(()=>M.resolveColour('G',palette),/Ambiguous/);assert.throws(()=>M.resolveColour('#123456',palette),/Choose a colour/);
+});
+test('length colours separate vendors and units, validate duplicates and all three fields',()=>{
+  const row={vendor:'Test',unit:'m',length:5,colour1:'#FF0000',colour2:'#FFFFFF',colour3:''};
+  assert.deepEqual(M.validateLengthColours({items:[row,{...row,unit:'ft'},{...row,vendor:'Other'}]},palette),[]);
+  const problems=M.validateLengthColours({items:[row,{...row,colour3:'Unknown'}]},palette);
+  assert(problems.some(x=>x.field==='length'));assert(problems.some(x=>x.field==='colour3'));
+  assert(M.validateLengthColours({items:[{...row,length:-1}]},palette).some(x=>x.field==='length'));
+});
+test('table parsers reject invalid adaptor, positive length and colour values before edits',()=>{
+  assert.equal(parseCell('yes',{type:'boolean'}),true);assert.equal(parseCell('no',{type:'boolean'}),false);assert.throws(()=>parseCell('maybe',{type:'boolean'}));
+  assert.equal(parseCell('12.5',{type:'positive'}),12.5);assert.throws(()=>parseCell('0',{type:'positive'}));
+  assert.throws(()=>parseCell('B',{parse:v=>M.resolveColour(v,palette)}),/Ambiguous/);
+});

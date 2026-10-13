@@ -2,6 +2,9 @@ import {clone, object, parseJSON, parseLengths} from './model.js';
 
 export function display(value) { return Array.isArray(value) ? value.join(', ') : value && typeof value === 'object' ? JSON.stringify(value) : String(value ?? ''); }
 export function parseCell(value, column) {
+  if(column.parse)return column.parse(value);
+  if(column.type==='boolean'){const text=String(value).trim().toLowerCase();if(!['','yes','no','true','false'].includes(text))throw new Error('Use yes or no.');return ['yes','true'].includes(text);}
+  if(column.type==='positive'){const n=Number(value);if(!Number.isFinite(n)||n<=0)throw new Error('Use one positive number.');return n;}
   if (column.type === 'lengths') {const parsed=parseLengths(value);if(parsed.duplicates.length)throw new Error(`Duplicate lengths: ${parsed.duplicates.join(', ')}. Remove duplicates or use the chip editor.`);return parsed.values;}
   if (column.type === 'aliases') return String(value).split(/[;,]/).map(x => x.trim()).filter(Boolean);
   if (column.type === 'json') {const parsed=parseJSON(String(value).trim() || '{}');if(!object(parsed))throw new Error('This column needs a JSON object.');return parsed;}
@@ -47,6 +50,7 @@ export class Grid {
     const toolbar=el('div',null,'grid-toolbar');
     const button=(label,fn,title)=>{const b=el('button',label);b.type='button';if(title)b.title=title;b.onclick=fn;toolbar.append(b);return b;};
     button('+ Row',()=>{this.o.add();this.render();});
+    button('Save',()=>{if(this.editor.value!==this.editorOriginal&&!this.commitEditor())return;this.o.save?.();},'Save this table locally');
     button('Undo',()=>this.o.undo()); button('Redo',()=>this.o.redo());
     button('Copy',()=>this.copy()); button('Paste',()=>this.pasteClipboard());
     button('Fill down',()=>this.fill());
@@ -91,9 +95,12 @@ export class Grid {
         if(this.o.changed?.(id,col.key))td.classList.add('changed');
         if(this.o.added?.(id))td.classList.add('added');
         const value=this.o.get(row,col.key);
-        if(col.type==='lengths'){
+        if(col.type==='boolean'){
+          const check=el('input');check.type='checkbox';check.checked=!!value;check.setAttribute('aria-label',`${col.label}, row ${r+1}`);check.onclick=e=>e.stopPropagation();check.onchange=()=>this.apply([{id,col,text:String(check.checked)}]);td.append(check);
+        }else if(col.render){col.render(value,td);
+        }else if(col.type==='lengths'){
           const chips=el('div',null,'cell-chips');
-          if(Array.isArray(value))value.forEach(v=>chips.append(el('span',String(v),'chip mini')));else chips.append(el('span',display(value),'invalid'));
+          if(Array.isArray(value))value.forEach(v=>chips.append(this.o.lengthChip?.(v)||el('span',String(v),'chip mini')));else chips.append(el('span',display(value),'invalid'));
           td.append(chips);
           const edit=el('button','Edit lengths','cell-action');edit.onclick=e=>{e.stopPropagation();this.o.lengths(id);};td.append(edit);
         }else td.append(el('span',display(value),'cell-text'));
@@ -114,12 +121,14 @@ export class Grid {
     const b=this.bounds();this.table.querySelectorAll('td[data-r]').forEach(td=>{const r=+td.dataset.r,c=+td.dataset.c,selected=r>=b.r&&r<=b.rr&&c>=b.c&&c<=b.cc;td.classList.toggle('selected',selected);td.setAttribute('aria-selected',String(selected));td.querySelector('.fill-handle')?.remove();});
     const {r,c}=this.selection;this.address.textContent=`${String.fromCharCode(65+c)}${r+1}`;
     this.editor.value=this.ids[r]===undefined?'':display(this.o.get(this.o.rows()[this.ids[r]],this.o.columns[c].key));
+    this.editorOriginal=this.editor.value;
+    this.editor.disabled=!!this.o.readOnly?.(this.ids[r],this.o.columns[c].key);
     this.editor.setAttribute('list',this.o.columns[c].list||'');
     const last=this.table.querySelector(`td[data-r="${b.rr}"][data-c="${b.cc}"]`);
     if(last){const h=el('span',null,'fill-handle');h.title='Drag to copy selected cells';h.onpointerdown=e=>{e.stopPropagation();e.preventDefault();this.filling=clone(this.bounds());const finish=()=>{const source=this.filling;this.filling=null;this.filled=true;this.fill(source);document.removeEventListener('pointerup',finish);};document.addEventListener('pointerup',finish);};last.append(h);}
   }
   focusCell(r=this.selection.r,c=this.selection.c){const td=this.table.querySelector(`td[data-r="${r}"][data-c="${c}"]`);td?.focus({preventScroll:true});td?.scrollIntoView({block:'nearest',inline:'nearest'});}
-  commitEditor(){const {r,c}=this.selection;if(this.ids[r]===undefined)return;this.apply([{id:this.ids[r],col:this.o.columns[c],text:this.editor.value}]);}
+  commitEditor(){const {r,c}=this.selection;if(this.ids[r]===undefined)return true;return this.apply([{id:this.ids[r],col:this.o.columns[c],text:this.editor.value}]);}
   edit(r,c,initial){const col=this.o.columns[c];if(col.type==='lengths'){this.o.lengths(this.ids[r]);return;}this.select(r,c);this.editor.focus();if(initial!==undefined)this.editor.value=initial;else this.editor.select();this.editor.setAttribute('list',col.list||'');}
   key(e){
     if(e.target.closest('input'))return;
@@ -144,9 +153,14 @@ export class Grid {
   }catch(error){this.o.notice(error.message,true);}}
   apply(patches,allowNew=false){try{
     // Parse every cell before mutating anything: a bad rectangle is atomic.
-    const parsed=patches.map(p=>({...p,value:parseCell(p.text,p.col)}));
+    const parsed=patches.filter(p=>{
+      if(!this.o.readOnly?.(p.id,p.col.key,patches))return true;
+      if(String(p.text).trim())throw new Error('Direction is editable only for adaptors.');
+      return false;
+    }).map(p=>({...p,value:parseCell(p.text,p.col)}));
     this.o.apply(parsed,allowNew);this.renderBody();this.focusCell();
-  }catch(error){this.o.notice(`${error.message} No cells from this operation were changed.`,true);}}
+    return true;
+  }catch(error){this.o.notice(`${error.message} No cells from this operation were changed.`,true);return false;}}
   fill(source){const target=this.bounds();source||={r:target.r,rr:target.r,c:target.c,cc:target.cc};const patches=[];
     for(let r=target.r;r<=target.rr;r++)for(let c=target.c;c<=target.cc;c++){
       const sr=source.r+(r-target.r)%(source.rr-source.r+1),sc=source.c+(c-target.c)%(source.cc-source.c+1);
