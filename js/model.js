@@ -97,6 +97,31 @@ export function baselineRow(project, category, index) {
   const oldIndex = project.baseline?.rowIds?.[category]?.indexOf(id) ?? -1;
   return oldIndex < 0 ? undefined : project.baseline.stock.cables[category]?.[oldIndex];
 }
+// Plain stock JSON has no row IDs. Reconcile a preview copy only; importing
+// still establishes a fresh baseline and never adds IDs to Lampy JSON.
+export function stockImportChanges(incoming, current) {
+  const preview = clone(incoming);
+  for (const [category, rows] of Object.entries(preview.stock.cables)) {
+    const oldRows = current.stock.cables[category] || [];
+    const available = new Set(oldRows.map((_, i) => i));
+    const matched = new Map();
+    rows.forEach((row, i) => {
+      const old = [...available].find(j => same(row, oldRows[j]));
+      if (old !== undefined) { matched.set(i, old); available.delete(old); }
+    });
+    const unmatched = rows.map((_, i) => i).filter(i => !matched.has(i));
+    for (const i of unmatched) {
+      const name = rows[i].name;
+      if (typeof name !== 'string' || !name.trim()) continue;
+      const candidates = [...available].filter(j => oldRows[j].name === name);
+      if (candidates.length === 1 && unmatched.filter(j => rows[j].name === name).length === 1) {
+        matched.set(i, candidates[0]); available.delete(candidates[0]);
+      }
+    }
+    preview.rowIds[category] = rows.map((_, i) => matched.has(i) ? current.rowIds[category][matched.get(i)] : uid());
+  }
+  return changes(preview, snapshot(current));
+}
 export function changes(project, baseline = project.baseline) {
   if (!baseline) return [];
   const result = [];

@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.0.1 — 2026-10-13
+
+Previous version: v1.0.0. Local patch release, ready for user upload; not deployed by the builder.
+
+### Fix
+
+- Re-importing unchanged cable-stock JSON now shows zero changes instead of counting every cable as both added and removed.
+- Preview matches exact row content first, then unambiguous remaining names within each category. Actual modifications, additions, removals and row-order changes remain visible.
+- Matching operates on a preview copy. Cancelling, import baselines, project-backup IDs and Lampy output schemas retain their existing behaviour.
+
+### Files
+
+Updated: `js/model.js`, `js/app.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`.
+
+Added: none. Deleted: none. Original reference JSONs and logos unchanged.
+
+### Validation and limitations
+
+- All 53 automated tests passed, including seven new JSON-preview regressions covering identical input, real changes, row order, duplicate names, metadata, category changes, loom removal and non-mutation.
+- Authorised local Chromium tests verified zero changes for the original file, one modification for one edited length, cancellation without draft changes, accepted import with a fresh baseline, the v1.0.1 footer and no console errors.
+- Stock JSON has no stable row IDs: renames and ambiguous duplicate-name edits remain additions/removals rather than guessed matches. Project backups continue to use their stored IDs.
+- No GitHub changes or deployment checks were performed for this patch. Safari, Firefox and native Excel were not retested; the automated Excel regression suite passed. Existing v1.0.0 compatibility limits still apply.
+
 ## v1.0.0 — 2026-10-13
 
 Initial local release. Previous version: none (handover inputs only).

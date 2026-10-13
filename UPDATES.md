@@ -7,6 +7,7 @@
 
 ## Completed
 
+- v1.0.1: Fixed false additions/removals in plain JSON import previews; added seven regression tests and verified identical/changed imports, cancellation and accepted-import baselines in local Chromium.
 - Initial cable-stock-only application, v1.0.0.
 - Vendor selection, logos, unit choice, independent generator vendor version and custom metadata.
 - Editable cable-category and Settings tables, length chips, aliases and connector defaults/overrides.
@@ -19,8 +20,8 @@
 ## Notes
 
 - BUILD_BRIEF.md remains authoritative. Read this file before subsequent changes.
-- All GitHub upload and deployment actions belong to the user. No repository was inspected.
-- Browser testing was authorised for this initial build only. Every future update needs fresh explicit browser-test approval.
+- The user separately authorised the first GitHub upload and configured GitHub Pages. This v1.0.1 update is local only; the user will upload the changed files.
+- Browser testing was explicitly authorised for this v1.0.1 fix. Every future update still needs fresh explicit browser-test approval.
 - Application version is defined in js/version.js. Vendor version is separate.
 - No production manifest location outside the supplied reference path was inferred.
 

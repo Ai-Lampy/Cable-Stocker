@@ -12,7 +12,7 @@ python3 -m http.server 8080 --bind 127.0.0.1
 
 Open `http://localhost:8080`. Keep the terminal running while using the app. No install or build is needed. Do not open `index.html` using `file://`: browsers prevent its reference-file requests.
 
-For manual GitHub Pages upload, retain the complete folder structure and use this folder as the published static root. All application requests use relative paths, including under a repository subpath. Nothing has been uploaded or deployed by the builder.
+For manual GitHub Pages upload, retain the complete folder structure and use this folder as the published static root. All application requests use relative paths, including under a repository subpath. For later updates, replace changed files at those same relative paths.
 
 ## Work with cable stock
 
@@ -24,6 +24,8 @@ For manual GitHub Pages upload, retain the complete folder structure and use thi
 6. Open **Review & export**. Errors do not block JSON previews, copying or downloads. A downloaded file with errors is not labelled valid.
 
 Changing the vendor name keeps the current stock and asks before doing so when stock exists. Use **New vendor** for an empty document. Imports, category deletion and row deletion have review/confirmation. Undo/redo covers vendor, cable, loom and reference edits for the current session (up to 100 operations).
+
+Plain cable-stock JSON import previews compare against your current draft by matching identical rows first, then matching a single remaining row with the same name in the same category. An unchanged file reports zero changes. Renames and ambiguous duplicate-name edits appear as additions/removals because stock JSON has no persistent row IDs. Project backups retain their existing ID-based comparison. Cancelling leaves your draft untouched; accepting a stock JSON import establishes a fresh baseline.
 
 ## Three output types
 
@@ -105,7 +107,7 @@ Run `node --test tests/core.test.mjs` with Node 22+ recommended. Tests use gener
 
 Target current Chromium, Firefox and Safari with ES modules, native dialog, structuredClone, localStorage and CSS zoom. Browser tests used Codex Chromium. Older browsers, mobile drag gestures and native Excel/LibreOffice behaviour are not certified. Clipboard buttons depend on permission; keyboard copy/paste is the fallback.
 
-Tool Tracker Inventory Table View and footer were inspected read-only. No live-site changes were made. GitHub was not inspected or deployed. Static-path checks are not a deployment result. Future browser testing requires fresh approval, per `BUILD_BRIEF.md`.
+Tool Tracker Inventory Table View and footer were inspected read-only. No changes were made to that reference site. The user authorised the initial GitHub upload separately and configured GitHub Pages. The deployed v1.0.0 was subsequently tested. The v1.0.1 fix was tested locally with fresh browser-test approval and awaits the user's upload; those local checks do not verify its deployment. Future browser testing requires fresh approval, per `BUILD_BRIEF.md`.
 
 Bundled library: SheetJS CE 0.20.3 from its official CDN, with Apache 2.0 licence in `vendor/SHEETJS-LICENSE.txt`. Documentation: https://docs.sheetjs.com/docs/getting-started/installation/standalone/.
 

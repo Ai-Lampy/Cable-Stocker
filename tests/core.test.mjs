@@ -29,6 +29,50 @@ test('unsupported root structures rejected before import',()=>{for(const v of [{
 test('prototype pollution keys rejected',()=>assert.throws(()=>M.parseJSON('{"__proto__":{"polluted":true}}')));
 test('changes follow stable row IDs after deletions',()=>{const p=fresh();p.stock.cables.Data.splice(0,1);p.rowIds.Data.splice(0,1);assert.deepEqual(M.changes(p).map(x=>x.kind),['removed']);assert.equal(M.baselineRow(p,'Data',0).name,'XLR-4');});
 test('new and changed cells compare to imported baseline',()=>{const p=fresh();p.stock.cables.Data[0].lengths.push(999);p.stock.cables.Data.push(M.defaultCable());p.rowIds.Data.push(M.uid());assert.deepEqual(M.changes(p).map(x=>x.kind),['modified','added']);});
+test('identical stock JSON import preview reports zero changes without mutating either project',()=>{
+  const current=fresh(),incoming=fresh(),before=M.clone({current,incoming});
+  assert.deepEqual(M.stockImportChanges(incoming,current),[]);
+  assert.deepEqual({current,incoming},before);
+  assert.deepEqual(M.changes(incoming),[]);
+});
+test('stock JSON import preview reports changed lengths and unknown fields as modifications',()=>{
+  const current=fresh(),stock=M.clone(source);stock.cables.Data[0].lengths.push(999);stock.cables.Data[1].custom={colour:'blue'};
+  assert.deepEqual(M.stockImportChanges(M.projectFromStock(stock,current.filename),current),[
+    {category:'Data',kind:'modified',name:'XLR-3'},{category:'Data',kind:'modified',name:'XLR-4'}]);
+});
+test('stock JSON import preview separates insertions, removals and row order',()=>{
+  const current=fresh(),stock=M.clone(source);stock.cables.Data.splice(1,1);stock.cables.Data.reverse();stock.cables.Data.splice(2,0,{name:'New cable',lengths:[3]});
+  assert.deepEqual(M.stockImportChanges(M.projectFromStock(stock,current.filename),current),[
+    {category:'Data',kind:'modified',name:'Row order'},{category:'Data',kind:'added',name:'New cable'},{category:'Data',kind:'removed',name:'XLR-4'}]);
+});
+test('stock JSON preview matches duplicate names by full content before changed rows',()=>{
+  const current=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[{name:'Same',lengths:[1]},{name:'Same',lengths:[2]}]}});
+  const incoming=M.projectFromStock({vendor:current.stock.vendor,cables:{Data:[{name:'Same',lengths:[3]},{name:'Same',lengths:[2]}]}});
+  assert.deepEqual(M.stockImportChanges(incoming,current),[{category:'Data',kind:'modified',name:'Same'}]);
+});
+test('stock JSON preview handles identical duplicates one-to-one and leaves ambiguous matches explicit',()=>{
+  const current=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[{name:'Same',lengths:[1]},{name:'Same',lengths:[1]}]}});
+  assert.deepEqual(M.stockImportChanges(M.projectFromStock(current.stock),current),[]);
+  const incoming=M.projectFromStock({vendor:current.stock.vendor,cables:{Data:[{name:'Same',lengths:[2]},{name:'Same',lengths:[3]}]}});
+  assert.deepEqual(M.stockImportChanges(incoming,current).map(x=>x.kind),['added','added','removed','removed']);
+});
+test('stock JSON preview keeps renames, category changes and generator data removal visible',()=>{
+  const current=fresh();current.vendorVersion='v2';current.looms=[{id:'loom',name:'Saved loom',lengths:[30],components:[]}];
+  const stock=M.clone(source);stock.cables.Data[0].name='Renamed';stock.cables.Empty=[];delete stock.cables.Motor;
+  const result=M.stockImportChanges(M.projectFromStock(stock,current.filename),current);
+  for(const expected of [
+    {category:'Vendor',kind:'modified',name:'Generator vendor version'},
+    {category:'Data',kind:'added',name:'Renamed'},{category:'Data',kind:'removed',name:'XLR-3'},
+    {category:'Motor',kind:'removed',name:'Category'},{category:'Empty',kind:'added',name:'Category'},
+    {category:'Stock / Pre-Made Looms',kind:'removed',name:'Saved loom'}])assert(result.some(x=>M.same(x,expected)));
+});
+test('stock JSON preview compares the current draft, including vendor/root metadata, not its import baseline',()=>{
+  const current=fresh();current.stock.cables.Data[0].lengths.push(999);
+  const incoming=M.projectFromStock(current.stock,current.filename);
+  assert.deepEqual(M.stockImportChanges(incoming,current),[]);
+  incoming.stock.vendor.custom='changed';incoming.stock.extra={a:1};
+  assert.deepEqual(M.stockImportChanges(incoming,current).map(x=>x.name),['Vendor metadata','Root custom fields']);
+});
 test('semantic equality ignores object field order, but preserves array order',()=>{assert(M.same({x:1,y:2},{y:2,x:1}));assert(!M.same([1,2],[2,1]));});
 test('vendor version increment independent of app/runtime version',()=>{assert.equal(M.incrementVersion('v2',false),'v2.1');assert.equal(M.incrementVersion('v2.9',true),'v3');assert.throws(()=>M.incrementVersion('bad',true));const p=fresh();p.vendorVersion='v3';assert(!('version' in M.runtimeJSON(p).vendor));});
 test('runtime excludes editor data, loom content, IDs and preferences',()=>{const p=fresh();p.looms=[{id:'loom-test',name:'Fixture test',lengths:[30],components:[]}];p.vendorVersion='v4';assert.deepEqual(M.runtimeJSON(p),source);assert(M.validate(p).some(i=>i.message.includes('generator backup')));});
