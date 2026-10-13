@@ -1,5 +1,37 @@
 # Changelog
 
+## v1.1.2 — 2026-10-14
+
+Previous version: v1.1.1.
+
+- Set table header/data rows to 35 px at 100% table zoom, including full-cell colour pickers. Long text and length-chip lists scroll inside their cells instead of increasing row height.
+- Updated: `css/app.css`, `js/version.js`, `UPDATES.md`, `CHANGELOG.md`.
+- Created/deleted: none. JSON schemas and original inputs unchanged.
+- Validation: checked CSS sizing and version consistency locally. Browser testing not run; fresh approval required. Table zoom scales the 35 px base height. No upload or deployment performed.
+
+## v1.1.1 — 2026-10-14
+
+Previous version: v1.1.0. Local update for manual upload; not deployed by the builder.
+
+### Changes
+
+- Show only the selected vendor’s length colours in its active unit. New and pasted rows inherit both values; remove vendor/unit columns and show context above the table. Preserve hidden vendors in edits, deletions and dataset downloads. Error links identify hidden vendor assignments without selecting a different vendor’s row.
+- Replace small swatches with colour-filled table cells and a scrollable Lampy palette matching the supplied reference image. Apply colour directly to the table cell, without inset bubbles. Support keyboard selection, No Colour, typed aliases through the cell editor, and correct placement with table zoom.
+- Move Save table to the far right and make it prominent on every table. Successful saves clear only that table’s edit/addition highlights; later edits highlight again. Persist visual baselines separately from the original import/export-review baseline. Invalid input and blocked saves retain highlights.
+
+### Files
+
+Updated: `js/app.js`, `js/grid.js`, `js/version.js`, `css/app.css`, `README.md`, `UPDATES.md`, `CHANGELOG.md`.
+
+Created: none. Deleted: none. Supplied reference image, JSON examples, palette, schemas and logos unchanged.
+
+### Validation and limitations
+
+- All 63 automated regression tests passed, including JSON import previews, schema preservation and Excel round trips.
+- Approved local Chromium testing passed: vendor/unit isolation, inherited context, multi-row paste, sorted deletion, full-dataset preview, mouse/keyboard palette choice, zoom placement, table-only highlight clearing, reload persistence, subsequent edit highlighting, retained export review, invalid cell rejection and concurrent-tab save protection. No browser console errors observed.
+- Modern browser popover support is required for the styled palette. Firefox/Safari and native Excel were not tested for this update. Existing loom export compatibility limitation remains.
+- No GitHub files were changed and no deployment was performed or verified.
+
 ## v1.1.0 — 2026-10-13
 
 Previous version: v1.0.1. Local feature release, ready for user upload; not deployed by the builder.

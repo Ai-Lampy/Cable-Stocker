@@ -1,4 +1,4 @@
-import {clone, object, parseJSON, parseLengths} from './model.js';
+import {clone, same, object, parseJSON, parseLengths} from './model.js';
 
 export function display(value) { return Array.isArray(value) ? value.join(', ') : value && typeof value === 'object' ? JSON.stringify(value) : String(value ?? ''); }
 export function parseCell(value, column) {
@@ -50,7 +50,6 @@ export class Grid {
     const toolbar=el('div',null,'grid-toolbar');
     const button=(label,fn,title)=>{const b=el('button',label);b.type='button';if(title)b.title=title;b.onclick=fn;toolbar.append(b);return b;};
     button('+ Row',()=>{this.o.add();this.render();});
-    button('Save',()=>{if(this.editor.value!==this.editorOriginal&&!this.commitEditor())return;this.o.save?.();},'Save this table locally');
     button('Undo',()=>this.o.undo()); button('Redo',()=>this.o.redo());
     button('Copy',()=>this.copy()); button('Paste',()=>this.pasteClipboard());
     button('Fill down',()=>this.fill());
@@ -64,6 +63,14 @@ export class Grid {
     const align=el('select');align.setAttribute('aria-label','Text alignment');
     for(const value of ['left','center','right']){const option=el('option',`${value[0].toUpperCase()+value.slice(1)} align`);option.value=value;align.append(option);}align.value=this.prefs.align;align.onchange=()=>{this.prefs.align=align.value;this.updateStyle();};toolbar.append(align);
     button('Wrap text',()=>{this.prefs.wrap=!this.prefs.wrap;this.updateStyle();});
+    const save=button('Save table',()=>{
+      if(this.editor.value!==this.editorOriginal&&!this.commitEditor())return;
+      if(this.o.save?.()!==true)return;
+      const previous=this.prefs.highlights;
+      this.prefs.highlights={context:this.o.highlightContext,rows:this.o.rows().map((r,i)=>({id:this.o.rowKey?.(r,i)??i,values:Object.fromEntries((this.o.highlightColumns||this.o.columns).map(c=>[c.key,clone(this.o.get(r,c.key))]))}))};
+      try{localStorage.setItem(`lampy-grid:${this.o.key}`,JSON.stringify(this.prefs));this.renderBody();if(!this.host.isConnected)this.o.saved?.();}
+      catch{this.prefs.highlights=previous;this.o.notice('Data saved, but table highlights could not be saved.',true);}
+    },'Save this table locally and clear its edit highlights');save.className='primary save-table';
     this.host.append(toolbar);
     const formula=el('div',null,'formula-bar');this.address=el('span','A1','cell-address');this.editor=el('input');this.editor.setAttribute('aria-label','Selected cell contents');
     this.editor.onkeydown=e=>{if(e.key==='Enter'){this.commitEditor();this.focusCell();}if(e.key==='Escape')this.select(this.selection.r,this.selection.c);};
@@ -92,12 +99,14 @@ export class Grid {
       const row=this.o.rows()[id],tr=el('tr');const num=el('th',String(r+1));num.scope='row';tr.append(num);
       this.o.columns.forEach((col,c)=>{
         const td=el('td');td.dataset.r=r;td.dataset.c=c;td.tabIndex=-1;td.setAttribute('role','gridcell');td.setAttribute('aria-label',`${col.label}, row ${r+1}`);
-        if(this.o.changed?.(id,col.key))td.classList.add('changed');
-        if(this.o.added?.(id))td.classList.add('added');
+        const saved=this.prefs.highlights?.context===this.o.highlightContext?this.prefs.highlights:null;
+        const previous=saved?.rows.find(r=>r.id===(this.o.rowKey?.(row,id)??id));
+        if(saved?!!previous&&!same(previous.values[col.key],this.o.get(row,col.key)):this.o.changed?.(id,col.key))td.classList.add('changed');
+        if(saved?!previous:this.o.added?.(id))td.classList.add('added');
         const value=this.o.get(row,col.key);
         if(col.type==='boolean'){
           const check=el('input');check.type='checkbox';check.checked=!!value;check.setAttribute('aria-label',`${col.label}, row ${r+1}`);check.onclick=e=>e.stopPropagation();check.onchange=()=>this.apply([{id,col,text:String(check.checked)}]);td.append(check);
-        }else if(col.render){col.render(value,td);
+        }else if(col.render){col.render(value,td,{commit:text=>this.apply([{id,col,text}])});
         }else if(col.type==='lengths'){
           const chips=el('div',null,'cell-chips');
           if(Array.isArray(value))value.forEach(v=>chips.append(this.o.lengthChip?.(v)||el('span',String(v),'chip mini')));else chips.append(el('span',display(value),'invalid'));

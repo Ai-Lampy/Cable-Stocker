@@ -7,6 +7,13 @@
 
 ## Completed
 
+- v1.1.2: Set table header/data rows to 35 px at 100% table zoom, including colour cells. Long cell text/chip lists scroll inside the compact rows.
+
+- v1.1.1: Length colours show only the selected vendor and unit. Added/pasted rows inherit that context; vendor/unit columns removed.
+- Colour-filled table cells and scrollable palette follow the supplied picker image, including keyboard selection and table-zoom placement.
+- Prominent Save table buttons at the far right clear only their table’s edit highlights. Original export-review baselines remain intact.
+- Local tests verified vendor/unit isolation, scoped paste/deletion, save/reload, later edits, invalid input and concurrent-tab protection.
+
 - v1.1.0: Lighting Vendors adds missing manifest entries with user-approved generated filenames and preserves existing paths.
 - Category dropdown with typed entries and automatic cable-type/connector seeding for recognised categories.
 - Adaptor checkbox and adaptor-only direction editing; existing runtime direction values retained.
@@ -27,8 +34,8 @@
 ## Notes
 
 - BUILD_BRIEF.md remains authoritative. Read this file before subsequent changes.
-- The user separately authorised the first GitHub upload and configured GitHub Pages. This v1.1.0 update is local only; the user will upload the changed files.
-- Browser testing was explicitly authorised for this v1.1.0 update. Every future update still needs fresh explicit browser-test approval.
+- The user separately authorised the first GitHub upload and configured GitHub Pages. This v1.1.2 update is local only; the user will upload the changed files.
+- Browser testing was not run for v1.1.2; fresh approval is required. Prior v1.1.1 browser testing remains recorded in CHANGELOG.md.
 - The supplied colour_options.json is unchanged. New length_colours.json stores generator-only assignments; no unsupported colour/adaptor fields enter Lampy runtime JSON.
 - Application version is defined in js/version.js. Vendor version is separate.
 - No production manifest location outside the supplied reference path was inferred.

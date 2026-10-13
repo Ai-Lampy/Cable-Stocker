@@ -41,7 +41,7 @@ Vendor versions such as `v2` and `v2.1` are independent of the app version. Majo
 
 ## Tables
 
-Every cable, Settings and loom-component table has **Save**. It commits the cell currently being edited and saves the workspace in this browser. Invalid cell input prevents that save and displays a message. Save does not upload or rewrite the hosted files. Download project/Excel backups for vendor work and separate JSON files for Settings data.
+Every cable, Settings and loom-component table has a prominent **Save table** button at the far right. It commits the cell currently being edited and saves the workspace in this browser. A successful save clears that table’s yellow edit and green added-row highlights, including rows hidden by its search. Other tables keep their highlights. Later edits highlight again; the saved visual baseline survives reload. Cell selection remains visible. The original import baseline remains intact for export reviews. Invalid cell input prevents that save and displays a message. Save does not upload or rewrite the hosted files. Download project/Excel backups for vendor work and separate JSON files for Settings data.
 
 - Arrows, Enter, Tab and Shift+Tab move between cells. Shift+arrows or Shift+click extends a range. Ctrl/⌘ A selects the table.
 - Ctrl/⌘ C and Ctrl/⌘ V copy/paste rectangular Excel-compatible TSV. Quoted multiline cells are supported. Toolbar Copy/Paste uses clipboard permission when available.
@@ -86,7 +86,7 @@ Excel's 32,767-character limit applies to each cell. Oversized row metadata requ
 
 Lighting Vendors automatically adds missing vendors to Vendor Manifest on startup and after edits. Existing catalogue paths remain untouched. New paths use `json/cable/<vendor_name>_cable.json`, with lowercase underscores and numbered suffixes for collisions. Removing or renaming a vendor does not delete its older manifest entry automatically. Review those entries manually. This creates lookup entries, not the referenced cable-stock files. Download `manifest.json` to retain the expanded catalogue; the supplied original stays unchanged.
 
-Settings → **Length colour** assigns a vendor, unit (`m` or `ft`), positive length, and **Colour 1 / Colour 2 / Colour 3** per row. Different vendors and units can use different codes for the same number. Duplicate vendor/unit/length rows appear in Errors. Blank colour fields mean No Colour.
+Settings → **Length colour** shows only the vendor selected on the Vendor tab, in that vendor’s current unit (`m` or `ft`). Vendor and unit appear above the table; its columns are **Length / Colour 1 / Colour 2 / Colour 3**. Added and pasted rows inherit the selected vendor and unit. Switching vendor or unit hides other assignments without deleting them. The full dataset download retains every vendor. Different vendors and units can use different codes for the same number. Duplicate vendor/unit/length rows appear in Errors. Blank colour fields mean No Colour. Colour-filled table cells open a scrollable palette based on the supplied picker image. Choose with the mouse or arrow keys and Enter; Escape closes the palette. Typed names/aliases remain available through the selected-cell editor and paste.
 
 Colours resolve exclusively through the unchanged `reference/colour_options.json`. Full names, unambiguous aliases and palette hex codes are accepted; ambiguous abbreviations such as `G`, `B` and `P` require a full name. Assignments store the palette's exact hex values. Matching length chips display three colour bands. A colour assignment never converts or changes cable lengths.
 
@@ -120,9 +120,9 @@ The app warns on leaving with unexported edits where permitted. Storage failures
 
 Run `node --test tests/core.test.mjs` with Node 22+ recommended. Tests use generated internal fixtures, never modify original sources, and need no package installation. `package.json` supplies optional npm shortcuts; npm is not needed for the app.
 
-Target current Chromium, Firefox and Safari with ES modules, native dialog, structuredClone, localStorage and CSS zoom. Browser tests used Codex Chromium. Older browsers, mobile drag gestures and native Excel/LibreOffice behaviour are not certified. Clipboard buttons depend on permission; keyboard copy/paste is the fallback.
+Target current Chromium, Firefox and Safari with ES modules, native dialog and popover, structuredClone, localStorage and CSS zoom. Browser tests used Codex Chromium. Older browsers, mobile drag gestures and native Excel/LibreOffice behaviour are not certified. Clipboard buttons depend on permission; keyboard copy/paste is the fallback.
 
-Tool Tracker Inventory Table View and footer were inspected read-only. No changes were made to that reference site. The user authorised the initial GitHub upload separately and configured GitHub Pages. The deployed v1.0.0 was subsequently tested. The v1.0.1 fix was uploaded by the user and verified live. The v1.1.0 features were tested locally with fresh browser-test approval and await the user's upload; local checks do not verify their deployment. Future browser testing requires fresh approval, per `BUILD_BRIEF.md`.
+Tool Tracker Inventory Table View and footer were inspected read-only. No changes were made to that reference site. The user authorised the initial GitHub upload separately and configured GitHub Pages. The deployed v1.0.0 was subsequently tested. The v1.0.1 fix was uploaded by the user and verified live. The v1.1.0 features and v1.1.1 refinements were tested locally with fresh browser-test approval; local checks do not verify their deployment. Future browser testing requires fresh approval, per `BUILD_BRIEF.md`.
 
 Bundled library: SheetJS CE 0.20.3 from its official CDN, with Apache 2.0 licence in `vendor/SHEETJS-LICENSE.txt`. Documentation: https://docs.sheetjs.com/docs/getting-started/installation/standalone/.
 
@@ -130,4 +130,4 @@ Bundled library: SheetJS CE 0.20.3 from its official CDN, with Apache 2.0 licenc
 
 Upload the root HTML/docs/package files and `.nojekyll`, plus `css/`, `js/`, `data/`, `reference/`, `images/vendor/`, `vendor/` and `tests/`, retaining every filename and subfolder. The chat handover provides the complete file tree. Exclude Finder `.DS_Store` files and locally downloaded test outputs. No V2 modules or placeholders are included.
 
-For v1.1.0, upload all changed application files together, plus `data/length_colours.json` and the supplied `reference/colour_options.json`. Refresh the browser fully after deployment so it loads the updated modules.
+For v1.1.1, upload `js/app.js`, `js/grid.js`, `js/version.js`, `css/app.css`, `README.md`, `UPDATES.md` and `CHANGELOG.md` together. If upgrading from v1.0.1, also include the v1.1.0 files, `data/length_colours.json` and supplied `reference/colour_options.json`. Refresh the browser fully after deployment so it loads the updated modules.
