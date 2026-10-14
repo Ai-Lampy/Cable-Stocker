@@ -7,6 +7,10 @@
 
 ## Completed
 
+- v1.1.19 (local): Cable-name connector fallbacks, grouped review warnings, yellow Errors notification, explicit approval/correction and exact connector-list download. Hidden table columns retained. Reference names/aliases are trusted; other names need review.
+- Validation: 126 automated tests and approved local Chromium checks passed, including approval, export and saved pending/approved states. No console errors. No upload or deployment.
+- Upload: `js/app.js`, `js/model.js`, `js/version.js`, `css/app.css`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Also include `js/grid.js` from v1.1.18 when upgrading from v1.1.17. New/deleted project files: none; original inputs unchanged. Publish approved references separately by downloading `connector_types.json` to `data/connector_types.json`.
+
 - v1.1.18 (local): Restored adaptor-only direction/connector columns. Custom/incomplete cables use a Connectors button and normal form; inheritance retained. 123 automated tests and approved local Chromium checks passed. No upload or deployment.
 - v1.1.17 verified live at ailampy.com/cable/: recognised inheritance and custom connector JSON preview passed. Address retained, test category removed, no console errors in checked flows.
 - Upload: `js/app.js`, `js/grid.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.

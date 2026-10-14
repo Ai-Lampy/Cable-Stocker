@@ -2,7 +2,15 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.17 was confirmed live in Chromium on 2026-10-14 after the user's upload; connector inheritance and custom connector exports passed. The local v1.1.18 update restores hidden table columns and provides a separate connector form for custom or incomplete cables and includes the earlier palette-only colour suggestions and table improvements. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.17 was confirmed live in Chromium on 2026-10-14 after the user's upload; connector inheritance and custom connector exports passed. The local v1.1.19 update adds fallback connector review and includes v1.1.18's hidden-column fix. It has not been uploaded or deployed.
+
+## Connector review
+
+Missing connectors inherit recognised cable defaults first. Any required end still missing uses the cable name. Existing connector values stay unchanged. Unknown names show a yellow notification icon and count on **Errors**; names and aliases already in Connectors do not need repeat approval.
+
+Open **Errors**, expand a connector warning and choose **Review connector**. Confirm or correct its name, then choose **Approve & add to Connectors**. Approval updates the listed cable ends and saves the connector in your local reference list. Cancel keeps it pending. Custom cables still use the **Connectors** form in their name cell; adaptor columns stay hidden for normal cables.
+
+Use **Download connector list** on Errors (or the Connectors download in Settings), then upload the resulting `connector_types.json` to **`data/connector_types.json`** to publish the permanent list. Browser approval does not change GitHub files. Keep this reference download with your project backups: pending reviews are determined by which connector names are absent from the reference list. Lampy cable-stock JSON keeps its existing schema.
 
 ## Run locally
 

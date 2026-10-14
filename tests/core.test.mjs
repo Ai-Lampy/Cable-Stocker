@@ -214,3 +214,26 @@ test('empty recognised bidirectional cables inherit direction and end; incompati
 test('custom cable normal connector inputs fix validation without adaptor flag or runtime markers',()=>{const p=fresh();p.stock.cables.Custom=[M.defaultCable(null,'Custom cable')];p.rowIds.Custom=['custom'];const row=p.stock.cables.Custom[0];M.setCell(row,'start','Custom plug');M.setCell(row,'end','Custom socket');assert.equal(M.validate(p).filter(x=>x.category==='Custom'&&x.level==='error').length,0);assert.equal(M.isCableAdaptor(p,'Custom',0),false);assert.deepEqual(M.runtimeJSON(p).cables.Custom[0].connectors,{male:'Custom plug',female:'Custom socket'});});
 
 test('bidirectional inherited end is visible despite old empty male/female keys',()=>{const row={name:'Ethernet',direction:'bidirectional',connectors:{male:'',female:'',end:'RJ45'}};assert.equal(M.getCell(row,'start'),'RJ45');assert.equal(M.getCell(row,'end'),'RJ45');M.setCell(row,'end','EtherCON');assert.equal(M.getCell(row,'end'),'EtherCON');});
+
+test('missing connectors use cable names after reference inheritance, preserving overrides and malformed data',()=>{
+ const p=fresh(),r=M.clone(refs);p.stock.cables.Custom=[M.defaultCable(null,'Review cable'),{name:'Two way',direction:'bidirectional',connectors:{},lengths:[]},{name:'Partial',direction:'male-female',connectors:{male:'XLR3',extra:4},lengths:[]},{name:'Bad',direction:'male-female',connectors:42,lengths:[]},M.defaultCable()];
+ const baseline=M.clone(p.baseline);assert.equal(M.fillCableConnectors(p,r),true);
+ assert.deepEqual(p.stock.cables.Custom[0].connectors,{male:'Review cable',female:'Review cable'});
+ assert.deepEqual(p.stock.cables.Custom[1].connectors,{end:'Two way'});
+ assert.deepEqual(p.stock.cables.Custom[2].connectors,{male:'XLR3',extra:4,female:'Partial'});
+ assert.equal(p.stock.cables.Custom[3].connectors,42);assert.deepEqual(p.stock.cables.Custom[4].connectors,{male:'',female:''});assert.deepEqual(p.baseline,baseline);assert.equal(M.fillCableConnectors(p,r),false);
+});
+test('review groups unknown connector ends and approval corrects all uses without duplicate references',()=>{
+ const p=fresh(),r=M.clone(refs);p.stock.cables.Custom=[M.defaultCable(null,'Review cable'),M.defaultCable(null,'review cable')];M.fillCableConnectors(p,r);
+ const review=M.connectorReviews(p,r).find(x=>x.name==='Review cable');assert.equal(review.usages.length,4);
+ const count=r.connector_types.items.length;assert.throws(()=>M.approveConnector(p,r,'Review cable','  '),/Enter/);assert.equal(r.connector_types.items.length,count);
+ M.approveConnector(p,r,'Review cable','Approved connector');assert.equal(r.connector_types.items.length,count+1);assert(!M.connectorReviews(p,r).some(x=>x.name==='Approved connector'));
+ assert.equal(p.stock.cables.Custom[1].connectors.female,'Approved connector');assert.throws(()=>M.approveConnector(p,r,'Review cable','Again'),/no longer/);
+ p.stock.cables.Custom.push(M.defaultCable(null,'Another'));M.fillCableConnectors(p,r);M.approveConnector(p,r,'Another','approved connector');assert.equal(r.connector_types.items.length,count+1);
+});
+test('pending connector review survives stock JSON and project/Excel round trips without runtime metadata',()=>{
+ const p=fresh(),r=M.clone(refs);p.stock.cables.Custom=[M.defaultCable(null,'Review cable')];p.rowIds.Custom=['test-review'];M.fillCableConnectors(p,r);
+ const output=M.runtimeJSON(p);assert.deepEqual(Object.keys(output).sort(),Object.keys(source).sort());
+ for(const restored of [M.projectFromStock(output),M.restoreProject(M.clone(p)),fromWorkbook(toWorkbook(p,X),X,p).project])assert(M.connectorReviews(restored,r).some(x=>x.name==='Review cable'));
+ assert.equal(M.connectorReviews(fresh(),r).length,0);
+});

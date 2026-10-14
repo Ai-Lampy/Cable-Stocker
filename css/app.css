@@ -45,3 +45,5 @@
 .metadata-form{margin-top:20px}.metadata-row{display:flex;align-items:start;gap:10px;margin:12px 0}.metadata-row>label,.metadata-row>fieldset{flex:1;min-width:0}.metadata-row fieldset{border:1px solid var(--border,#ddd);padding:12px}.metadata-row textarea{min-height:60px;resize:vertical}
 
 .colour-suggestions{position:fixed;inset:auto;margin:0;max-height:210px;overflow:auto;padding:6px;border:1px solid var(--line);border-radius:5px;background:white;box-shadow:0 4px 14px #0003}.colour-suggestions .colour-option{display:block;width:100%;margin:2px 0}.colour-suggestions [aria-selected=true]{outline:2px solid var(--focus);outline-offset:-2px}.colour-suggestions p{padding:8px;margin:0;font-size:12px}
+
+.review-badge{display:inline-block;background:#ffda57;color:#503d00;border-radius:10px;padding:2px 6px;margin-left:5px;font-size:12px}.review-badge[hidden]{display:none}

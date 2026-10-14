@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.19 — 2026-10-14
+
+Previous version: v1.1.18 (local); last verified live version: v1.1.17.
+
+- Missing cable endpoints first inherit recognised cable defaults, then use the cable name as fallback. Preserve populated overrides, unknown fields and imported baselines; malformed connector objects and invalid directions remain validation errors.
+- Unknown connector names become grouped review warnings. The Errors button shows a yellow notification icon and pending connector count alongside its red error count. Existing reference names and aliases are already recognised and do not need repeat approval.
+- Review a connector using a normal text input, optionally correct all listed cable ends, then explicitly approve it into the local Connectors list. Empty approvals are rejected; duplicate names/aliases are not added. Cancel leaves it pending. Download the exact connector_types.json from Errors or Settings and upload to data/connector_types.json to publish the permanent list.
+- Review status follows the connector reference list across JSON, project backup and Excel round trips without adding fields to Lampy stock JSON. Keep adaptor-only table columns and the separate connector form.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/version.js`, `css/app.css`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Include `js/grid.js` from v1.1.18 if upgrading from v1.1.17. Added/deleted project files: none. Original references/examples unchanged.
+- Validation: 126 automated tests passed, including fallback, partial/malformed data, deduplicated approval, JSON/project/Excel review persistence and original schema round trips. Approved local Chromium testing passed fallback inputs, yellow indicator, empty approval rejection, corrected approval, connector reference download, stock JSON preview, hidden table columns and reopening with pending/approved states retained. No console warnings/errors in checked flows.
+- Not uploaded or deployed. Other browsers were not tested. Approvals persist locally; publishing reference changes still requires your manual download/upload.
+
 ## v1.1.18 — 2026-10-14
 
 Previous version: v1.1.17.

@@ -83,6 +83,40 @@ export function inheritCableConnectors(row,entries){
   }
   return !same(before,row);
 }
+// Review is derived from connector references, so it survives JSON and Excel round trips
+// without adding generator fields to Lampy's cable-stock schema.
+export function fillCableConnectors(project,refs){
+  let changed=false;
+  for(const rows of Object.values(project.stock.cables))for(const row of rows){
+    changed=inheritCableConnectors(row,refs.cable_types.items)||changed;
+    const name=String(row.name||'').trim();if(!name)continue;
+    const keys=row.direction==='male-female'?['male','female']:row.direction==='bidirectional'?['end']:[];
+    if(!keys.length)continue;
+    if(row.connectors==null){row.connectors={};changed=true;}
+    if(!object(row.connectors))continue;
+    for(const key of keys)if(row.connectors[key]==null||(typeof row.connectors[key]==='string'&&!row.connectors[key].trim())){row.connectors[key]=name;changed=true;}
+  }
+  return changed;
+}
+export function connectorReviews(project,refs){
+  const reviews=new Map();
+  for(const [category,rows]of Object.entries(project.stock.cables))rows.forEach((row,index)=>{
+    if(!object(row.connectors))return;
+    const keys=row.direction==='male-female'?['male','female']:row.direction==='bidirectional'?['end']:[];
+    for(const key of keys){const value=row.connectors[key];if(typeof value!=='string'||!value.trim()||referenceMatch(refs.connector_types.items,value.trim()))continue;
+      const name=value.trim(),id=name.toLocaleLowerCase();
+      if(!reviews.has(id))reviews.set(id,{name,usages:[]});
+      reviews.get(id).usages.push({category,row:index,key});
+    }
+  });return [...reviews.values()];
+}
+export function approveConnector(project,refs,pendingName,approvedName){
+  const name=String(approvedName||'').trim();if(!name)throw new Error('Enter a connector name before approval.');
+  const review=connectorReviews(project,refs).find(r=>r.name.toLocaleLowerCase()===pendingName.toLocaleLowerCase());
+  if(!review)throw new Error('This connector no longer needs review.');
+  for(const use of review.usages)project.stock.cables[use.category][use.row].connectors[use.key]=name;
+  if(!referenceMatch(refs.connector_types.items,name))refs.connector_types.items.push({id:uid(),name,aliases:[]});
+}
 export function cableNeedsConnectorInputs(row,entries){
   if(!referenceMatch(entries,String(row.name||'').trim())||!object(row.connectors))return true;
   const keys=row.direction==='male-female'?['male','female']:row.direction==='bidirectional'?['end']:[];
