@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.22 — 2026-10-14
+
+Previous version: v1.1.21.
+
+- Add generator-only Save vendor project with a deterministic filename and exact projects/ destination. Offer a native save-location picker where supported plus standard JSON download. Preserve complete generator project data; no changes to Lampy stock JSON or manifest schema.
+- Vendor selection fetches its saved project relative to the app path without cached responses. Validate project format and vendor identity before replacement. Missing files start empty projects; HTTP/network/invalid-file errors preserve the current draft. Provide explicit reload for the current vendor.
+- Confirm before replacing an existing workspace, with Cancel and Save current backup. Ignore superseded requests and responses arriving after workspace edits. Startup continues restoring local drafts without fetching over them.
+- Explain manual GitHub upload, public hosted files, exact filenames, new-vendor reference updates and separate reference downloads. Register the new module in release-specific bootstrap imports.
+- Updated/upload: `index.html`, `js/app.js`, `js/version.js`, new `js/vendor-projects.js`, new `tests/vendor-projects.test.mjs`, new `projects/README.md`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Deleted files: none. Original examples/reference inputs unchanged. No real vendor projects fabricated or bundled.
+- Validation: 133 automated tests passed, including filenames/collisions, relative uncached requests, full project preservation, missing/error/mismatched files, stale requests and edits during loading. Approved local Chromium tests passed download to exact filename, loading the downloaded file from an isolated local hosted folder, vendor-selection loading, cancellation, saved version/cable restoration and invalid-file draft preservation. No console warnings/errors in checked flows.
+- Not uploaded or deployed. Native OS save dialog/file writing and non-Chromium browsers were not tested; standard download was tested. Live deployment of this feature remains unverified.
+
 ## v1.1.21 — 2026-10-14
 
 Previous version: v1.1.20.

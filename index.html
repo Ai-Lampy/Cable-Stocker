@@ -46,7 +46,7 @@
       if (!match) throw new Error('The published version file is incomplete. Please try again shortly.');
       const version = match[1];
       const asset = path => {const url = new URL(path, base);url.searchParams.set('release', version);return url.href;};
-      const imports = Object.fromEntries(['app', 'model', 'grid', 'excel', 'updates', 'version'].map(name => {
+      const imports = Object.fromEntries(['app', 'model', 'grid', 'excel', 'updates', 'version', 'vendor-projects'].map(name => {
         const path = 'js/' + name + '.js';return [new URL(path, base).href, asset(path)];
       }));
       const map = document.createElement('script');map.type = 'importmap';map.textContent = JSON.stringify({imports});document.head.append(map);

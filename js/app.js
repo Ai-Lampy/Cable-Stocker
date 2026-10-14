@@ -1,3 +1,4 @@
+import {vendorProjectFilename,loadVendorProject} from './vendor-projects.js';
 import {watchUpdates, safeRefresh, freshDocumentURL} from './updates.js';
 import {APP_VERSION} from './version.js';
 import {clone,same,uid,cableTypeSheets,cableTypeRows,connectorTypeSheets,connectorTypeRows,connectorTypeCategories,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,parseLengths,combineLengths,referenceMatch,defaultCable,inheritCableConnectors,fillCableConnectors,connectorReviews,approveConnector,cableNeedsConnectorInputs,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,colourSuggestions,resolveColour,validateLengthColours,changes,validate,normaliseVendorVersion,incrementVersion,mergeProjects,relativePath} from './model.js';
@@ -15,7 +16,7 @@ const KEYS={draft:'lampy-cable:draft:1',prefs:'lampy-cable:references:1'};
 const LOOMS='Stock / Pre-Made Looms';
 const REF_NAMES={categories:'Categories',cable_types:'Cable Types',connector_types:'Connectors',lighting_vendors:'Lighting Vendors',manifest:'Vendor Manifest',length_colours:'Length colour'};
 let colourPalette={},project=newProject(),refs={},referenceBaseline={},referenceExports={},dirty=false,refDirty=false,page='vendor',settingsTab='categories',cableTypesSheet=null,connectorTypesSheet=null,grid=null,history=[],future=[],copiedLengths=null,toastTimer,loaded=false,saveError='',saveBlocked=false,sessionIssues=[];
-let lastSavedDraft='',lastSavedRefs='',updateReload=false,importPending=false;
+let lastSavedDraft='',lastSavedRefs='',updateReload=false,importPending=false,vendorLoadSequence=0;
 const issueTimes=new Map();let issueSequence=0;
 function notice(message,error=false){const t=$('#toast');t.textContent=message;t.className=`show${error?' error':''}`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='',error?11000:5000);}
 function capture(){return {project:clone(project),refs:clone(refs),dirty,refDirty};}
@@ -64,11 +65,7 @@ function chosenFilename(name){const path=refs.manifest.catalogues.find(v=>v.vend
 function renderVendor(){
   heading('Vendor setup','Choose a vendor, set its unit once, then build its cable categories.',[btn('Import JSON / Excel',()=>$('#file-input').click()),btn('New vendor',()=>requireSafe('Start a new vendor? Your current autosaved draft will be replaced. Download a project backup first if you need it.',()=>{change(()=>project=newProject());navigate('vendor');}))]);
   const layout=node('div',null,'vendor-layout'),panel=node('section',null,'panel');panel.append(node('h2','Vendor details'));const form=node('div',null,'form-grid');
-  const vendor=field('Vendor name',project.stock.vendor.name,value=>{
-    if(value===project.stock.vendor.name)return;
-    const apply=()=>{change(()=>{project.stock.vendor.name=value;project.filename=chosenFilename(value);});if(value&&!refs.lighting_vendors.vendors.some(r=>r.name===value))offerVendor(value);};
-    if(Object.values(project.stock.cables).some(r=>r.length)||project.looms.length)confirmAction('Change vendor name',`Keep the current cable stock and rename this vendor to “${value}”? Use New vendor to start with empty stock.`,apply,'Keep stock & rename');else apply();
-  },{list:'vendors-list',help:'Search the supplied 15 vendors, or enter your own name. Changing this name keeps the current stock.'});form.append(vendor);
+  const vendor=field('Vendor name',project.stock.vendor.name,(value,input)=>{input.value=project.stock.vendor.name;input.dataset.draftValue=input.value;selectVendorProject(value);},{list:'vendors-list',help:'Select a vendor to load its uploaded generator project from projects/. Current work is protected before replacement.'});form.append(vendor);
   const unit=node('label','Length unit'),select=node('select');select.setAttribute('aria-label','Length unit');for(const [value,text]of [['m','Metric · metres (m)'],['ft','Imperial · feet (ft)']]){const o=node('option',text);o.value=value;select.append(o);}select.value=project.stock.vendor.lengthUnit;select.onchange=()=>{const value=select.value;select.value=project.stock.vendor.lengthUnit;confirmAction('Change length unit',`Switch to ${value}? All length numbers will stay exactly the same. Review them manually; this does not convert lengths.`,()=>change(()=>project.stock.vendor.lengthUnit=value),'Change unit');};unit.append(select,node('small','Applies to all cables and looms. Numbers are never converted.'));form.append(unit);
   form.append(field('Cable-stock output filename',project.filename,value=>change(()=>project.filename=value),{help:chosenFilename(project.stock.vendor.name)?`Confirmed by manifest: ${chosenFilename(project.stock.vendor.name)}`:'No manifest match. Enter the destination filename you intend to use.'}));
   const version=field('Vendor version',project.vendorVersion,value=>change(()=>project.vendorVersion=normaliseVendorVersion(value)),{help:'Enter a number such as 2 or 2.1; the v prefix is added automatically. For your generator backup and Excel. Independent of the app version. Imported runtime version fields remain in custom metadata.'});const increments=node('div',null,'actions');increments.append(btn('+ Major',()=>bumpVersion(true)),btn('+ Minor',()=>bumpVersion(false)));version.append(increments);form.append(version);
@@ -76,12 +73,41 @@ function renderVendor(){
   panel.append(form);
   const meta=node('details');meta.append(node('summary','Custom metadata · preserved on import'));
   meta.append(metadataForm('vendor','Additional vendor fields'),metadataForm('root','Additional document fields'));panel.append(meta);
-  const actions=node('div',null,'form-actions');actions.append(btn('+ Add category',addCategory,'primary'),btn('Save project backup',downloadBackup));panel.append(actions);layout.append(panel);
+  const actions=node('div',null,'form-actions');actions.append(btn('+ Add category',addCategory,'primary'),btn('Save project backup',downloadBackup),btn('Save vendor project',saveVendorProject),btn('Load saved vendor project',()=>selectVendorProject(project.stock.vendor.name,true)));panel.append(actions);layout.append(panel);
   const side=node('aside',null,'panel');side.append(node('h2','Your workspace'));
   const stats=node('div',null,'stat-row');for(const [n,t]of [[Object.keys(project.stock.cables).length,'categories'],[Object.values(project.stock.cables).reduce((s,r)=>s+r.length,0),'cable types'],[project.looms.length,'looms']]){const d=node('div',null,'stat');d.append(node('strong',n),node('span',t));stats.append(d);}side.append(stats);
   for(const [number,title,desc]of [[1,'Choose your vendor','Select its unit and confirm the cable-stock filename.'],[2,'Build cable stock','Add categories, choose cable types and enter available lengths.'],[3,'Review & download','Check changes and issues, then download JSON or Excel.']]){const d=node('div',null,'step'),text=node('div');text.append(node('strong',title),node('p',desc));d.append(node('span',number,'step-number'),text);side.append(d);}
   side.append(node('p','Your files stay in this browser. Local drafts are not permanent backups.','note'));
   side.append(node('p','Looms and vendor version are saved in project JSON and Excel. The supplied Lampy cable-stock format does not demonstrate loom support.','note warning'));layout.append(side);$('#main').append(layout);
+}
+async function selectVendorProject(value,force=false){
+  const name=String(value).trim();if(!name||(!force&&name===project.stock.vendor.name))return;
+  const sequence=++vendorLoadSequence;let before=JSON.stringify(capture());notice(`Looking for ${name}’s saved project…`);
+  try{
+    const incoming=await loadVendorProject(name,refs.lighting_vendors.vendors);
+    if(sequence!==vendorLoadSequence)return;
+    if(force&&!incoming){notice(`No saved project found for ${name}. Your draft is unchanged.`,true);return;}
+    if($('#dialog').open){notice('Close the current dialog, then select the vendor again.',true);return;}
+    if(before!==JSON.stringify(capture())){notice('Your workspace changed while loading. Select the vendor again when ready.',true);return;}
+    const apply=()=>{
+      if(sequence!==vendorLoadSequence||before!==JSON.stringify(capture())){notice('Your workspace changed. Select the vendor again.',true);return;}
+      change(()=>{project=incoming||newProject();if(!incoming){project.stock.vendor.name=name;project.filename=chosenFilename(name);}});navigate('vendor');notice(incoming?`Loaded saved project for ${name}.`:`No saved project found for ${name}. Started an empty vendor project.`);
+      if(!refs.lighting_vendors.vendors.some(v=>v.name===name))offerVendor(name);
+    };
+    const hasWork=dirty||project.stock.vendor.name||Object.keys(project.stock.cables).length||project.looms.length;
+    if(hasWork)openDialog('Switch vendor project',body=>body.append(node('p',`${incoming?'A saved project is available':'No saved project was found'} for ${name}. ${incoming?'Load it':'Start an empty project'} and replace the current workspace? Download a backup first to keep your current work.`)),[{label:'Cancel',run:d=>d.close()},{label:'Save current backup',run:()=>{downloadBackupNow();before=JSON.stringify(capture());}},{label:incoming?'Load saved project':'Start empty project',cls:'primary',run:d=>{d.close();apply();}}]);else apply();
+  }catch(error){if(sequence===vendorLoadSequence)notice(error.message||'Saved project could not be loaded. Your current draft is unchanged.',true);}
+}
+function saveVendorProject(){
+  let filename;try{filename=vendorProjectFilename(project.stock.vendor.name,refs.lighting_vendors.vendors);restoreProject(project);}catch(error){notice(error.message,true);return;}
+  const copy=clone(project),text=JSON.stringify(copy,null,2);
+  openDialog('Save vendor project for this generator',body=>{
+    body.append(node('p',`Save this file in your Cable Stocker project folder at projects/${filename}, then upload it to the same projects/ folder on GitHub. Selecting this vendor will load that file.`, 'note'));
+    body.append(node('p','This is a complete generator project, including cable stock, looms, vendor version and baseline. It does not replace your Lampy cable-stock export or manifest. Uploaded projects are available to anyone who can access the hosted files.'));
+    body.append(node('p','For a new vendor, also download Lighting Vendors in Settings and upload reference/lighting_vendors.json so it appears in the selector. Connector/reference edits remain separate downloads.'));
+  },[{label:'Cancel',run:d=>d.close()},...(typeof window.showSaveFilePicker==='function'?[{label:'Choose save location',cls:'primary',run:async d=>{
+    try{const handle=await window.showSaveFilePicker({suggestedName:filename,types:[{description:'Generator project JSON',accept:{'application/json':['.json']}}]});const stream=await handle.createWritable();await stream.write(text);await stream.close();d.close();notice(`Project saved. Upload it as projects/${filename}.`);}catch(error){if(error.name!=='AbortError')notice('Could not save the file. Use Download project JSON instead.',true);}
+  }}]:[]),{label:'Download project JSON',run:d=>{download(filename,copy);d.close();notice(`Place the download in projects/${filename}, then upload that file.`);}}]);
 }
 function offerVendor(name){confirmAction('Add vendor to references',`Add “${name}” to the Lighting Vendors reference? You can set its logo path in Settings.`,()=>change(()=>refs.lighting_vendors.vendors.push({name,logo:''}),{references:true}),'Add vendor');}
 function metadataTarget(scope,path=[]){

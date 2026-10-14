@@ -6,7 +6,22 @@ Static, local-first cable-stock editor. The application version has one source o
 
 **Live v1.1.20 verification:** On 2026-10-14, Chromium confirmed v1.1.20 at ailampy.com/cable/, Connectors category sheets, category assignment and the bottom Save table button committing active edits. No console errors; temporary test entry removed.
 
-**Local update: v1.1.21** adds an explicit filtered category dropdown and matches the bottom Save table button’s alignment, size and styling to the top button. It has not been uploaded or deployed.
+**Local update: v1.1.22** adds saving and loading hosted vendor project JSONs for this generator. It includes v1.1.21’s category dropdown and matching Save buttons. It has not been uploaded or deployed.
+
+## Saved vendor projects — generator only
+
+1. Build or import your vendor’s project, then choose **Vendor → Save vendor project**.
+2. Use **Choose save location** where supported, or **Download project JSON**. Save/move the file into this project’s **`projects/`** folder using the exact generated filename. For example: `projects/christie_lites_uk.lampy-project.json`.
+3. Upload that file to the same `projects/` location in your GitHub repository. Do not add it to Lampy’s cable-stock manifest. No project index or manifest change is needed.
+4. Selecting the vendor now looks for its uploaded generator project. Confirm before replacing an existing workspace, or cancel to keep your draft. Use **Load saved vendor project** to reload the currently selected vendor.
+
+The project JSON preserves cable stock, custom fields, looms, adaptor markers, vendor version and imported baseline. Settings/reference changes remain separate files; for a newly added vendor, upload the updated `reference/lighting_vendors.json` so it appears in the selector. Approved connectors still need their own `data/connector_types.json` download/upload.
+
+Vendor selection now switches projects rather than renaming the current stock. If no saved project exists, it starts an empty vendor project after confirmation when there is existing work. Invalid files, network failures, wrong-vendor documents or edits made while a request is pending leave the current draft unchanged. Reopening the app restores your local draft; it does not silently replace it from the hosted file.
+
+Keep vendor names and generated filenames consistent. Filenames are derived from vendor names; conflicting names are rejected. Renaming a vendor requires saving/uploading under its new filename. Hosted project files are readable by visitors to the site.
+
+The native save-location picker requires a supporting browser and permission to write the chosen file. Standard download is the fallback. Neither button uploads to GitHub or automatically writes to your source folder without your choice.
 
 ## Connector category sheets and table saving
 

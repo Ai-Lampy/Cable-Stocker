@@ -7,6 +7,10 @@
 
 ## Completed
 
+- v1.1.22 (local): Save full generator vendor projects under projects/ and load them on vendor selection. Added native-save option/download fallback, exact filename guidance, protected replacement and explicit current-vendor reload. Existing Lampy schemas and references unchanged.
+- Validation: 133 automated tests and approved local Chromium download/hosted-load/cancel/invalid-file checks passed. Native OS save picker not tested. No console errors in checked flows. No upload or deployment.
+- Upload: `index.html`, `js/app.js`, `js/version.js`, new `js/vendor-projects.js`, new `tests/vendor-projects.test.mjs`, new `projects/README.md`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Deleted: none. No actual vendor projects included. Also include the v1.1.21 files if not uploaded yet: `js/grid.js` and `css/app.css`.
+
 - v1.1.21 (local): Explicit category suggestions in Connectors, including Uncategorised, with filtered typing and mouse/keyboard selection. Bottom Save table now matches the top button’s horizontal alignment, dimensions, border, font and padding.
 - Validation: 129 automated tests passed. Approved local Chromium checks passed dropdown opening, filtering, keyboard Tab selection, mouse selection and moving connectors between sheets. Browser measurements confirmed identical Save button geometry/styling. No console errors. Not uploaded or deployed.
 - Upload: `js/app.js`, `js/grid.js`, `js/version.js`, `css/app.css`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
