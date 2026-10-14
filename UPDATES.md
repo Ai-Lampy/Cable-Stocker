@@ -7,6 +7,10 @@
 
 ## Completed
 
+- v1.1.17 (local): Recognised names/aliases inherit missing connectors on entry and category opening, preserving existing overrides. Custom/incomplete cables show normal connector and direction columns without an adaptor flag. Error links target visible fields and sorted rows correctly.
+- Validation: 123 automated tests passed; approved Chromium checks passed custom inputs, inheritance, JSON preview and existing-row repair. No console errors. No upload or deployment.
+- Upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. Original references unchanged.
+
 - v1.1.16 (local): Added Reset widths for only the current table (150 px). Length chips display numerically lowest to highest without mutating source data. Removed their 450 px container cap; content uses the resized column width.
 - Validation: 119 automated tests passed; approved local Chromium checks verified chip order/full width, reset isolation and persistence. No console errors. No upload or deployment.
 - Upload: `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.

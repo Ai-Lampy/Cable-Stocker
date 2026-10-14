@@ -72,6 +72,22 @@ export function referenceMatch(entries, text) {
 export function defaultCable(ref, wording) {
   return {name: wording || ref?.name || '', direction: ref?.direction || 'male-female', connectors: clone(ref?.connectors || {male: '', female: ''}), lengths: []};
 }
+export function inheritCableConnectors(row,entries){
+  const ref=referenceMatch(entries,String(row.name||'').trim());if(!ref||!object(ref.connectors))return false;
+  const before=clone(row);if(row.connectors==null)row.connectors={};if(!object(row.connectors))return false;
+  const populated=Object.values(row.connectors).some(v=>typeof v==='string'&&v.trim());
+  if(!populated&&['male-female','bidirectional'].includes(ref.direction))row.direction=ref.direction;
+  if(row.direction===ref.direction){
+    const keys=row.direction==='male-female'?['male','female']:['end'];
+    for(const key of keys)if((row.connectors[key]==null||(typeof row.connectors[key]==='string'&&!row.connectors[key].trim()))&&typeof ref.connectors[key]==='string'&&ref.connectors[key].trim())row.connectors[key]=ref.connectors[key];
+  }
+  return !same(before,row);
+}
+export function cableNeedsConnectorInputs(row,entries){
+  if(!referenceMatch(entries,String(row.name||'').trim())||!object(row.connectors))return true;
+  const keys=row.direction==='male-female'?['male','female']:row.direction==='bidirectional'?['end']:[];
+  return !keys.length||keys.some(key=>typeof row.connectors[key]!=='string'||!row.connectors[key].trim());
+}
 export function syncVendorManifest(refs) {
   const entries=refs.manifest.catalogues, names=new Set(entries.map(x=>String(x.vendor).trim().toLowerCase()));
   const paths=new Set(entries.map(x=>String(x.file).toLowerCase()));
@@ -121,6 +137,7 @@ export function validateLengthColours(data,palette) {
   });return issues;
 }
 export function getCell(row, key) {
+  if(['start','end'].includes(key)&&row.direction==='bidirectional')return row.connectors?.end??'';
   if (key === 'start') return row.connectors?.male ?? row.connectors?.end ?? '';
   if (key === 'end') return row.connectors?.female ?? row.connectors?.end ?? '';
   if (key === 'custom') return Object.fromEntries(Object.entries(row).filter(([k]) => !['name','direction','connectors','lengths'].includes(k)));
@@ -129,7 +146,7 @@ export function getCell(row, key) {
 export function setCell(row, key, value) {
   if (key === 'start' || key === 'end') {
     if (!object(row.connectors)) row.connectors = {};
-    if (row.direction === 'bidirectional' && !Object.hasOwn(row.connectors, 'male') && !Object.hasOwn(row.connectors, 'female')) row.connectors.end = value;
+    if (row.direction === 'bidirectional') row.connectors.end = value;
     else row.connectors[key === 'start' ? 'male' : 'female'] = value;
   } else if (key === 'custom') {
     if (!object(value)) throw new Error('Custom fields must be a JSON object.');
@@ -221,10 +238,10 @@ export function validate(project, refs) {
       names.add(String(row.name).toLowerCase());
       lengths(row.lengths,category,i);
       if (!['male-female','bidirectional'].includes(row.direction)) add('warning',category,i,'direction','Direction is not demonstrated by the source schema.','Use male-female or bidirectional, or verify compatibility.');
-      if (!object(row.connectors)) add('error',category,i,'connectors','Connectors must be an object.','Enter a connectors JSON object.');
+      if (!object(row.connectors)) add('error',category,i,'start','Connectors are invalid.','Enter the connectors using the connector columns.');
       else {
         const keys = row.direction === 'male-female' ? ['male','female'] : row.direction === 'bidirectional' ? ['end'] : [];
-        for (const key of keys) if (typeof row.connectors[key] !== 'string' || !row.connectors[key].trim()) add('error',category,i,'connectors',`Missing ${key} connector.`,'Edit connectors to match the selected direction.');
+        for (const key of keys) if (typeof row.connectors[key] !== 'string' || !row.connectors[key].trim()) add('error',category,i,key==='male'?'start':'end',`Missing ${key} connector.`,'Enter the connector in the cable table; recognised cable types inherit reference defaults.');
       }
     });
   }

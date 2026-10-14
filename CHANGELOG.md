@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.17 — 2026-10-14
+
+Previous version: v1.1.16.
+
+- Recognised cable names/aliases fill missing connector defaults on name entry and when their category opens. Preserve populated connector overrides and incompatible existing directions; incomplete recognised rows remain editable. Empty recognised rows inherit the reference direction.
+- Show ordinary Direction, Start/male and End/female columns when a category contains custom cables, incomplete connector data or adaptors. These controls no longer require an adaptor flag. Keep JSON columns hidden. Bidirectional cables edit/display their existing end field.
+- Connector errors link to usable connector fields and locate the source row correctly in sorted tables. Existing category repairs are saved as draft changes and remain visible in export review; imported baselines are retained.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted: none. Original examples/reference files unchanged.
+- Validation: 123 automated tests passed, including aliases, partial inheritance, override preservation, bidirectional end fields, custom inputs and existing JSON/Excel round trips. Approved local Chromium checks verified custom inputs without adaptor flags, recognised inheritance, exported connector values and repair of an existing incomplete row after reopening its category. No console errors in checked flows.
+- Limits: Unrecognised cable types require user-supplied connectors. Incompatible or malformed existing values remain available for manual correction. Existing recognised rows are repaired when their category is opened. Firefox/Safari and deployment not tested; no upload or deployment performed.
+
 ## v1.1.16 — 2026-10-14
 
 Previous version: v1.1.15.

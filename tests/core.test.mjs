@@ -199,12 +199,18 @@ test('Settings controller scopes additions, multi-cell category moves and deleti
  assert.equal(captured.rows().length,2);assert.equal(captured.rows()[1].category,'Data');
  assert.equal(vm.runInContext('refs.cable_types.items.length',context),4);
  vm.runInContext("project=projectFromStock(source,'example.json');renderCategory('Data');",context);
- assert.equal(captured.columns.some(c=>['start','end','direction'].includes(c.key)||c.type==='json'),false);
+ assert.equal(captured.columns.some(c=>c.key==='start'),true);assert.equal(captured.columns.some(c=>c.type==='json'),false);
  vm.runInContext("setCableAdaptor(project,'Data',0,true);renderCategory('Data');",context);
  assert.equal(captured.columns.some(c=>c.key==='start'),true);assert.equal(captured.columns.some(c=>c.type==='json'),false);
- assert.equal(captured.get(captured.rows()[1],'start'),'');assert.equal(captured.readOnly(1,'start'),true);assert.equal(captured.readOnly(0,'start'),false);
+ assert.equal(captured.get(captured.rows()[1],'start'),M.getCell(captured.rows()[1],'start'));assert.equal(captured.readOnly,undefined);
  assert.deepEqual(JSON.parse(vm.runInContext('JSON.stringify(runtimeJSON(project))',context)),source);
 });
 
 test('vendor version entry adds v once and preserves minor version digits',()=>{for(const [input,expected]of [['2','v2'],['2.1','v2.1'],['2.10','v2.10'],['v2.1','v2.1'],[' V3 ','v3'],['',''],['  ',''],[0,'v0']])assert.equal(M.normaliseVendorVersion(input),expected);assert.equal(M.incrementVersion(M.normaliseVendorVersion('2.1'),false),'v2.2');});
 test('invalid version text is not silently repaired into a different version',()=>{for(const input of ['bad','-2','2..1','2.1.3','vv2'])assert.equal(M.normaliseVendorVersion(input),input);});
+
+test('recognised cable names and aliases inherit missing connector defaults without replacing overrides',()=>{const entries=[{name:'Known',aliases:['Alias'],direction:'male-female',connectors:{male:'Plug',female:'Socket'}}];const row={name:' Alias ',direction:'male-female',connectors:{male:'Custom',female:''},lengths:[]};assert.equal(M.inheritCableConnectors(row,entries),true);assert.deepEqual(row.connectors,{male:'Custom',female:'Socket'});assert.equal(M.inheritCableConnectors(row,entries),false);assert.equal(M.cableNeedsConnectorInputs(row,entries),false);assert.equal(M.cableNeedsConnectorInputs({...row,name:'Custom'},entries),true);});
+test('empty recognised bidirectional cables inherit direction and end; incompatible overrides remain editable',()=>{const entries=[{name:'Known',direction:'bidirectional',connectors:{end:'RJ45'}}];const row=M.defaultCable();row.name='Known';assert.equal(M.inheritCableConnectors(row,entries),true);assert.equal(row.direction,'bidirectional');assert.equal(row.connectors.end,'RJ45');const custom={name:'Known',direction:'male-female',connectors:{male:'Override',female:''}};assert.equal(M.inheritCableConnectors(custom,entries),false);assert.equal(M.cableNeedsConnectorInputs(custom,entries),true);});
+test('custom cable normal connector inputs fix validation without adaptor flag or runtime markers',()=>{const p=fresh();p.stock.cables.Custom=[M.defaultCable(null,'Custom cable')];p.rowIds.Custom=['custom'];const row=p.stock.cables.Custom[0];M.setCell(row,'start','Custom plug');M.setCell(row,'end','Custom socket');assert.equal(M.validate(p).filter(x=>x.category==='Custom'&&x.level==='error').length,0);assert.equal(M.isCableAdaptor(p,'Custom',0),false);assert.deepEqual(M.runtimeJSON(p).cables.Custom[0].connectors,{male:'Custom plug',female:'Custom socket'});});
+
+test('bidirectional inherited end is visible despite old empty male/female keys',()=>{const row={name:'Ethernet',direction:'bidirectional',connectors:{male:'',female:'',end:'RJ45'}};assert.equal(M.getCell(row,'start'),'RJ45');assert.equal(M.getCell(row,'end'),'RJ45');M.setCell(row,'end','EtherCON');assert.equal(M.getCell(row,'end'),'EtherCON');});

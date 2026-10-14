@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.16 update adds per-table width reset, sorted length chips and full-width length cells and includes the earlier palette-only colour suggestions and table improvements. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.17 update fixes connector inheritance and exposes normal inputs for custom or incomplete cables and includes the earlier palette-only colour suggestions and table improvements. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
 
 ## Run locally
 
@@ -234,3 +234,11 @@ Upload `js/app.js`, `js/model.js`, `js/version.js`, `tests/core.test.mjs`, `READ
 Length chips display from lowest to highest, including decimal lengths. This changes the display only; imported/source array order stays intact. Length chips now use the full resized column width, with scrolling when needed, rather than stopping at 450 px. The length-entry dialog remains unchanged.
 
 Upload `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 119 automated tests and approved local Chromium checks passed. Firefox/Safari and deployment were not tested for this release.
+
+## Cable connectors — v1.1.17
+
+Recognised cable names and aliases inherit missing connectors from Cable Types. Existing populated overrides stay intact. Opening a category also fills missing defaults in its recognised rows and saves those repairs as draft changes.
+
+Custom cables and unresolved connector data show **Direction**, **Start / male** and **End / female** columns. Enter connector names normally; you do not need to tick Adaptor or write JSON. Bidirectional cables use the same end connector at both ends. Complete recognised cables keep these columns hidden unless another row needs them. Existing incompatible/malformed data needs manual correction; it is not silently replaced.
+
+Upload `js/app.js`, `js/model.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 123 automated tests and approved local Chromium checks passed. Firefox/Safari and deployment were not tested for this release.
