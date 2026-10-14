@@ -25,3 +25,5 @@
 .sheet .cell-chips{max-height:18px;overflow:auto;flex-wrap:nowrap}
 .sheet .cell-chips .chip{flex-shrink:0}
 .sheet .cell-action{display:block;height:14px;line-height:14px;padding:0}
+
+.update-notice:not([hidden]){display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:14px 24px;background:#eaf3dc;border-bottom:1px solid #a6c96a;color:#26372c}.update-notice small{flex-basis:100%}

@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.5 — 2026-10-14
+
+Previous version: v1.1.4.
+
+- Notify when a newer app release is available, with a Save & refresh button. Check same-site version metadata on startup, every five minutes while visible and when returning to the tab; throttle repeated checks and ignore unavailable/malformed responses.
+- Commit a pending valid table entry and verify saved project/reference data before reloading. Retain unexported edits and the imported baseline. Block refresh for invalid/unfinished entries, open dialogs/imports, multiple pending loom editors, storage failures and detected conflicting tabs.
+- Updated: `index.html`, `css/app.css`, `js/app.js`, `js/grid.js`, `js/version.js`, `package.json`, `README.md`, `UPDATES.md`, `CHANGELOG.md`.
+- Added: `js/updates.js`, `tests/updates.test.mjs`. Deleted: none.
+- Validation: 80 automated tests passed. Approved local Chromium testing verified a simulated v1.1.5 → v1.1.6 update, notification removal after refresh, pending cable name, edited lengths and reference recovery, invalid length retention, unfinished metadata retention and concurrent-tab refusal. No browser console errors in the tested refresh flow.
+- Limits: Existing older tabs need one manual refresh to install this feature. Undo/redo history, selection, temporary filters and internal Copy Lengths reset on reload. Drafts stay in the same browser/origin. Network/cache delays may postpone detection; offline editing continues. Firefox/Safari and live deployment were not tested for this update. No upload or deployment performed.
+
+
 ## v1.1.4 — 2026-10-14
 
 Previous version: v1.1.3.

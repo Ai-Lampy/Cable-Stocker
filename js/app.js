@@ -1,3 +1,4 @@
+import {watchUpdates, safeRefresh} from './updates.js';
 import {APP_VERSION} from './version.js';
 import {clone,same,uid,cableTypeSheets,cableTypeRows,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,parseLengths,combineLengths,referenceMatch,defaultCable,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,resolveColour,validateLengthColours,changes,validate,incrementVersion,mergeProjects,relativePath} from './model.js';
 import {Grid,display} from './grid.js';
@@ -8,13 +9,13 @@ const node=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=null)e.
 const btn=(text,fn,cls)=>{const b=node('button',text,cls);b.type='button';b.onclick=fn;return b;};
 const field=(label,value,onchange,{type='text',list,help}={})=>{
   const l=node('label',label),input=node(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;
-  input.value=value??'';if(list)input.setAttribute('list',list);input.onchange=()=>onchange(input.value,input);l.append(input);if(help)l.append(node('small',help));return l;
+  input.value=value??'';input.dataset.draftValue=input.value;if(list)input.setAttribute('list',list);input.onchange=()=>onchange(input.value,input);l.append(input);if(help)l.append(node('small',help));return l;
 };
 const KEYS={draft:'lampy-cable:draft:1',prefs:'lampy-cable:references:1'};
 const LOOMS='Stock / Pre-Made Looms';
 const REF_NAMES={categories:'Categories',cable_types:'Cable Types',connector_types:'Connectors',lighting_vendors:'Lighting Vendors',manifest:'Vendor Manifest',length_colours:'Length colour'};
 let colourPalette={},project=newProject(),refs={},referenceBaseline={},referenceExports={},dirty=false,refDirty=false,page='vendor',settingsTab='categories',cableTypesSheet=null,grid=null,history=[],future=[],copiedLengths=null,toastTimer,loaded=false,saveError='',saveBlocked=false,sessionIssues=[];
-let lastSavedDraft='',lastSavedRefs='';
+let lastSavedDraft='',lastSavedRefs='',updateReload=false,importPending=false;
 const issueTimes=new Map();let issueSequence=0;
 function notice(message,error=false){const t=$('#toast');t.textContent=message;t.className=`show${error?' error':''}`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='',error?11000:5000);}
 function capture(){return {project:clone(project),refs:clone(refs),dirty,refDirty};}
@@ -258,11 +259,30 @@ async function start(){
     const raw=stored(KEYS.draft);if(raw){try{const saved=parseJSON(raw);project=restoreProject(saved.project);dirty=!!saved.dirty;lastSavedDraft=raw;}catch{notice('Saved draft could not be read. It has not been overwritten. Download backups for new work; clear the damaged site storage only after recovery.',true);saveError='Saved draft needs recovery. Autosave paused.';saveBlocked=true;}}
     syncVendorManifest(refs);loaded=true;renderAll();
     $('#settings-button').onclick=()=>navigate('settings');$('#errors-button').onclick=()=>navigate('errors');$('#import-button').onclick=()=>$('#file-input').click();$('#export-button').onclick=()=>reviewExport('json');$('#backup-button').onclick=downloadBackup;
-    $('#file-input').onchange=e=>{const file=e.target.files[0];e.target.value='';importFile(file);};document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>navigate(b.dataset.page));$('.brand').onclick=e=>{e.preventDefault();navigate('vendor');};
-    window.addEventListener('beforeunload',e=>{if(dirty||refDirty){e.preventDefault();e.returnValue='';}});
+    $('#file-input').onchange=async e=>{const file=e.target.files[0];e.target.value='';importPending=true;try{await importFile(file);}finally{importPending=false;}};document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>navigate(b.dataset.page));$('.brand').onclick=e=>{e.preventDefault();navigate('vendor');};
+    window.addEventListener('beforeunload',e=>{if(!updateReload&&(dirty||refDirty)){e.preventDefault();e.returnValue='';}});
     window.addEventListener('storage',e=>{if((e.key===KEYS.draft&&e.newValue!==lastSavedDraft)||(e.key===KEYS.prefs&&e.newValue!==lastSavedRefs)){saveBlocked=true;saveError='Another tab changed this workspace. Save your backups before reloading.';status();notice(saveError,true);}});
     document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!e.target.closest('input,textarea,table')&&!$('#dialog').open){e.preventDefault();e.shiftKey?redo():undo();}});
     if(!saveError)save();
+    watchUpdates(APP_VERSION,version=>{
+      const banner=$('#update-notice');banner.hidden=false;
+      $('#update-message').textContent=`${version} is available. Save your work and refresh to update.`;
+    });
+    $('#refresh-update').onpointerdown=e=>e.preventDefault();
+    $('#refresh-update').onclick=()=>{
+      try{
+        safeRefresh({
+          blocked:()=>{if(importPending)return 'Wait for the import preview before updating.';if($('#dialog').open)return 'Finish or close the open dialog before updating.';
+            if(saveBlocked)return saveError||'Saving is paused. Download backups before reloading.';
+            const pending=[...document.querySelectorAll('#main [data-draft-value]')].find(el=>el.value!==el.dataset.draftValue);
+            if(pending){pending.focus();return 'Finish this field before updating. Your entry has been kept.';}return '';},
+          editors:()=>[...document.querySelectorAll('[data-lampy-grid]')].map(el=>el.lampyGrid),
+          persist:()=>{save();if(saveError||saveBlocked)throw new Error(saveError||'Saving is paused.');
+            if(localStorage.getItem(KEYS.draft)!==JSON.stringify({project,dirty})||localStorage.getItem(KEYS.prefs)!==JSON.stringify({refs,refDirty,referenceExports}))throw new Error('Could not verify your saved work. Refresh cancelled.');},
+          reload:()=>{updateReload=true;window.location.reload();}
+        });
+      }catch(e){updateReload=false;notice(e.message,true);}
+    };
   }catch(e){$('#main').replaceChildren(node('h1','Workspace could not load'),node('p',e.message,'note error-note'),node('p','Run this folder through a local HTTP server, for example: python3 -m http.server 8080. Then open http://localhost:8080. Opening index.html directly with file:// cannot fetch the reference files.'));$('#save-status').textContent='Startup error';}
 }
 start();

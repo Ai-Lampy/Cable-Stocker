@@ -33,7 +33,7 @@ export function toTSV(rows) { return rows.map(row => row.map(x => { const s=disp
 const el = (tag, text, className) => { const n=document.createElement(tag); if(text!=null)n.textContent=text; if(className)n.className=className; return n; };
 export class Grid {
   constructor(host, options) {
-    this.host=host; this.o={...options,columns:visibleTableColumns(options.columns)}; this.selection={r:0,c:0,rr:0,cc:0}; this.filter=''; this.sort=null;
+    this.host=host;host.dataset.lampyGrid='';host.lampyGrid=this; this.o={...options,columns:visibleTableColumns(options.columns)}; this.selection={r:0,c:0,rr:0,cc:0}; this.filter=''; this.sort=null;
     try { this.prefs=JSON.parse(localStorage.getItem(`lampy-grid:${options.key}`)) || {}; } catch { this.prefs={}; }
     this.prefs={zoom:1,widths:{},align:'left',wrap:true,...this.prefs};
     this.render();

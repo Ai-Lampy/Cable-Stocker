@@ -124,7 +124,7 @@ The app warns on leaving with unexported edits where permitted. Storage failures
 
 ## Tests and compatibility
 
-Run `node --test tests/core.test.mjs` with Node 22+ recommended. Tests use generated internal fixtures, never modify original sources, and need no package installation. `package.json` supplies optional npm shortcuts; npm is not needed for the app.
+Run `node --test tests/*.test.mjs` with Node 22+ recommended. Tests use generated internal fixtures, never modify original sources, and need no package installation. `package.json` supplies optional npm shortcuts; npm is not needed for the app.
 
 Target current Chromium, Firefox and Safari with ES modules, native dialog and popover, structuredClone, localStorage and CSS zoom. Browser tests used Codex Chromium. Older browsers, mobile drag gestures and native Excel/LibreOffice behaviour are not certified. Clipboard buttons depend on permission; keyboard copy/paste is the fallback.
 
@@ -137,3 +137,14 @@ Bundled library: SheetJS CE 0.20.3 from its official CDN, with Apache 2.0 licenc
 Upload the root HTML/docs/package files and `.nojekyll`, plus `css/`, `js/`, `data/`, `reference/`, `images/vendor/`, `vendor/` and `tests/`, retaining every filename and subfolder. The chat handover provides the complete file tree. Exclude Finder `.DS_Store` files and locally downloaded test outputs. No V2 modules or placeholders are included.
 
 For v1.1.1, upload `js/app.js`, `js/grid.js`, `js/version.js`, `css/app.css`, `README.md`, `UPDATES.md` and `CHANGELOG.md` together. If upgrading from v1.0.1, also include the v1.1.0 files, `data/length_colours.json` and supplied `reference/colour_options.json`. Refresh the browser fully after deployment so it loads the updated modules.
+
+
+## App updates (v1.1.5)
+
+The app checks its own `js/version.js` on startup, every five minutes while visible, and when you return to the tab (checks are throttled to once per 30 seconds). Newer releases show a persistent banner with **Save & refresh**. Offline/failed checks do not interrupt editing. The version file is read as text, with an uncached request; no remote JavaScript is executed by the checker.
+
+Save & refresh accepts one pending valid table edit, saves the complete project and reference edits locally, verifies both stored values and reloads. Your imported baseline, looms, custom fields and unexported status remain intact. It refuses to reload with invalid cells, unfinished form fields, an open dialog/import, multiple pending loom-table entries, a storage error or a detected conflicting tab. Finish those entries or resolve the conflict first. The button never refreshes automatically.
+
+After refresh, the Vendor page opens; undo/redo history, table selection, temporary filters and the internal Copy Lengths buffer reset. Saved stock/reference data and persisted table preferences remain. Drafts are specific to this browser and origin: switching between GitHub Pages and ailampy.com does not transfer them. Local storage is not a separate backup.
+
+Upload all v1.1.5 files together: `index.html`, `css/app.css`, `js/app.js`, `js/grid.js`, `js/version.js`, new `js/updates.js`, `package.json`, new `tests/updates.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Keep the version declaration format unchanged. Existing v1.1.4 tabs need one manual refresh to install the notification feature. Future releases must increment `js/version.js`. The website proxy needs no redeployment for ordinary app releases. Publishing/caching can delay when a release becomes visible; local validation is not deployment verification.
