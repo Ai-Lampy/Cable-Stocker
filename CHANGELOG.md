@@ -4,6 +4,8 @@
 
 Previous version: v1.1.22.
 
+- README rule audit — 2026-10-14: Removed the remaining browser and Excel test-history statements from README; their coverage and limitations remain in the existing release entries below. Replaced historical seed-dataset wording with current destination guidance. Kept setup requirements, the local test command, usage and upload instructions. Updated `README.md`, `CHANGELOG.md` and `UPDATES.md`; app version remains v1.1.23. No files added/deleted, uploads or deployment. Documentation links and unchanged app/data files verified; no browser tests run for this documentation-only change.
+
 - Documentation maintenance — 2026-10-14 (app remains v1.1.23): Corrected README upload guidance to include projects/ and saved vendor project JSON. Removed release notes, historical test reports and superseded instructions from README; retained current setup, usage, upload and troubleshooting guidance, with release history in CHANGELOG.md. Recorded the preceding removal of root .DS_Store. User project JSON, backups and app files preserved. Changed/upload: README.md, UPDATES.md, CHANGELOG.md. No new files; no further files deleted in this documentation follow-up. No upload or deployment.
 - Documentation checks: README release-note sections removed; local document links and required upload paths checked. App version and all non-documentation files unchanged. Browser tests not run for this documentation-only change.
 

@@ -70,7 +70,7 @@ Plain cable-stock JSON import previews compare against your current draft by mat
 | `*.lampy-project.json` | Reopen vendor work | Cable stock, composite looms, adaptor markers, generator vendor version, filename, row identities and imported baseline. **Not** a Lampy Paperwork input. |
 | `.xlsx` | Spreadsheet editing and backup | Cable categories, adaptor markers, looms/components, vendor metadata, custom fields and stable row keys. |
 
-The supplied cable-stock example has **no loom structure or version field**. V1 keeps newly authored looms and the generator vendor version in project/Excel backups. It warns before a Lampy download that excludes them. Imported runtime version fields and other custom fields stay untouched and can be edited under Custom metadata. The app does not claim Lampy Paperwork can consume composite looms. No unsupported runtime fields were invented.
+The supplied cable-stock example has **no loom structure or version field**. V1 keeps newly authored looms and the generator vendor version in project/Excel backups. It warns before a Lampy download that excludes them. Imported runtime version fields and other custom fields stay untouched and can be edited under Custom metadata. The app does not claim Lampy Paperwork can consume composite looms.
 
 Vendor versions such as `v2` and `v2.1` are independent of the app version. Major/minor buttons require confirmation. A category JSON preview/download is a labelled fragment, not a complete vendor file.
 
@@ -121,7 +121,7 @@ Loom columns: `key`, `name`, `lengths`, `description`, `custom_json`.
 
 Single-category exports include mapping and metadata so imports know their scope. **Replace imported scope** removes rows absent from that scope; **Merge** updates matching keys (or names when keys are unavailable) and retains absent rows. Review shows both outcomes. A plain single sheet with documented cable columns can be imported without metadata; its sheet name becomes the category and current vendor metadata remains.
 
-Excel's 32,767-character limit applies to each cell. Oversized row metadata requires project JSON as the lossless alternative. Desktop Microsoft Excel and LibreOffice were not used for native-application validation; binary read/write and local-browser re-import were tested.
+Excel's 32,767-character limit applies to each cell. Oversized row metadata requires project JSON as the lossless alternative.
 
 ## Cable type category sheets
 
@@ -141,7 +141,7 @@ Settings → **Length colour** shows only the vendor selected on the Vendor tab,
 
 Colours resolve exclusively through the unchanged `reference/colour_options.json`. Full names, unambiguous aliases and palette hex codes are accepted; ambiguous abbreviations such as `G`, `B` and `P` require a full name. Assignments store the palette's exact hex values. Matching length chips display three colour bands. A colour assignment never converts or changes cable lengths.
 
-Download assignments as **length_colours.json** and place them in `data/length_colours.json`. This is a new generator dataset, not an invented Lampy cable-stock extension. Like other Settings references, it is separate from vendor project/Excel backups.
+Download assignments as **length_colours.json** and place them in `data/length_colours.json`. This generator dataset stores colour assignments separately from Lampy cable-stock JSON. Like other Settings references, it is separate from vendor project/Excel backups.
 
 ## References and exact destinations
 
@@ -151,13 +151,13 @@ Download assignments as **length_colours.json** and place them in `data/length_c
 | `reference/manifest.json` | Original authoritative lookup. Replace the generator copy here; apply to Lampy Paperwork only at your existing manifest location. |
 | `reference/examples/christie_lites_cable.json` | Read-only original. Generated output belongs separately in Lampy Paperwork at `json/cable/christie_lites_cable.json`. |
 | `reference/colour_options.json` | Supplied Lampy Paperwork palette; keep unchanged at this path. |
-| `data/length_colours.json` | **New generator dataset** for vendor/unit/length colour assignments. Place Settings download here. |
-| `data/categories.json` | **New generator seed dataset**. Place Settings download here. |
-| `data/cable_types.json` | **New generator seed dataset**. Place Settings download here. |
-| `data/connector_types.json` | **New generator seed dataset**. Place Settings download here. |
+| `data/length_colours.json` | **Generator dataset** for vendor/unit/length colour assignments. Place Settings download here. |
+| `data/categories.json` | **Generator seed dataset**. Place Settings download here. |
+| `data/cable_types.json` | **Generator seed dataset**. Place Settings download here. |
+| `data/connector_types.json` | **Generator seed dataset**. Place Settings download here. |
 | `images/vendor/*` | 15 unchanged original logos. Preserve path and filename case. |
 
-The original three seed dataset filenames were approved for generator use; length_colours.json is the new generator-only assignment dataset. They do not claim pre-existing Lampy production paths. The supplied manifest has one Christie entry, preserved in full. Its location in the separate Lampy Paperwork deployment was not inspected or guessed.
+Use the data/ datasets only for the generator. The supplied manifest contains one Christie entry. Apply manifest downloads to Lampy Paperwork only at your existing manifest location.
 
 Settings downloads use the exact basename without timestamps. Your browser may add a duplicate-download suffix; restore the canonical name before manually replacing a reference. Browsers cannot overwrite project files themselves.
 
@@ -167,11 +167,11 @@ Drafts and references autosave in localStorage for the current browser origin. C
 
 The app warns on leaving with unexported edits where permitted. Storage failures appear in the header. If another tab changes the draft, autosave pauses; download the current in-memory project before reloading. Damaged saved drafts are not silently overwritten. No analytics, server storage or runtime CDN requests are used.
 
-## Tests and compatibility
+## Setup requirements and local checks
 
 Run `node --test tests/*.test.mjs` with Node 22+ recommended. Tests use generated internal fixtures, never modify original sources, and need no package installation. `package.json` supplies optional npm shortcuts; npm is not needed for the app.
 
-Target current Chromium, Firefox and Safari with import maps, ES modules, native dialog and popover, structuredClone, localStorage and CSS zoom. Browser tests used Codex Chromium. Older browsers, mobile drag gestures and native Excel/LibreOffice behaviour are not certified. Clipboard buttons depend on permission; keyboard copy/paste is the fallback.
+Use a browser with import maps, ES modules, native dialog and popover, structuredClone, localStorage and CSS zoom. Clipboard buttons depend on permission; keyboard copy/paste is the fallback. See [CHANGELOG.md](CHANGELOG.md) for browser and spreadsheet test coverage and limitations.
 
 Bundled library: SheetJS CE 0.20.3 from its official CDN, with Apache 2.0 licence in `vendor/SHEETJS-LICENSE.txt`. Documentation: https://docs.sheetjs.com/docs/getting-started/installation/standalone/.
 
