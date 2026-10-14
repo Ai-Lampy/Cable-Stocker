@@ -7,6 +7,12 @@
 
 ## Completed
 
+- v1.1.8 (local): All tables default to centred text and 90 px editable columns. One-time layout migration replaces old widths/alignment while retaining zoom and highlight baselines; later choices persist. Empty/small tables show five entry slots without exporting untouched blank records.
+- Removed the formula bar. Typing edits the cell directly, with Tab/Enter commit, Escape cancel and invalid-input retention. Cable, reference and loom-component tables share this behaviour. Existing chip dialogs, checkboxes and colour pickers remain available.
+- Settings notes/hints now have Ok acknowledgement saved by note text; only new/changed notes reappear. Length colour values show m/ft suffixes while retaining numeric editing/export and vendor/unit isolation.
+- Validation: 98 automated tests passed. Approved local Chromium tests covered defaults, empty rows, direct editing, rebuilt tables, invalid entries, saves/sorting, persistent acknowledgements, both unit suffixes and empty exports. No console errors in checked flows. Not uploaded or deployed.
+- v1.1.8 changed files: `js/app.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; added `tests/tables.test.mjs`; deleted none. Also upload `index.html`, `js/updates.js` and `tests/loading.test.mjs` if the v1.1.7 cache fix has not yet been published.
+
 - v1.1.7 (local, ready for user upload): Load fresh release metadata before startup and use release-specific URLs for every app module, stylesheet and Excel library. Import maps cover relative dependencies; Save & refresh also requests fresh HTML and restores the clean address without clearing drafts.
 - Failed/malformed metadata, mismatched version modules and unsupported browsers show a retry/error instead of silently loading stale code. `js/version.js` remains the only version setting.
 - Validation: 87 automated tests passed. Approved local Chromium testing cached an old v1.1.5 module, loaded v1.1.7, then advanced to simulated v1.1.8 via Save & refresh. Footer version changed, pending reference entry survived, banner disappeared, /cable/ URL stayed clean and all app modules/CSS used new release URLs. No console errors in the app flow.

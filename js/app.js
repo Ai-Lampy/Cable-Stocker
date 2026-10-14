@@ -132,7 +132,7 @@ function renderColourCell(value,host,editor){
   menu.onclick=e=>e.stopPropagation();menu.onkeydown=e=>{e.stopPropagation();const i=options.indexOf(document.activeElement);if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();options[e.key==='Home'?0:e.key==='End'?options.length-1:(i+(e.key==='ArrowDown'?1:-1)+options.length)%options.length].focus();}};
   menu.addEventListener('toggle',()=>trigger.setAttribute('aria-expanded',String(menu.matches(':popover-open'))));
   trigger.onclick=e=>{e.stopPropagation();if(menu.matches(':popover-open')){menu.hidePopover();return;}const rect=trigger.getBoundingClientRect();menu.style.zoom=String(1/(parseFloat(host.closest('table').style.zoom)||1));menu.style.width=`${rect.width}px`;menu.style.left=`${Math.min(rect.left,window.innerWidth-rect.width-8)}px`;const below=window.innerHeight-rect.bottom-12;menu.style.top=`${below>=180?rect.bottom+5:Math.max(8,rect.top-280)}px`;menu.style.maxHeight=`${below>=180?Math.min(280,below):Math.min(280,rect.top-16)}px`;menu.showPopover();options[Math.max(0,entries.findIndex(([code])=>code===hex))].focus();};
-  trigger.onkeydown=e=>{e.stopPropagation();if(e.key==='Tab'){e.preventDefault();editor.tab(e.shiftKey);return;}if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();trigger.click();}};host.append(trigger,menu);
+  trigger.onkeydown=e=>{e.stopPropagation();if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();editor.edit(e.key);return;}if(e.key==='F2'){e.preventDefault();editor.edit();return;}if(e.key==='Tab'){e.preventDefault();editor.tab(e.shiftKey);return;}if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();trigger.click();}};host.append(trigger,menu);
 
 }
 function makeLengthChip(value){
@@ -171,31 +171,44 @@ function renderLooms(){
   });
 }
 function refRows(key=settingsTab){return refs[key].items||refs[key].vendors||refs[key].catalogues;}
-function refColumns(key,includeHidden=false){if(key==='length_colours')return [{key:'length',label:'Length',type:'positive',width:120},...['colour1','colour2','colour3'].map((key,i)=>({key,label:`Colour ${i+1}`,list:'colours-list',width:180,parse:v=>resolveColour(v,colourPalette),render:renderColourCell}))];if(key==='manifest')return [{key:'vendor',label:'vendor',width:280,list:'vendors-list'},{key:'file',label:'file',width:500}];if(key==='lighting_vendors')return [{key:'name',label:'Name',width:280},{key:'logo',label:'Logo path',width:400}];const columns=[{key:'name',label:'Canonical name',width:230},{key:'aliases',label:'Aliases (comma-separated)',type:'aliases',width:300}];if(key==='cable_types')columns.push({key:'adaptor',label:'Adaptor',type:'boolean',width:105},{key:'category',label:'Default category',list:'categories-list',width:180},{key:'direction',label:'Direction',list:'directions-list',width:170},{key:'connectors',label:'Default connectors JSON',type:'json',width:350});return key==='cable_types'?columns.filter(c=>includeHidden||c.key!=='direction'||cableTypeRows(refs.cable_types.items,cableTypesSheet).some(r=>r.adaptor)):columns;}
+function refColumns(key,includeHidden=false){if(key==='length_colours')return [{key:'length',label:`Length (${project.stock.vendor.lengthUnit})`,type:'positive',format:value=>value===''?'':`${value} ${project.stock.vendor.lengthUnit}`},...['colour1','colour2','colour3'].map((key,i)=>({key,label:`Colour ${i+1}`,list:'colours-list',width:180,parse:v=>resolveColour(v,colourPalette),render:renderColourCell}))];if(key==='manifest')return [{key:'vendor',label:'vendor',width:280,list:'vendors-list'},{key:'file',label:'file',width:500}];if(key==='lighting_vendors')return [{key:'name',label:'Name',width:280},{key:'logo',label:'Logo path',width:400}];const columns=[{key:'name',label:'Canonical name',width:230},{key:'aliases',label:'Aliases (comma-separated)',type:'aliases',width:300}];if(key==='cable_types')columns.push({key:'adaptor',label:'Adaptor',type:'boolean',width:105},{key:'category',label:'Default category',list:'categories-list',width:180},{key:'direction',label:'Direction',list:'directions-list',width:170},{key:'connectors',label:'Default connectors JSON',type:'json',width:350});return key==='cable_types'?columns.filter(c=>includeHidden||c.key!=='direction'||cableTypeRows(refs.cable_types.items,cableTypesSheet).some(r=>r.adaptor)):columns;}
 function newRef(key){if(key==='length_colours')return {vendor:project.stock.vendor.name||'',unit:project.stock.vendor.lengthUnit||'m',length:'',colour1:'',colour2:'',colour3:''};if(key==='manifest')return {vendor:'',file:''};if(key==='lighting_vendors')return {name:'',logo:''};const value={id:uid(),name:'',aliases:[]};if(key==='cable_types')Object.assign(value,{category:cableTypesSheet||'',direction:'male-female',connectors:{male:'',female:''}});return value;}
+const readSettingsNotes=new Set();
+function settingsNote(message){
+  const storageKey='lampy-cable:read-notes:1';
+  try{const saved=JSON.parse(localStorage.getItem(storageKey)||'[]');if(Array.isArray(saved))saved.forEach(text=>readSettingsNotes.add(text));}catch{}
+  const note=node('div',null,'note settings-note');
+  if(readSettingsNotes.has(message)){note.hidden=true;return note;}
+  note.append(node('span',message),btn('Ok',()=>{
+    readSettingsNotes.add(message);
+    try{localStorage.setItem(storageKey,JSON.stringify([...readSettingsNotes]));}catch{notice('Acknowledgement kept for this session only; browser storage is unavailable.',true);}
+    note.remove();
+  }));return note;
+}
 function renderSettings(){
-  heading('Reference settings','Edits apply immediately in this browser. Download each changed file to keep it.',[btn(`Download ${settingsTab}.json`,()=>exportReference(settingsTab),'primary')]);
+  heading('Reference settings',null,[btn(`Download ${settingsTab}.json`,()=>exportReference(settingsTab),'primary')]);
+  $('#main').append(settingsNote('Edits apply immediately in this browser. Download each changed file to keep it.'));
   const tabs=node('nav',null,'tabs settings-tabs');for(const [key,label]of Object.entries(REF_NAMES))tabs.append(btn(label,()=>{settingsTab=key;renderSettingsPage();},settingsTab===key?'active':''));$('#main').append(tabs);
-  if(settingsTab==='manifest')$('#main').append(node('p','Exact Lampy schema: { "catalogues": [{ "vendor": "…", "file": "…" }] }. Existing source: reference/manifest.json. File paths refer to Lampy Paperwork, not this generator.','note'));
-  else if(['categories','cable_types','connector_types'].includes(settingsTab))$('#main').append(node('p','New generator reference dataset, derived from the supplied Christie stock example. Internal IDs stay in references and never enter Lampy cable-stock JSON.','note'));
-  if(settingsTab==='length_colours')$('#main').append(node('p','Only the selected vendor’s length colours are shown. New rows inherit that vendor and unit. Choose another vendor on the Vendor tab. Download length_colours.json to keep all vendors’ assignments.','note'));
+  if(settingsTab==='manifest')$('#main').append(settingsNote('Exact Lampy schema: { "catalogues": [{ "vendor": "…", "file": "…" }] }. Existing source: reference/manifest.json. File paths refer to Lampy Paperwork, not this generator.'));
+  else if(['categories','cable_types','connector_types'].includes(settingsTab))$('#main').append(settingsNote('New generator reference dataset, derived from the supplied Christie stock example. Internal IDs stay in references and never enter Lampy cable-stock JSON.'));
+  if(settingsTab==='length_colours')$('#main').append(settingsNote('Only the selected vendor’s length colours are shown. New rows inherit that vendor and unit. Choose another vendor on the Vendor tab. Download length_colours.json to keep all vendors’ assignments.'));
   const key=settingsTab,host=node('div',null,'grid-panel');$('#main').append(host);
   const vendor=project.stock.vendor.name,unit=project.stock.vendor.lengthUnit;
   if(key==='cable_types'){
     const sheets=cableTypeSheets(refs);if(!sheets.includes(cableTypesSheet))cableTypesSheet=sheets[0];
     const tabs=node('nav',null,'tabs settings-tabs');tabs.setAttribute('aria-label','Cable type categories');
     for(const category of sheets){const b=btn(category||'Uncategorised',()=>{cableTypesSheet=category;renderSettingsPage();},category===cableTypesSheet?'active':'');b.setAttribute('aria-current',category===cableTypesSheet?'page':'false');tabs.append(b);}
-    host.before(tabs,node('p',`Cable Types · ${cableTypesSheet||'Uncategorised'} · New rows inherit this category. Download includes all category sheets.`,'note'));
+    host.before(tabs,settingsNote(`Cable Types · ${cableTypesSheet||'Uncategorised'} · New rows inherit this category. Download includes all category sheets.`));
   }
   const sheet=cableTypesSheet;
   const scoped=rows=>key==='cable_types'?cableTypeRows(rows,sheet):key==='length_colours'?rows.filter(r=>String(r.vendor).trim().toLowerCase()===String(vendor).trim().toLowerCase()&&r.unit===unit):rows;
   const rows=()=>scoped(refRows(key));
   if(key==='length_colours'){
     host.before(node('p',`${vendor||'No vendor selected'} · Lengths in ${unit||'unit unset'}`,'colour-context'));
-    if(!vendor||!['m','ft'].includes(unit)){host.replaceWith(node('p','Select a vendor and unit on the Vendor tab before adding length colours.','empty'));return;}
+    if(!vendor||!['m','ft'].includes(unit)){host.replaceWith(settingsNote('Select a vendor and unit on the Vendor tab before adding length colours.'));return;}
   }
   const old=scoped(referenceBaseline[key].items||referenceBaseline[key].vendors||referenceBaseline[key].catalogues);
-  grid=new Grid(host,{current:()=>grid,key:`settings:${key}${key==='length_colours'?':'+JSON.stringify([vendor,unit]):key==='cable_types'?':'+JSON.stringify(sheet):''}`,rowKey:r=>r.id,highlightContext:JSON.stringify(referenceBaseline[key]),label:`${REF_NAMES[key]}${key==='cable_types'?' · '+(sheet||'Uncategorised'):''} reference table`,columns:refColumns(key),highlightColumns:refColumns(key,true),rows,get:(r,k)=>k==='direction'&&key==='cable_types'&&!r.adaptor?'':r[k],readOnly:(i,k,patches)=>key==='cable_types'&&k==='direction'&&!adaptorAfterPaste(rows()[i]?.adaptor,i,patches),changed:(i,k)=>!same(rows()[i][k],old[i]?.[k]),added:i=>i>=old.length,
+  grid=new Grid(host,{hint:settingsNote,current:()=>grid,key:`settings:${key}${key==='length_colours'?':'+JSON.stringify([vendor,unit]):key==='cable_types'?':'+JSON.stringify(sheet):''}`,rowKey:r=>r.id,highlightContext:JSON.stringify(referenceBaseline[key]),label:`${REF_NAMES[key]}${key==='cable_types'?' · '+(sheet||'Uncategorised'):''} reference table`,columns:refColumns(key),highlightColumns:refColumns(key,true),rows,get:(r,k)=>k==='direction'&&key==='cable_types'&&!r.adaptor?'':r[k],readOnly:(i,k,patches)=>key==='cable_types'&&k==='direction'&&!adaptorAfterPaste(rows()[i]?.adaptor,i,patches),changed:(i,k)=>!same(rows()[i][k],old[i]?.[k]),added:i=>i>=old.length,
     add:()=>change(()=>refRows(key).push(newRef(key)),{references:true,renderPage:false}),apply:(patches,allowNew)=>change(()=>{const targets=[...rows()];for(const p of patches){while(targets.length<=p.id){if(!allowNew)throw new Error('Missing reference row.');const row=newRef(key);refRows(key).push(row);targets.push(row);}targets[p.id][p.col.key]=p.value;}},{references:true,renderPage:key==='cable_types'&&patches.some(p=>['adaptor','category'].includes(p.col.key))}),remove:ids=>confirmAction('Delete reference rows',`Delete ${ids.length} selected row(s)? Existing vendor wording stays unchanged.`,()=>change(()=>{const selected=ids.map(i=>rows()[i]);for(const row of selected)refRows(key).splice(refRows(key).indexOf(row),1);},{references:true}),'Delete'),undo,redo,notice,save:saveTable,saved:renderAll,lengthChip:makeLengthChip});
 }
 function renderSettingsPage(){$('#main').replaceChildren();renderSettings();}
@@ -260,8 +273,9 @@ async function start(){
     syncVendorManifest(refs);loaded=true;renderAll();
     $('#settings-button').onclick=()=>navigate('settings');$('#errors-button').onclick=()=>navigate('errors');$('#import-button').onclick=()=>$('#file-input').click();$('#export-button').onclick=()=>reviewExport('json');$('#backup-button').onclick=downloadBackup;
     $('#file-input').onchange=async e=>{const file=e.target.files[0];e.target.value='';importPending=true;try{await importFile(file);}finally{importPending=false;}};document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>navigate(b.dataset.page));$('.brand').onclick=e=>{e.preventDefault();navigate('vendor');};
-    window.addEventListener('beforeunload',e=>{if(!updateReload&&(dirty||refDirty)){e.preventDefault();e.returnValue='';}});
+    window.addEventListener('beforeunload',e=>{if(!updateReload&&(dirty||refDirty||[...document.querySelectorAll('[data-lampy-grid]')].some(el=>el.lampyGrid.editing&&el.lampyGrid.editor.value!==el.lampyGrid.editorOriginal))){e.preventDefault();e.returnValue='';}});
     window.addEventListener('storage',e=>{if((e.key===KEYS.draft&&e.newValue!==lastSavedDraft)||(e.key===KEYS.prefs&&e.newValue!==lastSavedRefs)){saveBlocked=true;saveError='Another tab changed this workspace. Save your backups before reloading.';status();notice(saveError,true);}});
+    document.addEventListener('click',e=>{for(const host of document.querySelectorAll('[data-lampy-grid]')){const g=host.lampyGrid;if(g.editing&&!g.table.contains(e.target)&&!g.commitEditor()){e.preventDefault();e.stopImmediatePropagation();return;}}},true);
     document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!e.target.closest('input,textarea,table')&&!$('#dialog').open){e.preventDefault();e.shiftKey?redo():undo();}});
     if(!saveError)save();
     watchUpdates(APP_VERSION,version=>{

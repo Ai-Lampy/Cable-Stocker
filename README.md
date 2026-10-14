@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.7 fix prevents stale app modules from surviving a version refresh; it is ready for upload and has not been deployed.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.8 update adds table defaults, in-cell editing, acknowledged Settings notes and length-unit suffixes. It includes the v1.1.7 cache fix and has not been deployed.
 
 ## Run locally
 
@@ -21,7 +21,7 @@ For manual GitHub Pages upload, retain the complete folder structure and use thi
 1. Select a vendor, or enter a new vendor name. New vendors start in metres. Imported feet remain feet.
 2. Confirm the output filename. The supplied manifest confirms `christie_lites_cable.json` for Christie Lites UK. Its Lampy Paperwork destination is `json/cable/christie_lites_cable.json`.
 3. Add categories with **+**. Choose a name/alias from the dropdown or type a category. Recognised categories start with their associated cable types and connector defaults, with empty lengths. Custom categories start empty. The selected category wording remains in vendor data; adding an existing category does not replace its rows.
-4. Ordinary cables hide direction and Start / male / End / female columns. When a category contains adaptors, those columns appear for adaptor rows; ordinary rows stay blank and read-only in those columns. Mark a row **Adaptor** to edit its direction and endpoints. Existing direction fields remain in Lampy JSON for compatibility. Add a row. Double-click a cell or press F2 to edit it through the cell-content bar. Press Enter or **Apply cell** to commit, or Tab to accept and move right (Shift+Tab moves left). Selecting a cable reference on a new row prefills connectors. Adaptor endpoint overrides remain editable. Hidden connector and custom data remain in JSON and Excel exports.
+4. Ordinary cables hide direction and Start / male / End / female columns. When a category contains adaptors, those columns appear for adaptor rows; ordinary rows stay blank and read-only in those columns. Mark a row **Adaptor** to edit its direction and endpoints. Existing direction fields remain in Lampy JSON for compatibility. Add a row. Select a cell and type to replace its contents directly in that cell; double-click or press F2 to edit existing text. Press Enter to accept and move down, or Tab to accept and move right (Shift+Tab moves left). Escape cancels the pending cell edit. Invalid entries remain in the cell for correction. Selecting a cable reference on a new row prefills connectors. Adaptor endpoint overrides remain editable. Hidden connector and custom data remain in JSON and Excel exports.
 5. Use **Edit lengths**. Type a positive number and press Enter for each chip. Paste separated lists. Backspace removes the last chip when the input is empty. **Copy Lengths** stores a set inside the app. **Apply / Paste Lengths** offers Replace, Merge or Cancel. No unit conversion occurs.
 6. Open **Review & export**. Errors do not block JSON previews, copying or downloads. A downloaded file with errors is not labelled valid.
 
@@ -42,6 +42,12 @@ The supplied cable-stock example has **no loom structure or version field**. V1 
 Vendor versions such as `v2` and `v2.1` are independent of the app version. Major/minor buttons require confirmation. A category JSON preview/download is a labelled fragment, not a complete vendor file.
 
 ## Tables
+
+All tables start with centred text and 90 px editable columns. The row-number gutter stays 42 px. v1.1.8 resets older saved alignment/width layouts once to these defaults; your later choices persist. Table zoom and saved edit-highlight baselines are retained. Widths can still shrink below 90 px.
+
+Empty tables show five editable entry rows. Small tables retain blank entry slots up to five rows. Untouched slots are presentation only: they do not add records, errors or exported rows. Entering data creates the required rows; entering a later slot also creates the preceding rows. Filters can show no matches, and sorting keeps unused slots at the end. **+ Row** still adds an actual record.
+
+The formula bar has been removed. All typing takes place in the selected table cell. Tab/Shift+Tab and Enter accept the edit and move; Escape restores its prior value. Save, sorting and page actions commit valid pending entries first; invalid input stays editable. Length chips and the separate **Edit lengths** dialog remain available, as do checkboxes and colour pickers.
 
 Every cable, Settings and loom-component table has a prominent **Save table** button at the far right. It commits the cell currently being edited and saves the workspace in this browser. A successful save clears that table’s yellow edit and green added-row highlights, including rows hidden by its search. Other tables keep their highlights. Later edits highlight again; the saved visual baseline survives reload. Cell selection remains visible. The original import baseline remains intact for export reviews. Invalid cell input prevents that save and displays a message. Save does not upload or rewrite the hosted files. Download project/Excel backups for vendor work and separate JSON files for Settings data.
 
@@ -92,6 +98,10 @@ All tables hide raw JSON columns, including cable custom fields, reference conne
 
 ## Vendor manifest and length colours
 
+Settings notes and table hints have an **Ok** button. Acknowledgements are saved in this browser by note text, so unchanged notes stay hidden across visits and reloads; new or changed notes appear. If storage is unavailable, acknowledgement lasts for the current session. Vendor/unit context and validation errors remain visible.
+
+Length colour cells show the vendor unit as a suffix, for example **12.5 ft** or **3.5 m**; the column heading also names the unit. In-cell editing and JSON downloads use the numeric length only. Changing units does not convert numbers or mix assignments between units/vendors.
+
 Lighting Vendors automatically adds missing vendors to Vendor Manifest on startup and after edits. Existing catalogue paths remain untouched. New paths use `json/cable/<vendor_name>_cable.json`, with lowercase underscores and numbered suffixes for collisions. Removing or renaming a vendor does not delete its older manifest entry automatically. Review those entries manually. This creates lookup entries, not the referenced cable-stock files. Download `manifest.json` to retain the expanded catalogue; the supplied original stays unchanged.
 
 Settings → **Length colour** shows only the vendor selected on the Vendor tab, in that vendor’s current unit (`m` or `ft`). Vendor and unit appear above the table; its columns are **Length / Colour 1 / Colour 2 / Colour 3**. Added and pasted rows inherit the selected vendor and unit. Switching vendor or unit hides other assignments without deleting them. The full dataset download retains every vendor. Different vendors and units can use different codes for the same number. Duplicate vendor/unit/length rows appear in Errors. Blank colour fields mean No Colour. Colour-filled table cells open a scrollable palette based on the supplied picker image. Choose with the mouse or arrow keys and Enter; Escape closes the palette. Typed names/aliases remain available through the selected-cell editor and paste.
@@ -138,7 +148,7 @@ Bundled library: SheetJS CE 0.20.3 from its official CDN, with Apache 2.0 licenc
 
 Upload the root HTML/docs/package files and `.nojekyll`, plus `css/`, `js/`, `data/`, `reference/`, `images/vendor/`, `vendor/` and `tests/`, retaining every filename and subfolder. The chat handover provides the complete file tree. Exclude Finder `.DS_Store` files and locally downloaded test outputs. No V2 modules or placeholders are included.
 
-For v1.1.7, upload `index.html`, `js/app.js`, `js/updates.js`, `js/version.js`, new `tests/loading.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md` together. No files were deleted. Every future app update must increase the unique version in `js/version.js`, update the changelog and explicitly include `js/version.js` in the upload list.
+For v1.1.8, upload `js/app.js`, `js/grid.js`, `css/app.css`, `js/version.js`, new `tests/tables.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. If v1.1.7 has not been uploaded, also include its `index.html`, `js/updates.js` and `tests/loading.test.mjs` to retain the cache fix. No files were deleted. Every future app update must increase the unique version in `js/version.js`, update the changelog and explicitly include `js/version.js` in the upload list.
 
 
 ## App updates (v1.1.5)
@@ -165,3 +175,8 @@ A normal refresh could previously find a newer version for the banner but reuse 
 After uploading v1.1.7, an old cached page may need one hard refresh (Ctrl+Shift+R on Windows/Linux or Cmd+Shift+R on macOS Chromium), or open `https://ailampy.com/cable/?_lampy_update=install117` once to request the updated HTML. Commit pending edits and save a project backup first; keep separate reference downloads for Settings changes. Do not clear site data: it contains your drafts. No AI Lampy Website deployment is needed for this app fix.
 
 Validation: 87 automated tests passed. Approved local Chromium testing first cached an old v1.1.5 module, then loaded v1.1.7 and advanced to a simulated published v1.1.8 through Save & refresh. The footer actually changed, the notification disappeared, the clean /cable/ URL returned, and an uncommitted reference cell survived. Server requests confirmed all six app modules and CSS used the new release URLs. This closes a gap in the earlier v1.1.5 live test, which proved notification and draft recovery but only simulated metadata, not a real module-version change. Firefox/Safari and deployment of v1.1.7 have not been tested.
+
+
+## v1.1.8 validation
+
+98 automated tests passed, including default migration, virtual entry rows, atomic validation, acknowledgement persistence, sorting and numeric suffix formatting. Approved local Chromium tests covered centred 90 px defaults, five entry rows in cable/Settings/loom tables, direct text/numeric/length/colour entry, Tab/Enter/Escape, table rebuilds, invalid-entry retention, Save and sorting during edits, note acknowledgement across tabs/reopening, unit switching and empty-reference export. No browser console errors were reported in the checked flows. Firefox/Safari and deployment of v1.1.8 have not been tested.

@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.1.8 — 2026-10-14
+
+Previous version: v1.1.7.
+
+- Set centred text and 90 px editable-column defaults for all tables. Migrate older alignment/width preferences once; preserve zoom/highlight baselines and later user choices. Keep unrestricted resizing below 90 px.
+- Display five entry slots for empty/small tables. Untouched slots stay out of data, validation and exports; sorted slots follow populated rows. Editing a later slot creates the preceding required rows.
+- Replace the formula bar with direct in-cell editing, including lengths and colour names. Tab/Shift+Tab and Enter accept/move; Escape cancels. Keep invalid input in place and commit valid pending entries before saves, sorting and navigation. Preserve checkboxes, colour pickers and length-chip dialogs.
+- Add persistent Ok acknowledgement to Settings notes/hints; show new/changed note text again. Display m/ft suffixes in Length colour cells and headings without changing stored numeric lengths.
+- Updated: `js/app.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added: `tests/tables.test.mjs`. Deleted: none. If upgrading directly from v1.1.6, also upload v1.1.7's `index.html`, `js/updates.js`, `tests/loading.test.mjs`.
+- Validation: 98 automated tests passed. Approved local Chromium tests covered all three table families, 90 px/centred defaults, five blank rows, direct entry, Tab/Enter/Escape, table rebuilds, invalid input, Save/sorting, note acknowledgement after reopening, m/ft suffixes and empty-reference export. No browser console errors in checked flows.
+- Limits: Existing table widths/alignment reset once. Very narrow columns can clip content. Note acknowledgement is browser-local; storage failure keeps it for the session only. Firefox/Safari and live deployment not tested for this release. No upload or deployment performed.
+
+
 ## v1.1.7 — 2026-10-14
 
 Previous version: v1.1.6.

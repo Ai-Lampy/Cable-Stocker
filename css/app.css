@@ -4,8 +4,8 @@
 
 .grid-toolbar .save-table{margin-left:auto;padding:11px 22px;font-size:14px;font-weight:800;border:2px solid #294b32;box-shadow:0 2px 4px #20302225;order:3}
 .colour-context{font-size:16px;font-weight:700;margin:18px 0}
-.sheet td.colour-cell{padding:0;text-align:center}
-.sheet .colour-field{display:block;width:100%;height:34px;min-height:0;min-width:130px;border:0;border-radius:0;background:transparent;color:inherit;text-shadow:inherit;padding:0 10px;font-size:18px;font-weight:800;cursor:pointer;white-space:nowrap}
+.sheet td.colour-cell{padding:0;text-align:inherit}
+.sheet .colour-field{display:block;width:100%;height:34px;min-height:0;min-width:0;text-align:inherit;border:0;border-radius:0;background:transparent;color:inherit;text-shadow:inherit;padding:0 10px;font-size:18px;font-weight:800;cursor:pointer;white-space:nowrap}
 .sheet td.colour-cell.changed{box-shadow:inset 0 0 0 3px var(--yellow)}
 .sheet td.colour-cell.added{box-shadow:inset 3px 0 #91b96a}
 .sheet td.colour-cell.changed.added{box-shadow:inset 0 0 0 3px var(--yellow),inset 6px 0 #91b96a}
@@ -32,3 +32,12 @@
 .sheet td{padding-left:0;padding-right:0;overflow:hidden}
 .sheet .cell-text{padding-left:10px;padding-right:10px}
 .sheet thead th{overflow:hidden}
+
+/* Table defaults and direct cell editing. */
+.sheet thead th,.sheet thead button{text-align:inherit}
+.sheet .cell-chips{justify-content:var(--cell-justify,center)}
+.sheet .cell-action{width:100%;text-align:inherit}
+.sheet .cell-editor{display:block;width:100%;max-width:100%;height:34px;min-height:0;padding:0 3px;border:2px solid var(--focus);border-radius:0;text-align:inherit;background:white;box-sizing:border-box}
+.settings-note:not([hidden]){display:flex;align-items:center;justify-content:space-between;gap:16px;margin:12px 0}
+.settings-note button{flex:none}
+.settings-note[hidden]{display:none}
