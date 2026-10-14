@@ -115,7 +115,7 @@ export function approveConnector(project,refs,pendingName,approvedName){
   const review=connectorReviews(project,refs).find(r=>r.name.toLocaleLowerCase()===pendingName.toLocaleLowerCase());
   if(!review)throw new Error('This connector no longer needs review.');
   for(const use of review.usages)project.stock.cables[use.category][use.row].connectors[use.key]=name;
-  if(!referenceMatch(refs.connector_types.items,name))refs.connector_types.items.push({id:uid(),name,aliases:[]});
+  if(!referenceMatch(refs.connector_types.items,name))refs.connector_types.items.push({id:uid(),name,aliases:[],category:[...new Set(review.usages.map(use=>use.category))].length===1?review.usages[0].category:''});
 }
 export function cableNeedsConnectorInputs(row,entries){
   if(!referenceMatch(entries,String(row.name||'').trim())||!object(row.connectors))return true;
@@ -366,3 +366,11 @@ export function mergeProjects(current, incoming, partial = false) {
 export function cableTypeSheets(refs){return [...new Set([...(refs.categories?.items||[]).map(r=>r.name),...(refs.cable_types?.items||[]).map(r=>r.category||''),''])];}
 export function cableTypeRows(rows,category){return rows.filter(r=>(r.category||'')===category);}
 export function visibleTableColumns(columns,adaptors=true){return columns.filter(c=>c.type!=='json'&&(adaptors||!['direction','start','end'].includes(c.key)));}
+
+export function connectorTypeCategories(row,refs){
+  if(Object.hasOwn(row,'category'))return [row.category||''];
+  const categories=[...new Set((refs.cable_types?.items||[]).filter(cable=>object(cable.connectors)&&Object.values(cable.connectors).some(name=>referenceMatch([row],String(name).trim()))).map(cable=>cable.category||''))];
+  return categories.length?categories:[''];
+}
+export function connectorTypeSheets(refs){return [...new Set([...(refs.categories?.items||[]).map(r=>r.name),...(refs.connector_types?.items||[]).flatMap(row=>connectorTypeCategories(row,refs)),''])];}
+export function connectorTypeRows(rows,category,refs){return rows.filter(row=>connectorTypeCategories(row,refs).includes(category));}

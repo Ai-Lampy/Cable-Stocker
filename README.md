@@ -2,7 +2,17 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.17 was confirmed live in Chromium on 2026-10-14 after the user's upload; connector inheritance and custom connector exports passed. The local v1.1.19 update adds fallback connector review and includes v1.1.18's hidden-column fix. It has not been uploaded or deployed.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **v1.1.19** was verified live in Chromium on 2026-10-14. Connector fallback, yellow review notification, approval/correction, reference export preview and persistence after reopening passed browser testing. The address stayed at ailampy.com/cable/ and no console errors were found. Temporary test data was removed.
+
+**Local update: v1.1.20** adds Connectors category sheets and a second Save table button below every table. This update has not been uploaded or deployed.
+
+## Connector category sheets and table saving
+
+Settings → Connectors now has one sheet per category, like Cable Types, plus Uncategorised. Existing connectors without an assigned category are grouped from the Cable Types reference, matching names and aliases. Shared connectors appear in each relevant sheet as the same entry. Unmatched connectors appear in Uncategorised. Editing or deleting a shared entry affects that entry everywhere.
+
+New rows inherit the selected category. Edit the Category cell to move an entry to another sheet; an explicit category overrides automatic grouping. Approved connectors inherit their cable category when all reviewed uses share one category; otherwise they start in Uncategorised. The download remains one complete `connector_types.json`, including every sheet. Category metadata stays in this generator reference file, never in Lampy cable-stock JSON.
+
+Both Save table buttons perform the same action: accept a valid pending edit, save locally and clear that table’s edit highlights. The additional button is below every cable, Settings and loom-component table. Saving locally does not publish files.
 
 ## Connector review
 

@@ -91,6 +91,7 @@ export class Grid {
     this.scroller.append(this.table);this.host.append(this.scroller);
     const hint='Type to edit the selected cell · Double-click or F2: edit existing text · Tab / Enter: accept and move · Escape: cancel · Shift+arrows: select range · Drag the green corner to fill · Paste: Excel cells';
     this.host.append(this.o.hint?this.o.hint(hint):el('p',hint,'grid-help'));
+    const footer=el('div',null,'grid-footer'),bottomSave=el('button','Save table','primary save-table');bottomSave.type='button';bottomSave.title=save.title;bottomSave.onclick=save.onclick;footer.append(bottomSave);this.host.append(footer);
     this.table.onkeydown=e=>this.key(e);
     this.table.oncopy=e=>{if(e.target.closest('input,button'))return;e.preventDefault();e.clipboardData.setData('text/plain',this.selectionText());};
     this.table.onpaste=e=>{if(e.target.closest('input,button'))return;e.preventDefault();this.paste(e.clipboardData.getData('text/plain'));};

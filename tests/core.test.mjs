@@ -237,3 +237,27 @@ test('pending connector review survives stock JSON and project/Excel round trips
  for(const restored of [M.projectFromStock(output),M.restoreProject(M.clone(p)),fromWorkbook(toWorkbook(p,X),X,p).project])assert(M.connectorReviews(restored,r).some(x=>x.name==='Review cable'));
  assert.equal(M.connectorReviews(fresh(),r).length,0);
 });
+
+test('connector sheets infer legacy categories and aliases without changing source records',()=>{
+ const r={categories:{items:[{name:'Data'},{name:'Mains'}]},cable_types:{items:[{category:'Data',connectors:{male:'alias'}},{category:'Multi',connectors:{end:'Shared'}}]},connector_types:{items:[{name:'Shared',aliases:['Alias']},{name:'Unmatched'},{name:'Explicit',category:'Custom'},{name:'Shared',category:''}]}};
+ const before=M.clone(r);assert.deepEqual(M.connectorTypeSheets(r),['Data','Mains','Multi','','Custom']);
+ assert.deepEqual(M.connectorTypeRows(r.connector_types.items,'Data',r).map(x=>x.name),['Shared']);
+ assert.deepEqual(M.connectorTypeRows(r.connector_types.items,'Multi',r).map(x=>x.name),['Shared']);
+ assert.equal(M.connectorTypeRows(r.connector_types.items,'',r).length,2);assert.deepEqual(r,before);
+});
+test('connector controller scopes additions, category moves, multi-row paste and deletion',()=>{
+ const element=()=>({append(){},before(){},replaceChildren(){},setAttribute(){},replaceWith(){}});let grid;
+ const c=vm.createContext({...M,APP_VERSION:'test',document:{createElement:element,querySelector:element},Grid:class{constructor(host,o){grid=o;}},setTimeout,clearTimeout});
+ vm.runInContext(fs.readFileSync(`${root}js/app.js`,'utf8').replace(/^import .*;$/gm,'').replace(/start\(\);\s*$/,''),c);
+ vm.runInContext(`refs={categories:{items:[{name:'Data'},{name:'Mains'}]},cable_types:{items:[{category:'Data',connectors:{end:'Legacy'}}]},connector_types:{items:[{id:'a',name:'Legacy',aliases:[]},{id:'b',name:'Power',category:'Mains',aliases:[]}]}};referenceBaseline=clone(refs);settingsTab='connector_types';connectorTypesSheet='Data';heading=()=>{};change=fn=>fn();confirmAction=(title,text,fn)=>fn();renderSettings();`,c);
+ assert.equal(grid.rows().length,1);grid.add();assert.equal(grid.rows()[1].category,'Data');
+ grid.apply([{id:0,col:{key:'category'},value:'Mains'},{id:0,col:{key:'name'},value:'Moved'}],false);
+ assert.equal(grid.rows().length,1);grid.remove([0]);assert.equal(grid.rows().length,0);
+ grid.apply([{id:0,col:{key:'name'},value:'New A'},{id:1,col:{key:'name'},value:'New B'}],true);
+ assert.equal(grid.rows().length,2);assert.equal(grid.rows()[1].category,'Data');
+ vm.runInContext("connectorTypesSheet='Mains';renderSettings();",c);assert.equal(grid.rows().length,2);assert.equal(grid.rows()[0].name,'Moved');assert.equal(grid.rows()[1].name,'Power');
+});
+test('approved connectors inherit one usage category without adding category to stock JSON',()=>{
+ const p=fresh(),r=M.clone(refs);p.stock.cables.Test=[M.defaultCable(null,'Unlisted')];M.fillCableConnectors(p,r);M.approveConnector(p,r,'Unlisted','Approved');
+ assert.equal(r.connector_types.items.at(-1).category,'Test');assert.equal(p.stock.cables.Test[0].category,undefined);
+});
