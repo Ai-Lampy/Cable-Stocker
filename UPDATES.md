@@ -7,6 +7,10 @@
 
 ## Completed
 
+- v1.1.23 (local): Corrected bottom Save table placement. The button now appears directly after the table rows, before help text, aligned with the top Save button. v1.1.21 had changed styling only, not vertical placement.
+- Validation: 133 automated tests passed. Approved local Chromium checks confirmed zero gap between table container and footer, identical button alignment/dimensions, and successful Save action. No console errors. No upload/deployment; live version could not be rechecked via the available HTTP tools this turn.
+- Upload: `js/grid.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. If earlier updates are not uploaded, include their listed files too (especially `css/app.css` for matching Save button styling).
+
 - v1.1.22 (local): Save full generator vendor projects under projects/ and load them on vendor selection. Added native-save option/download fallback, exact filename guidance, protected replacement and explicit current-vendor reload. Existing Lampy schemas and references unchanged.
 - Validation: 133 automated tests and approved local Chromium download/hosted-load/cancel/invalid-file checks passed. Native OS save picker not tested. No console errors in checked flows. No upload or deployment.
 - Upload: `index.html`, `js/app.js`, `js/version.js`, new `js/vendor-projects.js`, new `tests/vendor-projects.test.mjs`, new `projects/README.md`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Deleted: none. No actual vendor projects included. Also include the v1.1.21 files if not uploaded yet: `js/grid.js` and `css/app.css`.

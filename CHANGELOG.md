@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.1.23 — 2026-10-14
+
+Previous version: v1.1.22.
+
+- Move the bottom Save table action directly below the table rows and ahead of help text. Retain the top button’s horizontal alignment, dimensions and save behaviour across shared grids. Correct the earlier styling-only change.
+- Updated/upload: `js/grid.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted files: none.
+- Validation: 133 automated tests passed. Approved local Chromium confirmed adjacent table/footer placement, equal button geometry and working save action, with no console errors. Other browsers not tested. Not uploaded or deployed.
+
 ## v1.1.22 — 2026-10-14
 
 Previous version: v1.1.21.

@@ -6,7 +6,7 @@ Static, local-first cable-stock editor. The application version has one source o
 
 **Live v1.1.20 verification:** On 2026-10-14, Chromium confirmed v1.1.20 at ailampy.com/cable/, Connectors category sheets, category assignment and the bottom Save table button committing active edits. No console errors; temporary test entry removed.
 
-**Local update: v1.1.22** adds saving and loading hosted vendor project JSONs for this generator. It includes v1.1.21’s category dropdown and matching Save buttons. It has not been uploaded or deployed.
+**Local update: v1.1.23** moves the bottom Save table button directly below the table rows, before help text, aligned with the top button. It includes v1.1.22’s generator project saving/loading and the earlier category dropdown. It has not been uploaded or deployed.
 
 ## Saved vendor projects — generator only
 
@@ -29,7 +29,7 @@ Settings → Connectors now has one sheet per category, like Cable Types, plus U
 
 New rows inherit the selected category. Double-click the Category cell or press F2 to show available categories, including Uncategorised. Type to filter; click a choice or use arrow keys and Enter/Tab. You can still type a new category. Selecting a category moves the entry to that sheet; an explicit category overrides automatic grouping. Approved connectors inherit their cable category when all reviewed uses share one category; otherwise they start in Uncategorised. The download remains one complete `connector_types.json`, including every sheet. Category metadata stays in this generator reference file, never in Lampy cable-stock JSON.
 
-Both Save table buttons perform the same action: accept a valid pending edit, save locally and clear that table’s edit highlights. The additional button is below every cable, Settings and loom-component table. Saving locally does not publish files.
+Both Save table buttons perform the same action: accept a valid pending edit, save locally and clear that table’s edit highlights. The additional button sits directly below the rows, before help text, in every cable, Settings and loom-component table. Its horizontal alignment and dimensions match the top button. Saving locally does not publish files.
 
 ## Connector review
 
