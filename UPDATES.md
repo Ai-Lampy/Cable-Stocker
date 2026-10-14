@@ -7,6 +7,9 @@
 
 ## Completed
 
+- v1.1.14 (local): Clear sort restores the default ascending table order and keeps the search filter. Sorted paste can extend tables without disabling sorting. 114 automated tests passed; browser testing not run. No upload or deployment.
+- Upload: `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+
 - v1.1.13 (local): Tables start in ascending Name order (vendor name for Manifest, cable type for loom components; numeric Length for Length colour). Blank rows stay last; manual sorting remains available; source/export order is unchanged.
 - Validation: 111 automated tests passed. Browser testing not run. No upload or deployment.
 - Upload: `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.

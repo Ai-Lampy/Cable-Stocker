@@ -33,11 +33,13 @@ export function toTSV(rows) { return rows.map(row => row.map(x => { const s=disp
 const el = (tag, text, className) => { const n=document.createElement(tag); if(text!=null)n.textContent=text; if(className)n.className=className; return n; };
 export class Grid {
   constructor(host, options) {
-    this.host=host;host.dataset.lampyGrid='';host.lampyGrid=this; this.o={...options,columns:visibleTableColumns(options.columns)}; this.selection={r:0,c:0,rr:0,cc:0}; this.filter=''; const sortKey=['name','vendor','type','length'].find(key=>this.o.columns.some(col=>col.key===key));this.sort=sortKey?{key:sortKey,dir:1}:null;
+    this.host=host;host.dataset.lampyGrid='';host.lampyGrid=this; this.o={...options,columns:visibleTableColumns(options.columns)}; this.selection={r:0,c:0,rr:0,cc:0}; this.filter=''; this.sort=this.defaultSort();
     try { this.prefs=JSON.parse(localStorage.getItem(`lampy-grid:${options.key}`)) || {}; } catch { this.prefs={}; }
     this.prefs={zoom:1,wrap:true,...this.prefs,...(this.prefs.layoutVersion===2?{}:{widths:{},align:'center',layoutVersion:2})};
     this.render();
   }
+  defaultSort(){const key=['name','vendor','type','length'].find(key=>this.o.columns.some(col=>col.key===key));return key?{key,dir:1}:null;}
+  resetSort(){if(this.editing&&!this.commitEditor())return false;const target=this.currentGrid();target.sort=target.defaultSort();target.renderBody();return true;}
   pref() { try {localStorage.setItem(`lampy-grid:${this.o.key}`, JSON.stringify(this.prefs));} catch {this.o.notice('Table preferences could not be saved.');} }
   indices() {
     let ids=Array.from({length:Math.max(5,this.o.rows().length,...[...(this.entryIds||[])].map(i=>i+1))},(_,i)=>i);
@@ -54,7 +56,7 @@ export class Grid {
     button('Copy',()=>this.copy()); button('Paste',()=>this.pasteClipboard());
     button('Fill down',()=>this.fill());
     button('Delete rows',()=>this.remove());
-    button('Clear sort',()=>{this.sort=null;this.renderBody();});
+    button('Clear sort',()=>this.resetSort(),'Restore the default table order');
     const search=el('input');search.type='search';search.placeholder='Search this table';search.setAttribute('aria-label','Search this table');search.value=this.filter;
     search.oninput=()=>{this.filter=search.value;this.selection={r:0,c:0,rr:0,cc:0};this.renderBody();};toolbar.append(search);
     button('−',()=>this.zoom(-.1),'Zoom out');
@@ -236,8 +238,9 @@ export class Grid {
   paste(text){try{
     const matrix=parseTSV(text),{r,c}=this.selection,patch=[];
     if(matrix.some(row=>row.length+c>this.o.columns.length))throw new Error('Paste exceeds the table columns. Nothing changed.');
-    if(this.filter||this.sort){if(r+matrix.length>this.ids.length)throw new Error('Clear sorting and filtering before pasting new rows.');}
-    matrix.forEach((row,dr)=>row.forEach((v,dc)=>patch.push({id:this.ids[r+dr]??r+dr,col:this.o.columns[c+dc],text:v})));
+    if(this.filter&&r+matrix.length>this.ids.length)throw new Error('Clear the search filter before pasting new rows.');
+    const nextId=Math.max(this.o.rows().length,...this.ids.map(id=>id+1));
+    matrix.forEach((row,dr)=>row.forEach((v,dc)=>patch.push({id:this.ids[r+dr]??nextId+(r+dr-this.ids.length),col:this.o.columns[c+dc],text:v})));
     this.apply(patch,true);
   }catch(error){this.o.notice(error.message,true);}}
   apply(patches,allowNew=false){try{

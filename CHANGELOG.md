@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.1.14 — 2026-10-14
+
+Previous version: v1.1.13.
+
+- Clear sort now restores the default ascending Name order instead of source order. Manifest uses vendor name, loom components use cable type, and Length colour uses numeric Length. Keep the search filter and validate pending edits before resetting.
+- Allow paste to extend sorted tables safely, since clearing sort no longer disables sorting. A search filter must still be cleared before extending past visible rows.
+- Updated/upload: `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted: none.
+- Validation: 114 automated tests passed, including reset defaults, pending/rebuilt editors and sorted paste extension. Browser testing not run for this update. No upload or deployment performed.
+
 ## v1.1.13 — 2026-10-14
 
 Previous version: v1.1.12.

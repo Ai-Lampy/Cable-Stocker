@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.13 update adds default alphabetical table sorting and includes the earlier palette-only colour suggestions and table improvements. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.14 update makes Clear sort restore default alphabetical table sorting and includes the earlier palette-only colour suggestions and table improvements. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
 
 ## Run locally
 
@@ -55,7 +55,7 @@ Every cable, Settings and loom-component table has a prominent **Save table** bu
 - Ctrl/⌘ C and Ctrl/⌘ V copy/paste rectangular Excel-compatible TSV. Quoted multiline cells are supported. Toolbar Copy/Paste uses clipboard permission when available.
 - Drag the green selection corner to repeat values into a rectangle. Fill down repeats the first selected row. Invalid paste/fill operations apply no cells.
 - Drag a header separator to resize. Focus the separator and use left/right arrows for keyboard resizing. Editable columns no longer have the 90 px minimum or expand to fill the table viewport. They can shrink to 1 px (the non-zero geometry guard) and expand again; narrow content is clipped or scrollable without changing its data. The row-number gutter stays 42 px. Chosen widths persist per table, including at different zoom levels.
-- Click a heading to sort ascending/descending. **Clear sort** restores source order. Search filters displayed rows. Clear filtering/sorting before extending the table with pasted rows.
+- Click a heading to sort ascending/descending. **Clear sort** restores the default ascending order. Search filters displayed rows. Clear the search filter before extending the table with pasted rows; sorting can remain active.
 - Zoom, widths, alignment and wrapping persist per table. Zoom changes the table only. Preferences never enter Lampy JSON.
 - Yellow marks values changed from the imported baseline. Added rows have a green edge. Removed rows appear in review. Excel imports retain the original baseline; importing another stock JSON establishes a new one.
 
@@ -211,6 +211,12 @@ Upload `js/app.js`, `js/grid.js`, `js/model.js`, `js/version.js`, `css/app.css`,
 
 ## Default sorting — v1.1.13
 
-Tables open sorted A–Z by Name, ignoring case and ordering embedded numbers naturally. Vendor Manifest uses vendor name; loom components use cable type. Length colour has no Name column and sorts numerically by Length. Blank rows stay last. Header sorting and **Clear sort** remain available; export/source order is unchanged. Clear sorting before pasting more rows than are currently visible.
+Tables open sorted A–Z by Name, ignoring case and ordering embedded numbers naturally. Vendor Manifest uses vendor name; loom components use cable type. Length colour has no Name column and sorts numerically by Length. Blank rows stay last. Header sorting and **Clear sort** remain available; export/source order is unchanged. Clear the search filter before pasting more rows than are currently visible. Sorting can remain active.
 
 Upload `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 111 automated tests passed. Browser testing and deployment were not performed for this update.
+
+## Clear sort — v1.1.14
+
+**Clear sort** restores Name A–Z (vendor name for Manifest, cable type for loom components, numeric Length for Length colour). It does not remove the default sorting or clear your search. Invalid pending edits must be corrected first. Pasting additional rows now works with sorting active.
+
+Upload `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 114 automated tests passed. Browser testing and deployment were not performed for this update.
