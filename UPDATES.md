@@ -7,6 +7,8 @@
 
 ## Completed
 
+- Documentation maintenance — 2026-10-14 (app remains v1.1.23): Corrected README upload guidance to include projects/ and saved vendor project JSON. Removed release notes, historical test reports and superseded instructions from README; retained current setup, usage, upload and troubleshooting guidance, with release history in CHANGELOG.md. Recorded the preceding removal of root .DS_Store. User project JSON, backups and app files preserved. Changed/upload: README.md, UPDATES.md, CHANGELOG.md. No new files; no further files deleted in this documentation follow-up. No upload or deployment.
+
 - Live vendor-project verification on 2026-10-14: saving vendor projects and loading them when a vendor is selected passed approved Chromium browser testing at https://ailampy.com/cable/ on v1.1.23 using Siyan LTD. Selecting Siyan LTD found projects/siyan_ltd.lampy-project.json and loaded vendor v2, 4 categories, 17 cable types and 1 loom after confirmation. Save vendor project → Download project JSON produced JSON exactly matching the supplied project. The address stayed at ailampy.com/cable/; no console errors. The project has 3 connectors awaiting review. Native Choose save location was not tested. No upload or deployment performed by the agent.
 
 - v1.1.23 (live at https://ailampy.com/cable/; verified 2026-10-14): Corrected bottom Save table placement. The button now appears directly after the table rows, before help text, aligned with the top Save button. v1.1.21 had changed styling only, not vertical placement.
@@ -121,6 +123,8 @@
 - Original stock example, manifest, vendor reference and 15 logos preserved unchanged.
 
 ## Notes
+
+- Keep README.md focused on current setup, usage and upload guidance. Record release notes and test history in CHANGELOG.md, and pending work/maintenance outcomes here.
 
 - Delete agent-created test downloads once testing finishes. Preserve user originals and project source files; remove only downloads identified as test artifacts.
 - BUILD_BRIEF.md remains authoritative. Read this file before subsequent changes.

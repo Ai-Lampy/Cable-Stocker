@@ -4,6 +4,9 @@
 
 Previous version: v1.1.22.
 
+- Documentation maintenance — 2026-10-14 (app remains v1.1.23): Corrected README upload guidance to include projects/ and saved vendor project JSON. Removed release notes, historical test reports and superseded instructions from README; retained current setup, usage, upload and troubleshooting guidance, with release history in CHANGELOG.md. Recorded the preceding removal of root .DS_Store. User project JSON, backups and app files preserved. Changed/upload: README.md, UPDATES.md, CHANGELOG.md. No new files; no further files deleted in this documentation follow-up. No upload or deployment.
+- Documentation checks: README release-note sections removed; local document links and required upload paths checked. App version and all non-documentation files unchanged. Browser tests not run for this documentation-only change.
+
 - Live vendor-project verification on 2026-10-14: saving vendor projects and loading them when a vendor is selected passed approved Chromium browser testing at https://ailampy.com/cable/ on v1.1.23 using Siyan LTD. Selecting Siyan LTD found projects/siyan_ltd.lampy-project.json and loaded vendor v2, 4 categories, 17 cable types and 1 loom after confirmation. Save vendor project → Download project JSON produced JSON exactly matching the supplied project. The address stayed at ailampy.com/cable/; no console errors. The project has 3 connectors awaiting review. Native Choose save location was not tested. No upload or deployment performed by the agent.
 - Documentation-only follow-up: updated `UPDATES.md`, `CHANGELOG.md` and `README.md`; app version remains v1.1.23. Recorded cleanup of agent-created test downloads as an ongoing rule. No new or deleted project files.
 
