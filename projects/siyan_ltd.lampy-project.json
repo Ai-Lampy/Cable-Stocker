@@ -1,0 +1,340 @@
+{
+  "format": "lampy-cable-generator-project",
+  "formatVersion": 1,
+  "stock": {
+    "vendor": {
+      "name": "Siyan LTD",
+      "lengthUnit": "m"
+    },
+    "cables": {
+      "Mains": [
+        {
+          "name": "32A 3ø",
+          "direction": "male-female",
+          "connectors": {
+            "male": "CEE 32A 3ø",
+            "female": "CEE 32A 3ø"
+          },
+          "lengths": [
+            3,
+            5,
+            10,
+            15,
+            20,
+            30,
+            40,
+            50
+          ]
+        },
+        {
+          "name": "63A 3ø",
+          "direction": "male-female",
+          "connectors": {
+            "male": "CEE 63A 3ø",
+            "female": "CEE 63A 3ø"
+          },
+          "lengths": [
+            3,
+            5,
+            10,
+            15,
+            20,
+            30,
+            40,
+            50
+          ]
+        },
+        {
+          "name": "125A 3ø",
+          "direction": "male-female",
+          "connectors": {
+            "male": "CEE 125A 3ø",
+            "female": "CEE 125A 3ø"
+          },
+          "lengths": [
+            3,
+            5,
+            10,
+            15,
+            20,
+            30,
+            40
+          ]
+        },
+        {
+          "name": "32A 1ø",
+          "direction": "male-female",
+          "connectors": {
+            "male": "CEE 32A 1ø",
+            "female": "CEE 32A 1ø"
+          },
+          "lengths": [
+            3,
+            5,
+            10,
+            15,
+            20,
+            30,
+            40,
+            50
+          ]
+        },
+        {
+          "name": "Powerlock - 95mm",
+          "direction": "male-female",
+          "connectors": {
+            "male": "Powerlock (3P + N + E)",
+            "female": "Powerlock (3P + N + E)"
+          },
+          "lengths": [
+            3,
+            5,
+            10,
+            15,
+            20,
+            30,
+            40
+          ]
+        }
+      ],
+      "Multi": [
+        {
+          "name": "Socapex 19-Pin - 1.5mm",
+          "direction": "male-female",
+          "connectors": {
+            "male": "Socapex 19-Pin",
+            "female": "Socapex 19-Pin"
+          },
+          "lengths": [
+            3,
+            5,
+            10,
+            15,
+            20,
+            30,
+            40,
+            1.5
+          ]
+        },
+        {
+          "name": "Socapex 19-Pin - 2.5mm",
+          "direction": "male-female",
+          "connectors": {
+            "male": "Socapex 19-Pin",
+            "female": "Socapex 19-Pin"
+          },
+          "lengths": [
+            3,
+            5,
+            10,
+            15,
+            20,
+            30,
+            40,
+            1.5
+          ]
+        }
+      ],
+      "TRS": [
+        {
+          "name": "True 1",
+          "direction": "male-female",
+          "connectors": {
+            "male": "powerCON TRUE1",
+            "female": "powerCON TRUE1"
+          },
+          "lengths": [
+            5,
+            10,
+            15,
+            20,
+            30,
+            40,
+            1.5,
+            3
+          ]
+        },
+        {
+          "name": "13A",
+          "direction": "male-female",
+          "connectors": {
+            "male": "13A Plug",
+            "female": "13A Socket"
+          },
+          "lengths": [
+            5,
+            10,
+            15,
+            20,
+            30,
+            40,
+            1.5,
+            3
+          ]
+        },
+        {
+          "name": "16A",
+          "direction": "male-female",
+          "connectors": {
+            "male": "CEE 16A 1ø",
+            "female": "CEE 16A 1ø"
+          },
+          "lengths": [
+            5,
+            10,
+            15,
+            20,
+            30,
+            40,
+            1.5,
+            3
+          ]
+        }
+      ],
+      "Data": [
+        {
+          "name": "XLR-3",
+          "direction": "male-female",
+          "connectors": {
+            "male": "XLR-3",
+            "female": "XLR-3"
+          },
+          "lengths": []
+        },
+        {
+          "name": "XLR-4",
+          "direction": "male-female",
+          "connectors": {
+            "male": "XLR-4",
+            "female": "XLR-4"
+          },
+          "lengths": []
+        },
+        {
+          "name": "XLR-5",
+          "direction": "male-female",
+          "connectors": {
+            "male": "XLR-5",
+            "female": "XLR-5"
+          },
+          "lengths": []
+        },
+        {
+          "name": "XLR-7",
+          "direction": "male-female",
+          "connectors": {
+            "male": "XLR-7",
+            "female": "XLR-7"
+          },
+          "lengths": []
+        },
+        {
+          "name": "Ethernet",
+          "direction": "bidirectional",
+          "connectors": {
+            "end": "RJ45"
+          },
+          "lengths": []
+        },
+        {
+          "name": "Ethercon",
+          "direction": "bidirectional",
+          "connectors": {
+            "end": "etherCON"
+          },
+          "lengths": []
+        },
+        {
+          "name": "OpticalCON Quad Fiber",
+          "direction": "bidirectional",
+          "connectors": {
+            "end": "Quad Fiber"
+          },
+          "lengths": []
+        }
+      ]
+    }
+  },
+  "filename": "siyan_cable.json",
+  "vendorVersion": "v2",
+  "looms": [
+    {
+      "id": "d9ec8752-065a-43b1-8fc5-c77a15a8c454",
+      "name": "2-Way Socapex Loom",
+      "lengths": [
+        10,
+        15,
+        20,
+        25,
+        30
+      ],
+      "description": "",
+      "components": [
+        {
+          "id": "f9148d54-453b-4f4d-af8b-95ca8b35e036",
+          "type": "Socapex 19-Pin",
+          "count": 2,
+          "connectors": {
+            "male": "Socapex 19-Pin",
+            "female": "Socapex 19-Pin"
+          },
+          "lengths": []
+        },
+        {
+          "id": "138d9f4d-048d-449c-86d6-6b37af5b91fd",
+          "type": "XLR-5",
+          "count": 4,
+          "connectors": {
+            "male": "XLR-5",
+            "female": "XLR-5"
+          },
+          "lengths": []
+        }
+      ]
+    }
+  ],
+  "rowIds": {
+    "Mains": [
+      "d3b0da3d-6327-4afe-a259-1b9ad3228510",
+      "12c7e227-c7f6-4fee-8e76-166c5207f202",
+      "87e056cc-c15b-43a5-8b94-bc65a5c7a691",
+      "4c745827-f444-4c20-bdcc-e588cc54e532",
+      "5c99fec7-6a53-42bf-8cbf-52ce587ab309"
+    ],
+    "Multi": [
+      "8ae48d44-1492-4f8e-b303-124abb358b39",
+      "6b3e2cbd-b2b7-4ac9-b7c0-68584c7688b4"
+    ],
+    "TRS": [
+      "f2c2e5ad-4b6a-4139-9a92-98a1383fecb7",
+      "0b0b5a17-7c1a-427b-968e-2ee84008f95a",
+      "117f1eae-7189-4cbb-bd2a-7bd0ed90dae5"
+    ],
+    "Data": [
+      "309a377b-ff65-4ac1-a44d-d0125c7283b2",
+      "09ea214f-c626-4c6b-8c60-25f265744f94",
+      "67e48530-a9a2-4b81-8f08-917788f39f8a",
+      "05f7bdd5-e9aa-4653-ab4d-cbab7a6eeaeb",
+      "05d74082-decc-48a5-8411-ae25720eb69b",
+      "2295f20a-cd56-4419-bcad-3765b669dfaa",
+      "07c30d1c-0dc1-4e0a-ba52-572d0e1f32ce"
+    ]
+  },
+  "baseline": {
+    "format": "lampy-cable-generator-project",
+    "formatVersion": 1,
+    "stock": {
+      "vendor": {
+        "name": "",
+        "lengthUnit": "m"
+      },
+      "cables": {}
+    },
+    "filename": "",
+    "vendorVersion": "",
+    "looms": [],
+    "rowIds": {}
+  },
+  "adaptors": {},
+  "loomTab": true
+}
