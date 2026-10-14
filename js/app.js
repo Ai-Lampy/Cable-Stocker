@@ -1,4 +1,4 @@
-import {watchUpdates, safeRefresh} from './updates.js';
+import {watchUpdates, safeRefresh, freshDocumentURL} from './updates.js';
 import {APP_VERSION} from './version.js';
 import {clone,same,uid,cableTypeSheets,cableTypeRows,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,parseLengths,combineLengths,referenceMatch,defaultCable,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,resolveColour,validateLengthColours,changes,validate,incrementVersion,mergeProjects,relativePath} from './model.js';
 import {Grid,display} from './grid.js';
@@ -279,7 +279,7 @@ async function start(){
           editors:()=>[...document.querySelectorAll('[data-lampy-grid]')].map(el=>el.lampyGrid),
           persist:()=>{save();if(saveError||saveBlocked)throw new Error(saveError||'Saving is paused.');
             if(localStorage.getItem(KEYS.draft)!==JSON.stringify({project,dirty})||localStorage.getItem(KEYS.prefs)!==JSON.stringify({refs,refDirty,referenceExports}))throw new Error('Could not verify your saved work. Refresh cancelled.');},
-          reload:()=>{updateReload=true;window.location.reload();}
+          reload:()=>{updateReload=true;window.location.replace(freshDocumentURL(window.location.href));}
         });
       }catch(e){updateReload=false;notice(e.message,true);}
     };

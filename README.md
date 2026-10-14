@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.5 was verified live on 2026-10-14 after the user uploaded the corrected `index.html`. Its update notification and Save & refresh passed approved live Chromium testing. The local v1.1.6 column-resizing update is ready for upload; it has not been deployed.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.7 fix prevents stale app modules from surviving a version refresh; it is ready for upload and has not been deployed.
 
 ## Run locally
 
@@ -128,7 +128,7 @@ The app warns on leaving with unexported edits where permitted. Storage failures
 
 Run `node --test tests/*.test.mjs` with Node 22+ recommended. Tests use generated internal fixtures, never modify original sources, and need no package installation. `package.json` supplies optional npm shortcuts; npm is not needed for the app.
 
-Target current Chromium, Firefox and Safari with ES modules, native dialog and popover, structuredClone, localStorage and CSS zoom. Browser tests used Codex Chromium. Older browsers, mobile drag gestures and native Excel/LibreOffice behaviour are not certified. Clipboard buttons depend on permission; keyboard copy/paste is the fallback.
+Target current Chromium, Firefox and Safari with import maps, ES modules, native dialog and popover, structuredClone, localStorage and CSS zoom. Browser tests used Codex Chromium. Older browsers, mobile drag gestures and native Excel/LibreOffice behaviour are not certified. Clipboard buttons depend on permission; keyboard copy/paste is the fallback.
 
 Tool Tracker Inventory Table View and footer were inspected read-only. No changes were made to that reference site. The user authorised the initial GitHub upload separately and configured GitHub Pages. The deployed v1.0.0 was subsequently tested. The v1.0.1 fix was uploaded by the user and verified live. The v1.1.0 features and v1.1.1 refinements were tested locally with fresh browser-test approval; local checks do not verify their deployment. Future browser testing requires fresh approval, per `BUILD_BRIEF.md`.
 
@@ -138,7 +138,7 @@ Bundled library: SheetJS CE 0.20.3 from its official CDN, with Apache 2.0 licenc
 
 Upload the root HTML/docs/package files and `.nojekyll`, plus `css/`, `js/`, `data/`, `reference/`, `images/vendor/`, `vendor/` and `tests/`, retaining every filename and subfolder. The chat handover provides the complete file tree. Exclude Finder `.DS_Store` files and locally downloaded test outputs. No V2 modules or placeholders are included.
 
-For v1.1.6, upload `js/grid.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md` and `CHANGELOG.md` together. No files were added or deleted. Every future app update must increase the unique version in `js/version.js`, update the changelog and explicitly include `js/version.js` in the upload list.
+For v1.1.7, upload `index.html`, `js/app.js`, `js/updates.js`, `js/version.js`, new `tests/loading.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md` together. No files were deleted. Every future app update must increase the unique version in `js/version.js`, update the changelog and explicitly include `js/version.js` in the upload list.
 
 
 ## App updates (v1.1.5)
@@ -154,3 +154,14 @@ The v1.1.5 release included: `index.html`, `css/app.css`, `js/app.js`, `js/grid.
 Live verification on 2026-10-14 used a browser-only simulated v1.1.6 version response to trigger the banner. Save & refresh preserved an uncommitted table entry and kept ailampy.com/cable/ in the address bar. Removing the simulation restored the real v1.1.5 check and hid the banner. The test value was restored; no browser console errors were reported and no deployed files were changed.
 
 The local v1.1.6 update passed 80 automated tests and approved Chromium checks for pointer/keyboard resizing below 90 px, narrowing to 1 px and expanding again, zoom and width persistence across table switches. Firefox/Safari and deployment of v1.1.6 have not been tested.
+
+
+## Reliable release loading (v1.1.7)
+
+A normal refresh could previously find a newer version for the banner but reuse cached app modules. The page now reads fresh version metadata before startup, then loads all app modules, CSS and the Excel library using that release in their URLs. An import map also versions relative module dependencies. `js/version.js` remains the sole version setting; you do not edit version numbers in HTML.
+
+**Save & refresh** still commits and verifies your local draft/reference changes first. It then requests a fresh document, loads the published release and removes its temporary cache query from the address bar. It does not clear browser storage. If the version response is malformed, unavailable or inconsistent with its loaded module, startup offers Retry loading instead of silently displaying an old release. Already open sessions can keep editing when update checks fail; a new page load needs network access to check the release.
+
+After uploading v1.1.7, an old cached page may need one hard refresh (Ctrl+Shift+R on Windows/Linux or Cmd+Shift+R on macOS Chromium), or open `https://ailampy.com/cable/?_lampy_update=install117` once to request the updated HTML. Commit pending edits and save a project backup first; keep separate reference downloads for Settings changes. Do not clear site data: it contains your drafts. No AI Lampy Website deployment is needed for this app fix.
+
+Validation: 87 automated tests passed. Approved local Chromium testing first cached an old v1.1.5 module, then loaded v1.1.7 and advanced to a simulated published v1.1.8 through Save & refresh. The footer actually changed, the notification disappeared, the clean /cable/ URL returned, and an uncommitted reference cell survived. Server requests confirmed all six app modules and CSS used the new release URLs. This closes a gap in the earlier v1.1.5 live test, which proved notification and draft recovery but only simulated metadata, not a real module-version change. Firefox/Safari and deployment of v1.1.7 have not been tested.

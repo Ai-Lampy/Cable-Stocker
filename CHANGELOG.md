@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.1.7 — 2026-10-14
+
+Previous version: v1.1.6.
+
+- Fix the refresh path that could detect a newer version while reusing cached app modules. Read fresh version metadata before startup and use release-specific URLs for all six app modules, CSS and the Excel library. Import maps cover relative dependencies; no duplicate version setting is required.
+- Save & refresh verifies drafts as before, requests fresh HTML, then restores the clean address. Keep browser storage intact. Show a retry/error for unavailable or malformed metadata, inconsistent version modules or missing import-map support.
+- Updated: `index.html`, `js/app.js`, `js/updates.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added: `tests/loading.test.mjs`. Deleted: none. Upload all eight files together.
+- Validation: 87 automated tests passed. Approved local Chromium testing cached a v1.1.5 module, loaded v1.1.7, then advanced to simulated v1.1.8. Save & refresh changed the actual footer version, preserved a pending reference entry, removed the banner and restored /cable/. Requests verified new release URLs for all six app modules and CSS; no app console errors.
+- Test correction: The earlier v1.1.5 live test verified notification and draft recovery using simulated metadata, but did not prove a real version change through cached dependencies. This regression test adds that missing coverage.
+- Live inspection: Published v1.1.6 index, grid and version files matched local v1.1.6; a fresh Chromium tab displayed v1.1.6. The user's stale session was not reproduced directly.
+- Limits: Existing cached HTML may need one hard refresh or the documented temporary install URL to adopt this fix. Fresh startup needs network access and import-map support; already open sessions continue editing if update checks fail. Firefox/Safari not tested. v1.1.7 remains local; no upload or deployment performed.
+
+
 ## v1.1.6 — 2026-10-14
 
 Previous version: v1.1.5.

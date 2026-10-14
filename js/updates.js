@@ -34,3 +34,8 @@ export function safeRefresh({blocked,editors,persist,reload}) {
   reason=blocked();if(reason)throw new Error(reason);
   persist();reload();
 }
+
+// A fresh document plus release-specific module URLs avoids stale reload loops.
+export function freshDocumentURL(current, token=Date.now()) {
+  const url=new URL(current);url.searchParams.set('_lampy_update',String(token));return url.href;
+}

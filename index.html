@@ -6,9 +6,7 @@
   <meta name="description" content="Create, edit and export Lampy vendor cable stock locally in your browser.">
   <title>Lampy · Cable Stock Generator</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2326372c'/%3E%3Cpath d='M20 14v36h27v-9H30V14' fill='%23a6c96a'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="css/app.css">
-  <script defer src="vendor/xlsx.full.min.js"></script>
-  <script type="module" src="js/app.js"></script>
+  <link id="app-style" rel="stylesheet" href="css/app.css">
 </head>
 <body>
   <header class="app-header">
@@ -33,5 +31,44 @@
   <div id="toast" role="status" aria-live="polite"></div>
   <input id="file-input" type="file" accept=".json,.xlsx" hidden>
   <div id="datalists"></div>
+  <script>
+  // Resolve one fresh release before loading any app modules. Keep every
+  // dependency on a release-specific URL, including relative module imports.
+  (async () => {
+    try {
+      if (!HTMLScriptElement.supports?.('importmap')) throw new Error('This app needs a current browser with import map support.');
+      const base = document.baseURI;
+      const check = new URL('js/version.js', base);
+      check.searchParams.set('check', Date.now() + '-' + Math.random().toString(36).slice(2));
+      const response = await fetch(check, {cache: 'no-store', signal: AbortSignal.timeout(10000)});
+      if (!response.ok) throw new Error('Could not check the published app version.');
+      const match = (await response.text()).trim().match(/^export const APP_VERSION = ['"](v\d+\.\d+\.\d+)['"];?$/);
+      if (!match) throw new Error('The published version file is incomplete. Please try again shortly.');
+      const version = match[1];
+      const asset = path => {const url = new URL(path, base);url.searchParams.set('release', version);return url.href;};
+      const imports = Object.fromEntries(['app', 'model', 'grid', 'excel', 'updates', 'version'].map(name => {
+        const path = 'js/' + name + '.js';return [new URL(path, base).href, asset(path)];
+      }));
+      const map = document.createElement('script');map.type = 'importmap';map.textContent = JSON.stringify({imports});document.head.append(map);
+      document.querySelector('#app-style').href = asset('css/app.css');
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');script.src = asset('vendor/xlsx.full.min.js');
+        script.onload = resolve;script.onerror = () => reject(new Error('Could not load the Excel library. Please try again.'));document.head.append(script);
+      });
+      const loaded = await import(imports[new URL('js/version.js', base).href]);
+      if (loaded.APP_VERSION !== version) throw new Error('The release is still publishing. Please try again shortly.');
+      // Remove only our temporary document-cache key, preserving other URL state.
+      const address = new URL(location.href);
+      if (address.searchParams.has('_lampy_update')) {address.searchParams.delete('_lampy_update');history.replaceState(null, '', address.href);}
+      await import(imports[new URL('js/app.js', base).href]);
+    } catch (error) {
+      document.querySelector('#save-status').textContent = 'App could not load';
+      const message = document.createElement('p');message.textContent = error.message + ' Your saved draft has not been cleared.';
+      const retry = document.createElement('button');retry.textContent = 'Retry loading';
+      retry.onclick = () => {const url = new URL(location.href);url.searchParams.set('_lampy_update', Date.now());location.replace(url.href);};
+      document.querySelector('#main').replaceChildren(message, retry);
+    }
+  })();
+  </script>
 </body>
 </html>

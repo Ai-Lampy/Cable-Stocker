@@ -7,7 +7,13 @@
 
 ## Completed
 
-- v1.1.6 (local, ready for user upload): Removed the 90 px editable-column resize floor, inline minimum widths and forced full-width table stretching. Explicit table widths preserve user-selected sizes; a 1 px guard prevents zero/negative geometry. Narrow cells clip/scroll content without changing data. Keyboard resizing retains focus; widths persist per table.
+- v1.1.7 (local, ready for user upload): Load fresh release metadata before startup and use release-specific URLs for every app module, stylesheet and Excel library. Import maps cover relative dependencies; Save & refresh also requests fresh HTML and restores the clean address without clearing drafts.
+- Failed/malformed metadata, mismatched version modules and unsupported browsers show a retry/error instead of silently loading stale code. `js/version.js` remains the only version setting.
+- Validation: 87 automated tests passed. Approved local Chromium testing cached an old v1.1.5 module, loaded v1.1.7, then advanced to simulated v1.1.8 via Save & refresh. Footer version changed, pending reference entry survived, banner disappeared, /cable/ URL stayed clean and all app modules/CSS used new release URLs. No console errors in the app flow.
+- Earlier live v1.1.5 testing proved notification and draft recovery using simulated metadata; it did not verify replacing cached modules with a real new release. The v1.1.7 regression test covers that gap.
+- v1.1.7 upload list: `index.html`, `js/app.js`, `js/updates.js`, `js/version.js`, new `tests/loading.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Deleted files: none. No upload or deployment performed.
+
+- v1.1.6 (uploaded by the user; confirmed in a fresh live Chromium tab on 2026-10-14): Removed the 90 px editable-column resize floor, inline minimum widths and forced full-width table stretching. Explicit table widths preserve user-selected sizes; a 1 px guard prevents zero/negative geometry. Narrow cells clip/scroll content without changing data. Keyboard resizing retains focus; widths persist per table.
 - README now records v1.1.5 as verified live at ailampy.com/cable and explains version notifications, Save & refresh, retained data and session-state limits.
 - Validation for v1.1.6: 80 automated tests passed. Approved local Chromium tests passed pointer/keyboard resizing below 90 px, 1 px narrowing and reopening, zoom and width persistence across table switches; no console errors. No upload or deployment performed.
 - v1.1.6 files to upload: `js/grid.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
