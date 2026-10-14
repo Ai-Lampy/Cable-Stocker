@@ -7,6 +7,10 @@
 
 ## Completed
 
+- v1.1.18 (local): Restored adaptor-only direction/connector columns. Custom/incomplete cables use a Connectors button and normal form; inheritance retained. 123 automated tests and approved local Chromium checks passed. No upload or deployment.
+- v1.1.17 verified live at ailampy.com/cable/: recognised inheritance and custom connector JSON preview passed. Address retained, test category removed, no console errors in checked flows.
+- Upload: `js/app.js`, `js/grid.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+
 - v1.1.17 (local): Recognised names/aliases inherit missing connectors on entry and category opening, preserving existing overrides. Custom/incomplete cables show normal connector and direction columns without an adaptor flag. Error links target visible fields and sorted rows correctly.
 - Validation: 123 automated tests passed; approved Chromium checks passed custom inputs, inheritance, JSON preview and existing-row repair. No console errors. No upload or deployment.
 - Upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. Original references unchanged.

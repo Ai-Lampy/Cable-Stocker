@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.18 — 2026-10-14
+
+Previous version: v1.1.17.
+
+- Correct the v1.1.17 table regression: custom/incomplete cables no longer reveal direction and connector columns for the whole table. Those columns are once again adaptor-only; non-adaptor cells remain hidden/read-only there.
+- Add a Connectors button within the cable-name cell for custom/incomplete rows. Open ordinary connector inputs with a direction choice, required-end validation, Save and Cancel. No JSON input or adaptor flag is required. Connector error links open this form for non-adaptors. Retain recognised connector inheritance and existing overrides.
+- Updated/upload: `js/app.js`, `js/grid.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted: none.
+- Live verification: ailampy.com/cable/ displays v1.1.17 and retains that address. Live tests verified recognised inheritance and custom connector values in the JSON preview. Temporary test category removed; no deployed files modified and no console errors in checked flows.
+- Local validation: 123 automated tests passed. Approved Chromium tests verified hidden columns for custom cables, connector form saving/export, and adaptor columns appearing/disappearing with the checkbox. No console errors.
+- Limits: v1.1.18 is local only; not uploaded or deployed. Firefox/Safari not tested.
+
 ## v1.1.17 — 2026-10-14
 
 Previous version: v1.1.16.

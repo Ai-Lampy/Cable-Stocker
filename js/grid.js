@@ -92,8 +92,8 @@ export class Grid {
     const hint='Type to edit the selected cell · Double-click or F2: edit existing text · Tab / Enter: accept and move · Escape: cancel · Shift+arrows: select range · Drag the green corner to fill · Paste: Excel cells';
     this.host.append(this.o.hint?this.o.hint(hint):el('p',hint,'grid-help'));
     this.table.onkeydown=e=>this.key(e);
-    this.table.oncopy=e=>{if(e.target.closest('input'))return;e.preventDefault();e.clipboardData.setData('text/plain',this.selectionText());};
-    this.table.onpaste=e=>{if(e.target.closest('input'))return;e.preventDefault();this.paste(e.clipboardData.getData('text/plain'));};
+    this.table.oncopy=e=>{if(e.target.closest('input,button'))return;e.preventDefault();e.clipboardData.setData('text/plain',this.selectionText());};
+    this.table.onpaste=e=>{if(e.target.closest('input,button'))return;e.preventDefault();this.paste(e.clipboardData.getData('text/plain'));};
     this.renderBody();this.updateStyle();
   }
   renderBody() {
@@ -120,7 +120,7 @@ export class Grid {
         const value=this.value(id,col.key);
         if(col.type==='boolean'){
           const check=el('input');check.type='checkbox';check.checked=!!value;check.setAttribute('aria-label',`${col.label}, row ${r+1}`);check.onclick=e=>e.stopPropagation();check.onchange=()=>this.apply([{id,col,text:String(check.checked)}]);td.append(check);
-        }else if(col.render){col.render(value,td,{commit:text=>this.apply([{id,col,text}]),edit:initial=>this.edit(r,c,initial),enter:reverse=>{this.select(r,c);this.moveEnter(reverse);},tab:reverse=>{this.select(r,c);this.moveTab(reverse);}});
+        }else if(col.render){col.render(value,td,{rowId:id,commit:text=>this.apply([{id,col,text}]),edit:initial=>this.edit(r,c,initial),enter:reverse=>{this.select(r,c);this.moveEnter(reverse);},tab:reverse=>{this.select(r,c);this.moveTab(reverse);}});
         }else if(col.type==='lengths'){
           const chips=el('div',null,'cell-chips');
           if(Array.isArray(value))sortedLengths(value).forEach(v=>chips.append(this.o.lengthChip?.(v)||el('span',String(v),'chip mini')));else chips.append(el('span',display(value),'invalid'));
@@ -224,7 +224,7 @@ export class Grid {
     if(e.isComposing||e.target.classList?.contains('cell-editor'))return;
     if(e.key==='Enter'&&e.target.closest('td[data-r]')&&!e.target.closest('button')){e.preventDefault();const cell=e.target.closest('td[data-r]');this.selection={r:+cell.dataset.r,c:+cell.dataset.c,rr:+cell.dataset.r,cc:+cell.dataset.c};this.moveEnter(e.shiftKey);return;}
     if(e.key==='Tab'&&e.target.closest('td[data-r]')){e.preventDefault();const cell=e.target.closest('td[data-r]');this.selection={r:+cell.dataset.r,c:+cell.dataset.c,rr:+cell.dataset.r,cc:+cell.dataset.c};this.moveTab(e.shiftKey);return;}
-    if(e.target.closest('input'))return;
+    if(e.target.closest('input,button'))return;
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?this.o.redo():this.o.undo();return;}
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='a'){e.preventDefault();this.selection={r:0,c:0,rr:this.ids.length-1,cc:this.o.columns.length-1};this.paint();return;}
     const moves={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};

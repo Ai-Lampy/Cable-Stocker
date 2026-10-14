@@ -199,10 +199,10 @@ test('Settings controller scopes additions, multi-cell category moves and deleti
  assert.equal(captured.rows().length,2);assert.equal(captured.rows()[1].category,'Data');
  assert.equal(vm.runInContext('refs.cable_types.items.length',context),4);
  vm.runInContext("project=projectFromStock(source,'example.json');renderCategory('Data');",context);
- assert.equal(captured.columns.some(c=>c.key==='start'),true);assert.equal(captured.columns.some(c=>c.type==='json'),false);
+ assert.equal(captured.columns.some(c=>c.key==='start'),false);assert.equal(captured.columns.some(c=>c.type==='json'),false);
  vm.runInContext("setCableAdaptor(project,'Data',0,true);renderCategory('Data');",context);
  assert.equal(captured.columns.some(c=>c.key==='start'),true);assert.equal(captured.columns.some(c=>c.type==='json'),false);
- assert.equal(captured.get(captured.rows()[1],'start'),M.getCell(captured.rows()[1],'start'));assert.equal(captured.readOnly,undefined);
+ assert.equal(captured.get(captured.rows()[1],'start'),'');assert.equal(captured.readOnly(1,'start'),true);assert.equal(captured.readOnly(0,'start'),false);
  assert.deepEqual(JSON.parse(vm.runInContext('JSON.stringify(runtimeJSON(project))',context)),source);
 });
 

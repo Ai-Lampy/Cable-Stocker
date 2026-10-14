@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.17 update fixes connector inheritance and exposes normal inputs for custom or incomplete cables and includes the earlier palette-only colour suggestions and table improvements. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.17 was confirmed live in Chromium on 2026-10-14 after the user's upload; connector inheritance and custom connector exports passed. The local v1.1.18 update restores hidden table columns and provides a separate connector form for custom or incomplete cables and includes the earlier palette-only colour suggestions and table improvements. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
 
 ## Run locally
 
@@ -242,3 +242,11 @@ Recognised cable names and aliases inherit missing connectors from Cable Types. 
 Custom cables and unresolved connector data show **Direction**, **Start / male** and **End / female** columns. Enter connector names normally; you do not need to tick Adaptor or write JSON. Bidirectional cables use the same end connector at both ends. Complete recognised cables keep these columns hidden unless another row needs them. Existing incompatible/malformed data needs manual correction; it is not silently replaced.
 
 Upload `js/app.js`, `js/model.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 123 automated tests and approved local Chromium checks passed. Firefox/Safari and deployment were not tested for this release.
+
+## Connector form and hidden columns — v1.1.18
+
+Direction and connector columns appear only for adaptors. A custom/incomplete cable now has a **Connectors** button inside its name cell. Use that form to choose direction and enter connector names, then **Save connectors**. **Cancel** leaves the row unchanged. Connector errors for non-adaptors open the form. Recognised cables still inherit missing defaults.
+
+This replaces v1.1.17's behaviour of showing connector columns for the whole table when a custom row was present.
+
+Upload `js/app.js`, `js/grid.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 123 automated tests and approved local Chromium checks passed. v1.1.18 is not deployed; the verified live release is v1.1.17. Firefox/Safari were not tested.
