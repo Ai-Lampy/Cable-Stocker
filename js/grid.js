@@ -1,4 +1,4 @@
-import {clone, same, object, parseJSON, parseLengths} from './model.js';
+import {clone, same, object, parseJSON, parseLengths, visibleTableColumns} from './model.js';
 
 export function display(value) { return Array.isArray(value) ? value.join(', ') : value && typeof value === 'object' ? JSON.stringify(value) : String(value ?? ''); }
 export function parseCell(value, column) {
@@ -33,7 +33,7 @@ export function toTSV(rows) { return rows.map(row => row.map(x => { const s=disp
 const el = (tag, text, className) => { const n=document.createElement(tag); if(text!=null)n.textContent=text; if(className)n.className=className; return n; };
 export class Grid {
   constructor(host, options) {
-    this.host=host; this.o=options; this.selection={r:0,c:0,rr:0,cc:0}; this.filter=''; this.sort=null;
+    this.host=host; this.o={...options,columns:visibleTableColumns(options.columns)}; this.selection={r:0,c:0,rr:0,cc:0}; this.filter=''; this.sort=null;
     try { this.prefs=JSON.parse(localStorage.getItem(`lampy-grid:${options.key}`)) || {}; } catch { this.prefs={}; }
     this.prefs={zoom:1,widths:{},align:'left',wrap:true,...this.prefs};
     this.render();
@@ -73,7 +73,7 @@ export class Grid {
     },'Save this table locally and clear its edit highlights');save.className='primary save-table';
     this.host.append(toolbar);
     const formula=el('div',null,'formula-bar');this.address=el('span','A1','cell-address');this.editor=el('input');this.editor.setAttribute('aria-label','Selected cell contents');
-    this.editor.onkeydown=e=>{if(e.key==='Enter'){this.commitEditor();this.focusCell();}if(e.key==='Escape')this.select(this.selection.r,this.selection.c);};
+    this.editor.onkeydown=e=>{if(e.key==='Tab'){e.preventDefault();this.moveTab(e.shiftKey,true);return;}if(e.key==='Enter'){this.commitEditor();this.focusCell();}if(e.key==='Escape')this.select(this.selection.r,this.selection.c);};
     const apply=el('button','Apply cell');apply.onclick=()=>{this.commitEditor();this.focusCell();};formula.append(this.address,this.editor,apply);this.host.append(formula);
     this.scroller=el('div',null,'grid-scroll');this.table=el('table',null,'sheet');this.table.setAttribute('aria-label',this.o.label);this.table.setAttribute('role','grid');this.table.tabIndex=0;
     this.scroller.append(this.table);this.host.append(this.scroller);
@@ -106,7 +106,7 @@ export class Grid {
         const value=this.o.get(row,col.key);
         if(col.type==='boolean'){
           const check=el('input');check.type='checkbox';check.checked=!!value;check.setAttribute('aria-label',`${col.label}, row ${r+1}`);check.onclick=e=>e.stopPropagation();check.onchange=()=>this.apply([{id,col,text:String(check.checked)}]);td.append(check);
-        }else if(col.render){col.render(value,td,{commit:text=>this.apply([{id,col,text}])});
+        }else if(col.render){col.render(value,td,{commit:text=>this.apply([{id,col,text}]),tab:reverse=>{this.select(r,c);this.moveTab(reverse);}});
         }else if(col.type==='lengths'){
           const chips=el('div',null,'cell-chips');
           if(Array.isArray(value))value.forEach(v=>chips.append(this.o.lengthChip?.(v)||el('span',String(v),'chip mini')));else chips.append(el('span',display(value),'invalid'));
@@ -139,13 +139,25 @@ export class Grid {
   focusCell(r=this.selection.r,c=this.selection.c){const td=this.table.querySelector(`td[data-r="${r}"][data-c="${c}"]`);td?.focus({preventScroll:true});td?.scrollIntoView({block:'nearest',inline:'nearest'});}
   commitEditor(){const {r,c}=this.selection;if(this.ids[r]===undefined)return true;return this.apply([{id:this.ids[r],col:this.o.columns[c],text:this.editor.value}]);}
   edit(r,c,initial){const col=this.o.columns[c];if(col.type==='lengths'){this.o.lengths(this.ids[r]);return;}this.select(r,c);this.editor.focus();if(initial!==undefined)this.editor.value=initial;else this.editor.select();this.editor.setAttribute('list',col.list||'');}
+  moveTab(reverse=false,commit=false){
+    const {r,c}=this.selection,id=this.ids[r],key=this.o.columns[c]?.key;
+    if(commit&&this.editor.value!==this.editorOriginal&&!this.commitEditor()){this.editor.focus();return false;}
+    // Editing a cable name/adaptor can rebuild the table and its visible columns.
+    const target=this.host.isConnected?this:(this.o.current?.()||this);
+    if(!target.ids.length)return true;
+    const row=Math.max(0,target.ids.indexOf(id)),column=Math.max(0,target.o.columns.findIndex(col=>col.key===key));
+    const width=target.o.columns.length,last=target.ids.length*width-1;
+    const next=Math.max(0,Math.min(last,row*width+column+(reverse?-1:1)));
+    target.select(Math.floor(next/width),next%width);return true;
+  }
   key(e){
+    if(e.key==='Tab'&&e.target.closest('td[data-r]')){e.preventDefault();const cell=e.target.closest('td[data-r]');this.selection={r:+cell.dataset.r,c:+cell.dataset.c,rr:+cell.dataset.r,cc:+cell.dataset.c};this.moveTab(e.shiftKey);return;}
     if(e.target.closest('input'))return;
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?this.o.redo():this.o.undo();return;}
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='a'){e.preventDefault();this.selection={r:0,c:0,rr:this.ids.length-1,cc:this.o.columns.length-1};this.paint();return;}
     const moves={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1],Enter:[e.shiftKey?-1:1,0]};
     if(moves[e.key]){e.preventDefault();const [dr,dc]=moves[e.key],r=e.shiftKey?this.selection.rr:this.selection.r,c=e.shiftKey?this.selection.cc:this.selection.c;this.select(r+dr,c+dc,e.shiftKey&&e.key!=='Enter');}
-    else if(e.key==='Tab'){e.preventDefault();let r=this.selection.r,c=this.selection.c+(e.shiftKey?-1:1);if(c<0){r--;c=this.o.columns.length-1;}if(c>=this.o.columns.length){r++;c=0;}this.select(r,c);}
+    else if(e.key==='Tab'){e.preventDefault();this.moveTab(e.shiftKey);}
     else if(e.key==='F2'){e.preventDefault();this.edit(this.selection.r,this.selection.c);}
     else if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();const b=this.bounds(),patch=[];for(let r=b.r;r<=b.rr;r++)for(let c=b.c;c<=b.cc;c++)patch.push({id:this.ids[r],col:this.o.columns[c],text:''});this.apply(patch);}
     else if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();this.edit(this.selection.r,this.selection.c,e.key);}
@@ -164,7 +176,7 @@ export class Grid {
     // Parse every cell before mutating anything: a bad rectangle is atomic.
     const parsed=patches.filter(p=>{
       if(!this.o.readOnly?.(p.id,p.col.key,patches))return true;
-      if(String(p.text).trim())throw new Error('Direction is editable only for adaptors.');
+      if(String(p.text).trim())throw new Error('This field is editable only for adaptors.');
       return false;
     }).map(p=>({...p,value:parseCell(p.text,p.col)}));
     this.o.apply(parsed,allowNew);this.renderBody();this.focusCell();

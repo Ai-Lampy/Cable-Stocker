@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {fileURLToPath} from 'node:url';
 import * as M from '../js/model.js';
-import {parseTSV,toTSV,parseCell} from '../js/grid.js';
+import {Grid,parseTSV,toTSV,parseCell} from '../js/grid.js';
 import {toWorkbook,fromWorkbook,replaceWorkbook,sheetName} from '../js/excel.js';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const source=JSON.parse(fs.readFileSync(`${root}reference/examples/christie_lites_cable.json`));
@@ -159,4 +159,49 @@ test('table parsers reject invalid adaptor, positive length and colour values be
   assert.equal(parseCell('yes',{type:'boolean'}),true);assert.equal(parseCell('no',{type:'boolean'}),false);assert.throws(()=>parseCell('maybe',{type:'boolean'}));
   assert.equal(parseCell('12.5',{type:'positive'}),12.5);assert.throws(()=>parseCell('0',{type:'positive'}));
   assert.throws(()=>parseCell('B',{parse:v=>M.resolveColour(v,palette)}),/Ambiguous/);
+});
+
+// Exercise commit/navigation without browser APIs, including table rebuilds.
+function tabGrid(){const g=Object.create(Grid.prototype);Object.assign(g,{selection:{r:0,c:0},ids:[0,1],o:{columns:[{key:'name'},{key:'length'}]},host:{isConnected:true},editor:{value:'new',focus(){this.focused=true;}},editorOriginal:'old',select(r,c){this.selection={r,c};},commitEditor(){this.committed=true;return true;}});return g;}
+test('Tab commits before moving right and Shift+Tab wraps to previous row',()=>{const g=tabGrid();assert.equal(g.moveTab(false,true),true);assert.equal(g.committed,true);assert.deepEqual(g.selection,{r:0,c:1});g.moveTab();assert.deepEqual(g.selection,{r:1,c:0});g.moveTab(true);assert.deepEqual(g.selection,{r:0,c:1});});
+test('Invalid Tab entry retains selection, entered text and editor focus',()=>{const g=tabGrid();g.commitEditor=()=>false;assert.equal(g.moveTab(false,true),false);assert.deepEqual(g.selection,{r:0,c:0});assert.equal(g.editor.value,'new');assert.equal(g.editor.focused,true);});
+test('Tab follows rebuilt table columns and sorted row position',()=>{const g=tabGrid(),next=tabGrid();next.ids=[1,0];next.o.columns=[{key:'name'},{key:'adaptor'},{key:'length'}];g.commitEditor=()=>{g.host.isConnected=false;return true;};g.o.current=()=>next;g.moveTab(false,true);assert.deepEqual(next.selection,{r:1,c:1});});
+test('Tab avoids unchanged commits and stays at outer table boundaries',()=>{const g=tabGrid();g.editor.value=g.editorOriginal;g.moveTab(true,true);assert.equal(g.committed,undefined);assert.deepEqual(g.selection,{r:0,c:0});g.selection={r:1,c:1};g.moveTab();assert.deepEqual(g.selection,{r:1,c:1});});
+
+test('Table column policy hides every JSON column and adaptor endpoints until needed',()=>{
+ const columns=[{key:'name'},{key:'start'},{key:'end'},{key:'direction'},{key:'connectors',type:'json'},{key:'custom',type:'json'}];
+ assert.deepEqual(M.visibleTableColumns(columns,false).map(c=>c.key),['name']);
+ assert.deepEqual(M.visibleTableColumns(columns,true).map(c=>c.key),['name','start','end','direction']);
+ assert.equal(columns.length,6);
+});
+test('Cable type sheets include reference, custom and uncategorised entries without mutation',()=>{
+ const r={categories:{items:[{name:'Data'},{name:'Mains'}]},cable_types:{items:[{category:'Custom',name:'A'},{category:'Data',name:'B'},{name:'C'}]}};
+ const before=M.clone(r);assert.deepEqual(M.cableTypeSheets(r),['Data','Mains','Custom','']);
+ assert.equal(M.cableTypeRows(r.cable_types.items,'Data')[0],r.cable_types.items[1]);
+ assert.equal(M.cableTypeRows(r.cable_types.items,'')[0].name,'C');assert.deepEqual(r,before);
+});
+test('Settings controller scopes additions, multi-cell category moves and deletions to the selected sheet',()=>{
+ const element=()=>({append(){},before(){},replaceChildren(){},setAttribute(){},replaceWith(){}});
+ let captured;
+ const context=vm.createContext({...M,source:M.clone(source),APP_VERSION:'test',document:{createElement:element,querySelector:element},Grid:class{constructor(host,o){captured=o;}},setTimeout,clearTimeout});
+ const app=fs.readFileSync(`${root}js/app.js`,'utf8').replace(/^import .*;$/gm,'').replace(/start\(\);\s*$/,'');
+ vm.runInContext(app,context);
+ vm.runInContext(`refs={categories:{items:[{name:'Data'},{name:'Mains'}]},cable_types:{items:[{id:'a',name:'A',category:'Data',aliases:[],connectors:{end:'preserved'}},{id:'b',name:'B',category:'Mains',aliases:[]}]}};referenceBaseline=clone(refs);settingsTab='cable_types';cableTypesSheet='Data';heading=()=>{};change=fn=>fn();confirmAction=(title,text,fn)=>fn();renderSettings();`,context);
+ assert.equal(captured.rows().length,1);captured.add();assert.equal(captured.rows().length,2);assert.equal(captured.rows()[1].category,'Data');
+ captured.apply([{id:0,col:{key:'category'},value:'Mains'},{id:0,col:{key:'name'},value:'Moved A'}],false);
+ const after=JSON.parse(vm.runInContext('JSON.stringify(refs.cable_types.items)',context));
+ assert.equal(after[0].name,'Moved A');assert.equal(after[0].category,'Mains');assert.deepEqual(after[0].connectors,{end:'preserved'});assert.equal(after[1].name,'B');
+ captured.remove([0]);assert.equal(captured.rows().length,0);assert.equal(vm.runInContext('refs.cable_types.items.length',context),2);
+ vm.runInContext("cableTypesSheet='Mains';renderSettings();",context);assert.equal(captured.rows().length,2);
+ assert.equal(app.includes('Load supplied Christie example'),false);
+ vm.runInContext("cableTypesSheet='Data';renderSettings();",context);
+ captured.apply([{id:0,col:{key:'name'},value:'New one'},{id:1,col:{key:'name'},value:'New two'}],true);
+ assert.equal(captured.rows().length,2);assert.equal(captured.rows()[1].category,'Data');
+ assert.equal(vm.runInContext('refs.cable_types.items.length',context),4);
+ vm.runInContext("project=projectFromStock(source,'example.json');renderCategory('Data');",context);
+ assert.equal(captured.columns.some(c=>['start','end','direction'].includes(c.key)||c.type==='json'),false);
+ vm.runInContext("setCableAdaptor(project,'Data',0,true);renderCategory('Data');",context);
+ assert.equal(captured.columns.some(c=>c.key==='start'),true);assert.equal(captured.columns.some(c=>c.type==='json'),false);
+ assert.equal(captured.get(captured.rows()[1],'start'),'');assert.equal(captured.readOnly(1,'start'),true);assert.equal(captured.readOnly(0,'start'),false);
+ assert.deepEqual(JSON.parse(vm.runInContext('JSON.stringify(runtimeJSON(project))',context)),source);
 });

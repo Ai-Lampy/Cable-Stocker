@@ -19,7 +19,7 @@ For manual GitHub Pages upload, retain the complete folder structure and use thi
 1. Select a vendor, or enter a new vendor name. New vendors start in metres. Imported feet remain feet.
 2. Confirm the output filename. The supplied manifest confirms `christie_lites_cable.json` for Christie Lites UK. Its Lampy Paperwork destination is `json/cable/christie_lites_cable.json`.
 3. Add categories with **+**. Choose a name/alias from the dropdown or type a category. Recognised categories start with their associated cable types and connector defaults, with empty lengths. Custom categories start empty. The selected category wording remains in vendor data; adding an existing category does not replace its rows.
-4. Ordinary cables hide direction controls. Mark a row **Adaptor** to edit its direction. Existing direction fields remain in Lampy JSON for compatibility. Add a row. Double-click a cell or press F2 to edit it through the cell-content bar. Press Enter or **Apply cell** to commit. Selecting a cable reference on a new row prefills connectors. Vendor overrides remain editable.
+4. Ordinary cables hide direction and Start / male / End / female columns. When a category contains adaptors, those columns appear for adaptor rows; ordinary rows stay blank and read-only in those columns. Mark a row **Adaptor** to edit its direction and endpoints. Existing direction fields remain in Lampy JSON for compatibility. Add a row. Double-click a cell or press F2 to edit it through the cell-content bar. Press Enter or **Apply cell** to commit, or Tab to accept and move right (Shift+Tab moves left). Selecting a cable reference on a new row prefills connectors. Adaptor endpoint overrides remain editable. Hidden connector and custom data remain in JSON and Excel exports.
 5. Use **Edit lengths**. Type a positive number and press Enter for each chip. Paste separated lists. Backspace removes the last chip when the input is empty. **Copy Lengths** stores a set inside the app. **Apply / Paste Lengths** offers Replace, Merge or Cancel. No unit conversion occurs.
 6. Open **Review & export**. Errors do not block JSON previews, copying or downloads. A downloaded file with errors is not labelled valid.
 
@@ -81,6 +81,12 @@ Loom columns: `key`, `name`, `lengths`, `description`, `custom_json`.
 Single-category exports include mapping and metadata so imports know their scope. **Replace imported scope** removes rows absent from that scope; **Merge** updates matching keys (or names when keys are unavailable) and retains absent rows. Review shows both outcomes. A plain single sheet with documented cable columns can be imported without metadata; its sheet name becomes the category and current vendor metadata remains.
 
 Excel's 32,767-character limit applies to each cell. Oversized row metadata requires project JSON as the lossless alternative. Desktop Microsoft Excel and LibreOffice were not used for native-application validation; binary read/write and local-browser re-import were tested.
+
+## Cable type category sheets
+
+Settings → **Cable Types** has a separate sheet for each category, including custom categories and **Uncategorised**. New and pasted rows inherit the active category. Editing Default category moves that row to its destination sheet. Search, selection, deletion and Save operate on the active sheet; downloading cable_types.json still includes every category.
+
+All tables hide raw JSON columns, including cable custom fields, reference connector objects and loom connector overrides. The underlying data stays intact in backups and exports. Use Excel/project files when you need to edit those hidden structured fields. The Vendor tab no longer has a sample-loading shortcut; use Import for existing files.
 
 ## Vendor manifest and length colours
 

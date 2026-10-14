@@ -7,6 +7,12 @@
 
 ## Completed
 
+- v1.1.4: Hide raw JSON columns in every table; preserve underlying data. Show cable connector endpoints only for adaptors.
+- Cable Types now has separate category sheets with scoped edits, inherited categories, full-dataset downloads and category-aware error links.
+- Removed the Vendor tab’s Christie sample-loading button and unused handler; the original example remains unchanged.
+
+- v1.1.3: Tab accepts a pending cell edit and moves right; Shift+Tab moves left. Invalid entries stay in the editor. Navigation follows rebuilt tables and wraps between existing rows.
+
 - v1.1.2: Set table header/data rows to 35 px at 100% table zoom, including colour cells. Long cell text/chip lists scroll inside the compact rows.
 
 - v1.1.1: Length colours show only the selected vendor and unit. Added/pasted rows inherit that context; vendor/unit columns removed.
@@ -34,8 +40,8 @@
 ## Notes
 
 - BUILD_BRIEF.md remains authoritative. Read this file before subsequent changes.
-- The user separately authorised the first GitHub upload and configured GitHub Pages. This v1.1.2 update is local only; the user will upload the changed files.
-- Browser testing was not run for v1.1.2; fresh approval is required. Prior v1.1.1 browser testing remains recorded in CHANGELOG.md.
+- The user separately authorised the first GitHub upload and configured GitHub Pages. This v1.1.4 update is local only; the user will upload the changed files.
+- Browser testing was not run for v1.1.2, v1.1.3 or v1.1.4; fresh approval is required. Prior v1.1.1 browser testing remains recorded in CHANGELOG.md.
 - The supplied colour_options.json is unchanged. New length_colours.json stores generator-only assignments; no unsupported colour/adaptor fields enter Lampy runtime JSON.
 - Application version is defined in js/version.js. Vendor version is separate.
 - No production manifest location outside the supplied reference path was inferred.

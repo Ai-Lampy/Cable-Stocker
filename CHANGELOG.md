@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.1.4 — 2026-10-14
+
+Previous version: v1.1.3.
+
+- Show Start / male, End / female and direction columns only when a cable table contains adaptors. Ordinary rows remain blank/read-only in those columns. Preserve original connectors and directions.
+- Hide raw JSON columns across all tables, including cable fields, reference connectors and loom overrides. Keep their data in backups and exports.
+- Split Settings → Cable Types into category sheets, including custom and uncategorised entries. Scope search, edits, deletion and Save to the active sheet; new rows inherit its category. Preserve complete reference downloads and route error links to the correct sheet.
+- Remove the Load supplied Christie example button and unused handler. Preserve the original input file.
+- Updated: `js/app.js`, `js/grid.js`, `js/model.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Created/deleted files: none.
+- Validation: 70 automated tests passed, including column visibility, category sheet discovery and controller checks for scoped additions, multi-cell category moves, deletions and hidden-data preservation. Browser testing not run; fresh approval required. No upload or deployment performed.
+
+## v1.1.3 — 2026-10-14
+
+Previous version: v1.1.2.
+
+- Tab accepts a pending cell entry and selects the next cell to the right. Shift+Tab accepts and moves left. Wrap between existing rows; stay at the table’s first/last boundary.
+- Invalid entries retain editor focus and selection. Preserve navigation when an edit rebuilds the table or changes its visible columns. Colour cells and checkbox cells use the same Tab navigation.
+- Updated: `js/grid.js`, `js/app.js`, `js/version.js`, `tests/core.test.mjs`, `UPDATES.md`, `CHANGELOG.md`. Created/deleted: none.
+- Validation: 67 automated tests passed, including four new commit/navigation regressions. Browser testing not run; fresh approval required. No upload or deployment performed.
+
 ## v1.1.2 — 2026-10-14
 
 Previous version: v1.1.1.

@@ -300,3 +300,8 @@ export function mergeProjects(current, incoming, partial = false) {
   }
   return result;
 }
+
+// Category sheets preserve original reference objects and category wording.
+export function cableTypeSheets(refs){return [...new Set([...(refs.categories?.items||[]).map(r=>r.name),...(refs.cable_types?.items||[]).map(r=>r.category||''),''])];}
+export function cableTypeRows(rows,category){return rows.filter(r=>(r.category||'')===category);}
+export function visibleTableColumns(columns,adaptors=true){return columns.filter(c=>c.type!=='json'&&(adaptors||!['direction','start','end'].includes(c.key)));}
