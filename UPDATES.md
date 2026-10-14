@@ -7,9 +7,16 @@
 
 ## Completed
 
+- v1.1.6 (local, ready for user upload): Removed the 90 px editable-column resize floor, inline minimum widths and forced full-width table stretching. Explicit table widths preserve user-selected sizes; a 1 px guard prevents zero/negative geometry. Narrow cells clip/scroll content without changing data. Keyboard resizing retains focus; widths persist per table.
+- README now records v1.1.5 as verified live at ailampy.com/cable and explains version notifications, Save & refresh, retained data and session-state limits.
+- Validation for v1.1.6: 80 automated tests passed. Approved local Chromium tests passed pointer/keyboard resizing below 90 px, 1 px narrowing and reopening, zoom and width persistence across table switches; no console errors. No upload or deployment performed.
+- v1.1.6 files to upload: `js/grid.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+
 - v1.1.5: New-release banner checks published version metadata on startup, every five minutes while visible and on return to the tab. Save & refresh commits a valid pending table edit, verifies saved project/reference data and reloads.
 - Refresh guards preserve invalid/unfinished entries and block open dialogs/imports, multiple pending loom editors, storage failures and detected concurrent-tab conflicts.
-- 80 automated tests passed. Freshly approved local Chromium tests verified notification, simulated release refresh, pending stock/reference recovery, invalid-cell/unfinished-field refusal and concurrent-tab protection. No upload or deployment performed.
+- 80 automated tests passed. Freshly approved local Chromium tests verified notification, simulated release refresh, pending stock/reference recovery, invalid-cell/unfinished-field refusal and concurrent-tab protection.
+- v1.1.5 is live at https://ailampy.com/cable/ following the user's GitHub upload. Approved live browser testing on 2026-10-14 confirmed successful startup and the displayed v1.1.5 version after the corrected index.html was published.
+- Live update notification and safe refresh passed: a browser-only simulated v1.1.6 response displayed the notification; Save & refresh preserved an uncommitted table entry and kept ailampy.com/cable/ in the address bar. Removing the simulation restored the real v1.1.5 check and hid the banner. The test cell was restored to its original value; no browser console errors were reported. No deployed files were changed during testing.
 
 - v1.1.4: Hide raw JSON columns in every table; preserve underlying data. Show cable connector endpoints only for adaptors.
 - Cable Types now has separate category sheets with scoped edits, inherited categories, full-dataset downloads and category-aware error links.
@@ -44,10 +51,11 @@
 ## Notes
 
 - BUILD_BRIEF.md remains authoritative. Read this file before subsequent changes.
-- The user separately authorised the first GitHub upload and configured GitHub Pages. This v1.1.5 update is local only; the user will upload the changed files.
+- The user configured GitHub Pages and uploaded v1.1.5, including the corrected index.html. The release is verified live through ailampy.com/cable/. Future uploads and deployments remain the user's responsibility unless separately authorised.
 - Browser testing was not run for v1.1.2, v1.1.3 or v1.1.4; fresh approval is required. Prior v1.1.1 browser testing remains recorded in CHANGELOG.md.
 - The supplied colour_options.json is unchanged. New length_colours.json stores generator-only assignments; no unsupported colour/adaptor fields enter Lampy runtime JSON.
 - Application version is defined in js/version.js. Vendor version is separate.
+- Every future app update must increase the application version in `js/version.js` to a new, unique version, update `CHANGELOG.md`, and explicitly include `js/version.js` in the handover list of files to upload. Never reuse a released version.
 - No production manifest location outside the supplied reference path was inferred.
 
 ## Future

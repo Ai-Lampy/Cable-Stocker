@@ -2,6 +2,8 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.5 was verified live on 2026-10-14 after the user uploaded the corrected `index.html`. Its update notification and Save & refresh passed approved live Chromium testing. The local v1.1.6 column-resizing update is ready for upload; it has not been deployed.
+
 ## Run locally
 
 From this folder:
@@ -46,7 +48,7 @@ Every cable, Settings and loom-component table has a prominent **Save table** bu
 - Arrows, Enter, Tab and Shift+Tab move between cells. Shift+arrows or Shift+click extends a range. Ctrl/⌘ A selects the table.
 - Ctrl/⌘ C and Ctrl/⌘ V copy/paste rectangular Excel-compatible TSV. Quoted multiline cells are supported. Toolbar Copy/Paste uses clipboard permission when available.
 - Drag the green selection corner to repeat values into a rectangle. Fill down repeats the first selected row. Invalid paste/fill operations apply no cells.
-- Drag a header separator to resize. Focus the separator and use left/right arrows for keyboard resizing.
+- Drag a header separator to resize. Focus the separator and use left/right arrows for keyboard resizing. Editable columns no longer have the 90 px minimum or expand to fill the table viewport. They can shrink to 1 px (the non-zero geometry guard) and expand again; narrow content is clipped or scrollable without changing its data. The row-number gutter stays 42 px. Chosen widths persist per table, including at different zoom levels.
 - Click a heading to sort ascending/descending. **Clear sort** restores source order. Search filters displayed rows. Clear filtering/sorting before extending the table with pasted rows.
 - Zoom, widths, alignment and wrapping persist per table. Zoom changes the table only. Preferences never enter Lampy JSON.
 - Yellow marks values changed from the imported baseline. Added rows have a green edge. Removed rows appear in review. Excel imports retain the original baseline; importing another stock JSON establishes a new one.
@@ -136,7 +138,7 @@ Bundled library: SheetJS CE 0.20.3 from its official CDN, with Apache 2.0 licenc
 
 Upload the root HTML/docs/package files and `.nojekyll`, plus `css/`, `js/`, `data/`, `reference/`, `images/vendor/`, `vendor/` and `tests/`, retaining every filename and subfolder. The chat handover provides the complete file tree. Exclude Finder `.DS_Store` files and locally downloaded test outputs. No V2 modules or placeholders are included.
 
-For v1.1.1, upload `js/app.js`, `js/grid.js`, `js/version.js`, `css/app.css`, `README.md`, `UPDATES.md` and `CHANGELOG.md` together. If upgrading from v1.0.1, also include the v1.1.0 files, `data/length_colours.json` and supplied `reference/colour_options.json`. Refresh the browser fully after deployment so it loads the updated modules.
+For v1.1.6, upload `js/grid.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md` and `CHANGELOG.md` together. No files were added or deleted. Every future app update must increase the unique version in `js/version.js`, update the changelog and explicitly include `js/version.js` in the upload list.
 
 
 ## App updates (v1.1.5)
@@ -147,4 +149,8 @@ Save & refresh accepts one pending valid table edit, saves the complete project 
 
 After refresh, the Vendor page opens; undo/redo history, table selection, temporary filters and the internal Copy Lengths buffer reset. Saved stock/reference data and persisted table preferences remain. Drafts are specific to this browser and origin: switching between GitHub Pages and ailampy.com does not transfer them. Local storage is not a separate backup.
 
-Upload all v1.1.5 files together: `index.html`, `css/app.css`, `js/app.js`, `js/grid.js`, `js/version.js`, new `js/updates.js`, `package.json`, new `tests/updates.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Keep the version declaration format unchanged. Existing v1.1.4 tabs need one manual refresh to install the notification feature. Future releases must increment `js/version.js`. The website proxy needs no redeployment for ordinary app releases. Publishing/caching can delay when a release becomes visible; local validation is not deployment verification.
+The v1.1.5 release included: `index.html`, `css/app.css`, `js/app.js`, `js/grid.js`, `js/version.js`, new `js/updates.js`, `package.json`, new `tests/updates.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Keep the version declaration format unchanged. Existing v1.1.4 tabs need one manual refresh to install the notification feature. Future releases must increment `js/version.js`. The website proxy needs no redeployment for ordinary app releases. Publishing/caching can delay when a release becomes visible.
+
+Live verification on 2026-10-14 used a browser-only simulated v1.1.6 version response to trigger the banner. Save & refresh preserved an uncommitted table entry and kept ailampy.com/cable/ in the address bar. Removing the simulation restored the real v1.1.5 check and hid the banner. The test value was restored; no browser console errors were reported and no deployed files were changed.
+
+The local v1.1.6 update passed 80 automated tests and approved Chromium checks for pointer/keyboard resizing below 90 px, narrowing to 1 px and expanding again, zoom and width persistence across table switches. Firefox/Safari and deployment of v1.1.6 have not been tested.

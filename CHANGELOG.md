@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.6 — 2026-10-14
+
+Previous version: v1.1.5.
+
+- Remove the 90 px minimum from pointer and keyboard column resizing, inline header minimum widths and the table's forced full-width stretching. Explicit table widths allow independent narrow columns; keep a 1 px non-zero geometry guard and the 42 px row-number gutter. Clip/scroll narrow contents without changing stored data.
+- Keep keyboard resize focus and persist selected widths per table.
+- Update README with v1.1.5 live status, verified update notification and safe refresh behaviour, and the v1.1.6 upload inventory.
+- Files to upload: `js/grid.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted: none.
+- Validation: 80 automated tests passed. Approved local Chromium tests verified pointer and keyboard resizing below 90 px, narrowing to 1 px and expanding again, zoom and saved widths across table switches. No browser console errors.
+- Limits: Very narrow columns clip their visible content; widen them or use the selected-cell editor to read/edit the value. Firefox/Safari not tested for this update. Local release only; no upload or deployment performed.
+
+
 ## v1.1.5 — 2026-10-14
 
 Previous version: v1.1.4.
@@ -9,7 +21,9 @@ Previous version: v1.1.4.
 - Updated: `index.html`, `css/app.css`, `js/app.js`, `js/grid.js`, `js/version.js`, `package.json`, `README.md`, `UPDATES.md`, `CHANGELOG.md`.
 - Added: `js/updates.js`, `tests/updates.test.mjs`. Deleted: none.
 - Validation: 80 automated tests passed. Approved local Chromium testing verified a simulated v1.1.5 → v1.1.6 update, notification removal after refresh, pending cable name, edited lengths and reference recovery, invalid length retention, unfinished metadata retention and concurrent-tab refusal. No browser console errors in the tested refresh flow.
-- Limits: Existing older tabs need one manual refresh to install this feature. Undo/redo history, selection, temporary filters and internal Copy Lengths reset on reload. Drafts stay in the same browser/origin. Network/cache delays may postpone detection; offline editing continues. Firefox/Safari and live deployment were not tested for this update. No upload or deployment performed.
+- Live status: v1.1.5 is live at https://ailampy.com/cable/ following the user's GitHub upload, including the corrected `index.html`. Approved live Chromium testing on 2026-10-14 confirmed successful startup and the displayed v1.1.5 version.
+- Live update notification and safe refresh passed browser testing. A browser-only simulated v1.1.6 response displayed the notification; Save & refresh preserved an uncommitted table entry and kept ailampy.com/cable/ in the address bar. Removing the simulation restored the real v1.1.5 check and hid the banner. The test cell was restored to its original value, and no browser console errors were reported. No deployed files were changed during testing.
+- Limits: Existing older tabs need one manual refresh to install this feature. Undo/redo history, selection, temporary filters and internal Copy Lengths reset on reload. Drafts stay in the same browser/origin. Network/cache delays may postpone detection; offline editing continues. Firefox/Safari were not tested for this update.
 
 
 ## v1.1.4 — 2026-10-14
