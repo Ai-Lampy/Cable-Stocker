@@ -7,6 +7,13 @@
 
 ## Completed
 
+- v1.1.16 (local): Added Reset widths for only the current table (150 px). Length chips display numerically lowest to highest without mutating source data. Removed their 450 px container cap; content uses the resized column width.
+- Validation: 119 automated tests passed; approved local Chromium checks verified chip order/full width, reset isolation and persistence. No console errors. No upload or deployment.
+- Upload: `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+
+- v1.1.15 (local): Vendor version accepts 2 or 2.1 and adds the v prefix automatically when committed. Existing prefixes, minor digits and empty values are handled without duplication or numeric rounding. 116 automated tests passed; browser testing not run. No upload or deployment.
+- Upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+
 - v1.1.14 (local): Clear sort restores the default ascending table order and keeps the search filter. Sorted paste can extend tables without disabling sorting. 114 automated tests passed; browser testing not run. No upload or deployment.
 - Upload: `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
 

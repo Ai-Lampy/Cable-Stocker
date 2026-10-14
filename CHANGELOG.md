@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.1.16 — 2026-10-14
+
+Previous version: v1.1.15.
+
+- Add Reset widths to each table toolbar. Restore only that table's editable columns to 150 px and save its preference; preserve other tables, zoom, alignment, sorting and highlighting. Validate a pending edit first and follow a rebuilt table.
+- Display length chips lowest to highest using numeric comparison, including decimals. Sort a copy so imported/source arrays remain unchanged; retain duplicates and invalid entries for validation.
+- Remove the 450 px chip-container cap. Length cells use their column's full width; overflowing chips remain scrollable from the first chip. The length-entry dialog is unchanged.
+- Updated/upload: `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+- Validation: 119 automated tests passed. Approved local Chromium checks verified 1.5/2/10/20 display order, 549 px chip content inside a 550 px column, Reset widths restoring 150 px only on the current table, another table retaining 170 px, and persistence across table switches. No console errors in checked flows.
+- Limits: Length sorting is display-only; source/export array order stays unchanged. Firefox/Safari and live deployment not tested. No upload or deployment performed.
+
+## v1.1.15 — 2026-10-14
+
+Previous version: v1.1.14.
+
+- Vendor version accepts a bare major/minor number and adds the v prefix when the field is committed: 2 → v2, 2.1 → v2.1. Accept existing v/V prefixes without duplication; trim surrounding whitespace. Keep minor digits such as 2.10 unchanged and allow clearing the field.
+- Invalid text remains available for correction with existing validation warnings. App version and imported custom runtime version fields remain independent.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+- Validation: 116 automated tests passed, covering numeric entry, existing prefixes, whitespace, empty/invalid values and increment compatibility. Browser testing not run for this update. No upload or deployment performed.
+
 ## v1.1.14 — 2026-10-14
 
 Previous version: v1.1.13.

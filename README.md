@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.14 update makes Clear sort restore default alphabetical table sorting and includes the earlier palette-only colour suggestions and table improvements. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.16 update adds per-table width reset, sorted length chips and full-width length cells and includes the earlier palette-only colour suggestions and table improvements. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
 
 ## Run locally
 
@@ -220,3 +220,17 @@ Upload `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPD
 **Clear sort** restores Name A–Z (vendor name for Manifest, cable type for loom components, numeric Length for Length colour). It does not remove the default sorting or clear your search. Invalid pending edits must be corrected first. Pasting additional rows now works with sorting active.
 
 Upload `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 114 automated tests passed. Browser testing and deployment were not performed for this update.
+
+## Vendor version entry — v1.1.15
+
+Enter **2** or **2.1** in Vendor version, then Tab or click outside the field. The app displays and saves **v2** or **v2.1** automatically. Entering an existing v prefix also works. Clear the field to leave the vendor version unset. Invalid formats retain the existing validation warning. This generator vendor version remains separate from the app version and imported custom version fields.
+
+Upload `js/app.js`, `js/model.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 116 automated tests passed; browser testing and deployment were not performed for this update.
+
+## Table widths and length display — v1.1.16
+
+**Reset widths** restores the current table's editable columns to 150 px. Other tables keep their chosen widths. Zoom, alignment, sorting and highlighting remain unchanged.
+
+Length chips display from lowest to highest, including decimal lengths. This changes the display only; imported/source array order stays intact. Length chips now use the full resized column width, with scrolling when needed, rather than stopping at 450 px. The length-entry dialog remains unchanged.
+
+Upload `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 119 automated tests and approved local Chromium checks passed. Firefox/Safari and deployment were not tested for this release.

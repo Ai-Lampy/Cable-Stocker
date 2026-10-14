@@ -205,3 +205,6 @@ test('Settings controller scopes additions, multi-cell category moves and deleti
  assert.equal(captured.get(captured.rows()[1],'start'),'');assert.equal(captured.readOnly(1,'start'),true);assert.equal(captured.readOnly(0,'start'),false);
  assert.deepEqual(JSON.parse(vm.runInContext('JSON.stringify(runtimeJSON(project))',context)),source);
 });
+
+test('vendor version entry adds v once and preserves minor version digits',()=>{for(const [input,expected]of [['2','v2'],['2.1','v2.1'],['2.10','v2.10'],['v2.1','v2.1'],[' V3 ','v3'],['',''],['  ',''],[0,'v0']])assert.equal(M.normaliseVendorVersion(input),expected);assert.equal(M.incrementVersion(M.normaliseVendorVersion('2.1'),false),'v2.2');});
+test('invalid version text is not silently repaired into a different version',()=>{for(const input of ['bad','-2','2..1','2.1.3','vv2'])assert.equal(M.normaliseVendorVersion(input),input);});

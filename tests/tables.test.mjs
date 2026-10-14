@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import {Grid,parseCell} from '../js/grid.js';
+import {Grid,parseCell,sortedLengths} from '../js/grid.js';
 import * as M from '../js/model.js';
 function grid(rows=[]){const g=Object.create(Grid.prototype);Object.assign(g,{o:{rows:()=>rows,columns:[{key:'name',width:500}],get:(r,k)=>r[k]},prefs:{widths:{}},filter:'',sort:null});return g;}
 test('empty tables expose five entry slots without changing exported rows',()=>{const rows=[],g=grid(rows);assert.deepEqual(g.indices(),[0,1,2,3,4]);assert.equal(g.value(4,'name'),'');assert.deepEqual(rows,[]);});
@@ -63,3 +63,7 @@ test('length defaults compare decimal values numerically',()=>{const g=grid([{le
 test('Clear sort restores Name ascending and preserves the search filter',()=>{const g=enterGrid([{name:'Zulu'},{name:'Alpha'}]);g.sort={key:'name',dir:-1};g.filter='a';assert.equal(g.resetSort(),true);assert.deepEqual(g.sort,{key:'name',dir:1});assert.equal(g.filter,'a');assert.deepEqual(g.ids,[1]);});
 test('Clear sort honours invalid edits and follows rebuilt tables',()=>{const g=enterGrid(),next=enterGrid();g.editing=true;g.commitEditor=()=>false;g.sort={key:'name',dir:-1};assert.equal(g.resetSort(),false);assert.equal(g.sort.dir,-1);g.commitEditor=()=>true;g.currentGrid=()=>next;next.sort={key:'name',dir:-1};assert.equal(g.resetSort(),true);assert.deepEqual(next.sort,{key:'name',dir:1});});
 test('sorted paste can extend the table without overwriting rows hidden by display order',()=>{const rows=Array.from({length:5},(_,i)=>({name:String(5-i)})),g=editable(rows);g.ids=[4,3,2,1,0];g.sort={key:'name',dir:1};g.selection={r:4,c:0};g.paste('Last\nNew');assert.equal(rows[0].name,'Last');assert.equal(rows[5].name,'New');assert.equal(rows[4].name,'1');});
+
+test('Reset widths changes only the active grid widths, retaining its other preferences',()=>{const g=enterGrid(),other=enterGrid();g.prefs={widths:{name:600},align:'right',zoom:1.2};other.prefs={widths:{name:300}};g.pref=()=>{g.saved=structuredClone(g.prefs);};assert.equal(g.resetWidths(),true);assert.deepEqual(g.prefs,{widths:{},align:'right',zoom:1.2});assert.deepEqual(g.saved,g.prefs);assert.equal(g.columnWidth(g.o.columns[0]),150);assert.equal(other.prefs.widths.name,300);});
+test('Reset widths refuses invalid edits and follows a rebuilt active table',()=>{const g=enterGrid(),next=enterGrid();g.editing=true;g.prefs.widths={name:400};g.commitEditor=()=>false;assert.equal(g.resetWidths(),false);assert.equal(g.prefs.widths.name,400);g.commitEditor=()=>true;g.currentGrid=()=>next;next.prefs.widths={name:500};next.pref=()=>{};g.resetWidths();assert.deepEqual(next.prefs.widths,{});});
+test('length chips sort numerically without mutating source values or hiding invalid entries',()=>{const values=[20,1.5,10,2,2,'invalid',null];assert.deepEqual(sortedLengths(values),[1.5,2,2,10,20,'invalid',null]);assert.deepEqual(values,[20,1.5,10,2,2,'invalid',null]);});

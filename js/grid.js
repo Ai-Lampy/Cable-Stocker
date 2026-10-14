@@ -1,6 +1,7 @@
 import {clone, same, object, parseJSON, parseLengths, visibleTableColumns} from './model.js';
 
 export function display(value) { return Array.isArray(value) ? value.join(', ') : value && typeof value === 'object' ? JSON.stringify(value) : String(value ?? ''); }
+export function sortedLengths(values){return [...values].sort((a,b)=>{const valid=x=>typeof x==='number'&&Number.isFinite(x);return valid(a)&&valid(b)?a-b:valid(a)?-1:valid(b)?1:0;});}
 export function parseCell(value, column) {
   if(column.parse)return column.parse(value);
   if(column.type==='boolean'){const text=String(value).trim().toLowerCase();if(!['','yes','no','true','false'].includes(text))throw new Error('Use yes or no.');return ['yes','true'].includes(text);}
@@ -40,6 +41,7 @@ export class Grid {
   }
   defaultSort(){const key=['name','vendor','type','length'].find(key=>this.o.columns.some(col=>col.key===key));return key?{key,dir:1}:null;}
   resetSort(){if(this.editing&&!this.commitEditor())return false;const target=this.currentGrid();target.sort=target.defaultSort();target.renderBody();return true;}
+  resetWidths(){if(this.editing&&!this.commitEditor())return false;const target=this.currentGrid();target.prefs.widths={};target.pref();target.renderBody();return true;}
   pref() { try {localStorage.setItem(`lampy-grid:${this.o.key}`, JSON.stringify(this.prefs));} catch {this.o.notice('Table preferences could not be saved.');} }
   indices() {
     let ids=Array.from({length:Math.max(5,this.o.rows().length,...[...(this.entryIds||[])].map(i=>i+1))},(_,i)=>i);
@@ -57,6 +59,7 @@ export class Grid {
     button('Fill down',()=>this.fill());
     button('Delete rows',()=>this.remove());
     button('Clear sort',()=>this.resetSort(),'Restore the default table order');
+    button('Reset widths',()=>this.resetWidths(),'Reset this table’s columns to 150 px');
     const search=el('input');search.type='search';search.placeholder='Search this table';search.setAttribute('aria-label','Search this table');search.value=this.filter;
     search.oninput=()=>{this.filter=search.value;this.selection={r:0,c:0,rr:0,cc:0};this.renderBody();};toolbar.append(search);
     button('−',()=>this.zoom(-.1),'Zoom out');
@@ -120,7 +123,7 @@ export class Grid {
         }else if(col.render){col.render(value,td,{commit:text=>this.apply([{id,col,text}]),edit:initial=>this.edit(r,c,initial),enter:reverse=>{this.select(r,c);this.moveEnter(reverse);},tab:reverse=>{this.select(r,c);this.moveTab(reverse);}});
         }else if(col.type==='lengths'){
           const chips=el('div',null,'cell-chips');
-          if(Array.isArray(value))value.forEach(v=>chips.append(this.o.lengthChip?.(v)||el('span',String(v),'chip mini')));else chips.append(el('span',display(value),'invalid'));
+          if(Array.isArray(value))sortedLengths(value).forEach(v=>chips.append(this.o.lengthChip?.(v)||el('span',String(v),'chip mini')));else chips.append(el('span',display(value),'invalid'));
           td.append(chips);
           const edit=el('button','Edit lengths','cell-action');edit.onclick=e=>{e.stopPropagation();if(this.editing&&!this.commitEditor())return;if(row)this.o.lengths(id);else this.edit(r,c);};td.append(edit);
         }else td.append(el('span',col.format?col.format(value):display(value),'cell-text'));

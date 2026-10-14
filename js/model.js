@@ -274,6 +274,10 @@ export function validateReferences(refs) {
   return issues;
 }
 export function relativePath(path) { return typeof path === 'string' && /^(?![/.\\])(?!.*(?:^|\/)\.\.(?:\/|$))[\p{L}\p{N}_ .\-/]+$/u.test(path) && !path.includes('//'); }
+export function normaliseVendorVersion(value){
+  const text=String(value??'').trim();
+  return /^v?\d+(?:\.\d+)?$/i.test(text)?`v${text.replace(/^v/i,'')}`:text;
+}
 export function incrementVersion(value, major) {
   const m = /^v(\d+)(?:\.(\d+))?$/.exec(value || 'v0');
   if (!m) throw new Error('Enter a vendor version such as v2 or v2.1 first.');
