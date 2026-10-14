@@ -7,6 +7,17 @@
 
 ## Completed
 
+- v1.1.11 (local): Enter on the last table row adds a blank entry row in the same column after accepting valid input. Shift+Enter moves up; invalid input stays editable. Length-colour picker supports typing to select colours with name/alias suggestions. Removed green cell accent stripes; kept selection and yellow change highlighting.
+- Validation: 106 automated tests passed; approved local Chromium checks passed Enter/colour typing/invalid input/Shift+Enter and accent removal, with no console errors. No upload or deployment.
+- Upload: `js/grid.js`, `js/app.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+
+- v1.1.10 (local): Default editable-column width increased from 90 px to 150 px across all tables; manually saved widths remain unchanged. 101 automated tests passed. Browser testing not run for this update. No upload or deployment.
+- Upload: `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+
+- v1.1.9 (local): Vendor custom metadata now uses ordinary labelled fields, number inputs, Yes/No choices and structured groups/lists. Add/remove fields without entering JSON; preserve existing field names, types and schema.
+- Validation: 101 automated tests passed; approved local Chromium checks passed creation/editing, export types and saved-value recovery. No console errors in checked flows. No upload or deployment.
+- Upload: `js/app.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`, new `tests/metadata.test.mjs`. Deleted: none. Earlier unpublished release files must also be included when upgrading from an older release.
+
 - v1.1.8 (local): All tables default to centred text and 90 px editable columns. One-time layout migration replaces old widths/alignment while retaining zoom and highlight baselines; later choices persist. Empty/small tables show five entry slots without exporting untouched blank records.
 - Removed the formula bar. Typing edits the cell directly, with Tab/Enter commit, Escape cancel and invalid-input retention. Cable, reference and loom-component tables share this behaviour. Existing chip dialogs, checkboxes and colour pickers remain available.
 - Settings notes/hints now have Ok acknowledgement saved by note text; only new/changed notes reappear. Length colour values show m/ft suffixes while retaining numeric editing/export and vendor/unit isolation.

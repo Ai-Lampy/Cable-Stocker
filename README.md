@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.8 update adds table defaults, in-cell editing, acknowledged Settings notes and length-unit suffixes. It includes the v1.1.7 cache fix and has not been deployed.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.11 update adds rows with Enter, improves typed colour selection and removes green cell accent stripes. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
 
 ## Run locally
 
@@ -43,7 +43,7 @@ Vendor versions such as `v2` and `v2.1` are independent of the app version. Majo
 
 ## Tables
 
-All tables start with centred text and 90 px editable columns. The row-number gutter stays 42 px. v1.1.8 resets older saved alignment/width layouts once to these defaults; your later choices persist. Table zoom and saved edit-highlight baselines are retained. Widths can still shrink below 90 px.
+All tables default to centred text and 150 px editable columns. The row-number gutter stays 42 px. Manually saved widths remain unchanged. The v1.1.8 layout migration still resets pre-v1.1.8 layouts once; your later choices persist. Table zoom and saved edit-highlight baselines are retained. Columns can still shrink to 1 px.
 
 Empty tables show five editable entry rows. Small tables retain blank entry slots up to five rows. Untouched slots are presentation only: they do not add records, errors or exported rows. Entering data creates the required rows; entering a later slot also creates the preceding rows. Filters can show no matches, and sorting keeps unused slots at the end. **+ Row** still adds an actual record.
 
@@ -180,3 +180,25 @@ Validation: 87 automated tests passed. Approved local Chromium testing first cac
 ## v1.1.8 validation
 
 98 automated tests passed, including default migration, virtual entry rows, atomic validation, acknowledgement persistence, sorting and numeric suffix formatting. Approved local Chromium tests covered centred 90 px defaults, five entry rows in cable/Settings/loom tables, direct text/numeric/length/colour entry, Tab/Enter/Escape, table rebuilds, invalid-entry retention, Save and sorting during edits, note acknowledgement across tabs/reopening, unit switching and empty-reference export. No browser console errors were reported in the checked flows. Firefox/Safari and deployment of v1.1.8 have not been tested.
+
+## Custom metadata fields — v1.1.9
+
+Open **Custom metadata** on the Vendor page. Enter text and numbers in labelled fields and select Yes/No for switches. Use **+ Add field** to choose a field name and value type. Groups contain fields; lists contain items. **Remove** asks for confirmation. No JSON code is needed.
+
+Imported field names, types and nested values stay intact in exports. Existing value types remain fixed; remove and recreate a field to change its type. Empty values offer **Enter text**. Standard vendor name and length unit remain in their dedicated controls.
+
+Upload `js/app.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md` and new `tests/metadata.test.mjs` to the same paths. Include earlier release files if you have not uploaded them yet. No files deleted.
+
+Validation: 101 automated tests passed. Approved local Chromium checks verified field creation, text/numeric/Yes-No editing, export types and values after reopening. No console errors in checked flows. Firefox/Safari and deployment were not tested for this release.
+
+## v1.1.10 upload
+
+Upload `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md` to the same paths. Include earlier unpublished release files if needed. No new or deleted files. 101 automated tests passed; browser testing and deployment were not performed for this update.
+
+## Enter and typed colours — v1.1.11
+
+Press **Enter** on the last visible table row to show another blank row and move into the same column. A valid pending edit is accepted first; invalid input stays in the editor. **Shift+Enter** moves up without adding a row. Unused blank entry rows are temporary and are not exported; typing into a later slot creates preceding required rows.
+
+In Length colour, type a supplied colour name or alias directly in the selected cell, or start typing while its picker is open. Suggestions include palette names and aliases. **Enter** accepts and moves down; **Tab** accepts and moves right. The picker remains available. Green cell accent stripes are removed; selection outlines and yellow change highlighting remain.
+
+Upload `js/grid.js`, `js/app.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 106 automated tests and approved local Chromium checks passed. Firefox/Safari and deployment were not tested.

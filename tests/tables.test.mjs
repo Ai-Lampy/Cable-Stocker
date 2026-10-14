@@ -7,8 +7,8 @@ import * as M from '../js/model.js';
 function grid(rows=[]){const g=Object.create(Grid.prototype);Object.assign(g,{o:{rows:()=>rows,columns:[{key:'name',width:500}],get:(r,k)=>r[k]},prefs:{widths:{}},filter:'',sort:null});return g;}
 test('empty tables expose five entry slots without changing exported rows',()=>{const rows=[],g=grid(rows);assert.deepEqual(g.indices(),[0,1,2,3,4]);assert.equal(g.value(4,'name'),'');assert.deepEqual(rows,[]);});
 test('small tables retain five entry slots and search does not create fake matches',()=>{const g=grid([{name:'Cable'}]);assert.equal(g.indices().length,5);g.filter='cable';assert.deepEqual(g.indices(),[0]);g.filter='absent';assert.deepEqual(g.indices(),[]);});
-test('90 px defaults ignore old per-column suggestions but honour chosen widths',()=>{const g=grid();assert.equal(g.columnWidth(g.o.columns[0]),90);g.prefs.widths.name=25;assert.equal(g.columnWidth(g.o.columns[0]),25);});
-test('existing layout preferences migrate once to centre/90 without discarding highlights',()=>{
+test('150 px defaults ignore old per-column suggestions but honour chosen widths',()=>{const g=grid();assert.equal(g.columnWidth(g.o.columns[0]),150);g.prefs.widths.name=25;assert.equal(g.columnWidth(g.o.columns[0]),25);});
+test('existing layout preferences migrate once to centre/default widths without discarding highlights',()=>{
  const saved=globalThis.localStorage,render=Grid.prototype.render;
  try{globalThis.localStorage={getItem:()=>JSON.stringify({align:'left',widths:{name:250},highlights:{context:'keep'},zoom:1.2})};Grid.prototype.render=function(){};
  const g=new Grid({dataset:{}},{key:'test',columns:[{key:'name'}]});assert.equal(g.prefs.align,'center');assert.deepEqual(g.prefs.widths,{});assert.equal(g.prefs.highlights.context,'keep');assert.equal(g.prefs.zoom,1.2);
@@ -26,3 +26,10 @@ test('Settings acknowledgements persist by note content; changed notes appear ag
 test('length colour suffix follows vendor units but editing/export stays numeric',()=>{const ctx=controller();for(const unit of ['m','ft']){vm.runInContext(`project.stock.vendor.lengthUnit='${unit}'`,ctx);const col=vm.runInContext("refColumns('length_colours')[0]",ctx);assert.equal(col.format(12.5),`12.5 ${unit}`);assert.equal(col.format(''),'');assert.equal(parseCell('12.5',col),12.5);}});
 
 test('sorting keeps unused entry rows after populated rows in either direction',()=>{const g=grid([{name:'B'},{name:'A'}]);g.sort={key:'name',dir:1};assert.deepEqual(g.indices(),[1,0,2,3,4]);g.sort.dir=-1;assert.deepEqual(g.indices(),[0,1,2,3,4]);});
+
+function enterGrid(rows=[]){const g=grid(rows);g.ids=g.indices();g.selection={r:g.ids.length-1,c:0};g.currentGrid=()=>g;g.renderBody=()=>{g.ids=g.indices();};g.select=(r,c)=>{g.selection={r:Math.max(0,Math.min(g.ids.length-1,r)),c};};return g;}
+test('Enter appends repeatable blank entry rows without adding exported records',()=>{const rows=[],g=enterGrid(rows);g.moveEnter();assert.equal(g.ids.length,6);assert.equal(g.selection.r,5);g.moveEnter();assert.equal(g.ids.length,7);assert.equal(g.selection.r,6);assert.deepEqual(rows,[]);});
+test('Enter within a table and Shift+Enter do not append rows',()=>{const g=enterGrid();g.moveEnter(true);assert.equal(g.selection.r,3);g.moveEnter();assert.equal(g.selection.r,4);assert.equal(g.ids.length,5);});
+test('invalid Enter commit neither moves nor appends',()=>{const g=enterGrid();g.commitEditor=()=>false;assert.equal(g.moveEnter(false,true),false);assert.equal(g.selection.r,4);assert.equal(g.ids.length,5);});
+test('Enter follows a rebuilt grid after committing the last cell',()=>{const g=enterGrid(),next=enterGrid(Array.from({length:5},()=>({name:'Cable'})));g.commitEditor=()=>true;g.currentGrid=()=>next;g.moveEnter(false,true);assert.equal(next.ids.length,6);assert.equal(next.selection.r,5);});
+test('new entry stays visible under filtering and descending sort',()=>{const g=enterGrid([{name:'Match'},{name:'Other'}]);g.filter='match';g.sort={key:'name',dir:-1};g.renderBody();g.selection.r=0;g.moveEnter();assert.deepEqual(g.ids,[0,5]);assert.equal(g.selection.r,1);});

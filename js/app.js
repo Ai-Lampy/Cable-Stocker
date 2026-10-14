@@ -51,7 +51,7 @@ function renderShell(){
   const tip=$('#recent-issues');tip.replaceChildren(node('strong',`${errors} errors · ${issues.length-errors} warnings`));for(const i of issues.slice(-5).reverse())tip.append(node('p',`${i.category}: ${i.message} ${i.fix}`));if(!issues.length)tip.append(node('p','No issues found in the current draft.'));
   rebuildLists();status();
 }
-function rebuildLists(){const host=$('#datalists');host.replaceChildren();const colours=node('datalist');colours.id='colours-list';for(const value of [colourPalette.noColour.name,...Object.entries(colourPalette.colours).flatMap(([hex,c])=>[c.names[0],hex])]){const option=node('option');option.value=value;colours.append(option);}host.append(colours);const units=node('datalist');units.id='units-list';for(const value of ['m','ft']){const o=node('option');o.value=value;units.append(o);}host.append(units);for(const [id,entries]of [['vendors-list',refs.lighting_vendors?.vendors||[]],['categories-list',refs.categories?.items||[]],['cables-list',refs.cable_types?.items||[]],['connectors-list',refs.connector_types?.items||[]]]){const list=node('datalist');list.id=id;for(const item of entries){for(const name of new Set([item.name,...(item.aliases||[])])){const option=node('option');option.value=name;if(name!==item.name)option.label=`${name} · ${item.name}`;list.append(option);}}host.append(list);}const list=node('datalist');list.id='directions-list';for(const value of ['male-female','bidirectional']){const o=node('option');o.value=value;list.append(o);}host.append(list);}
+function rebuildLists(){const host=$('#datalists');host.replaceChildren();const colours=node('datalist');colours.id='colours-list';for(const value of [...new Set([colourPalette.noColour.name,...colourPalette.noColour.aliases,...Object.entries(colourPalette.colours).flatMap(([hex,c])=>[...c.names,hex])])]){const option=node('option');option.value=value;colours.append(option);}host.append(colours);const units=node('datalist');units.id='units-list';for(const value of ['m','ft']){const o=node('option');o.value=value;units.append(o);}host.append(units);for(const [id,entries]of [['vendors-list',refs.lighting_vendors?.vendors||[]],['categories-list',refs.categories?.items||[]],['cables-list',refs.cable_types?.items||[]],['connectors-list',refs.connector_types?.items||[]]]){const list=node('datalist');list.id=id;for(const item of entries){for(const name of new Set([item.name,...(item.aliases||[])])){const option=node('option');option.value=name;if(name!==item.name)option.label=`${name} · ${item.name}`;list.append(option);}}host.append(list);}const list=node('datalist');list.id='directions-list';for(const value of ['male-female','bidirectional']){const o=node('option');o.value=value;list.append(o);}host.append(list);}
 function navigate(next){page=next;renderAll();window.scrollTo({top:0,behavior:'instant'});}
 function renderAll(){renderShell();render();}
 function heading(title,description,actions=[]){const head=node('div',null,'page-heading'),text=node('div');text.append(node('span','CABLE STOCK WORKSPACE','eyebrow'),node('h1',title));if(description)text.append(node('p',description));head.append(text);if(actions.length){const a=node('div',null,'actions');a.append(...actions);head.append(a);}$('#main').append(head);}
@@ -74,10 +74,7 @@ function renderVendor(){
   for(const [labelEl,key]of [[vendor,'name'],[unit,'lengthUnit']])if(!same(project.stock.vendor[key],project.baseline?.stock.vendor[key]))labelEl.classList.add('inline-changed');
   panel.append(form);
   const meta=node('details');meta.append(node('summary','Custom metadata · preserved on import'));
-  const vendorCustom=Object.fromEntries(Object.entries(project.stock.vendor).filter(([k])=>!['name','lengthUnit'].includes(k)));
-  meta.append(field('Additional vendor fields (JSON object)',JSON.stringify(vendorCustom,null,2),value=>editMetadata(value,'vendor'),{type:'textarea'}));
-  const root=Object.fromEntries(Object.entries(project.stock).filter(([k])=>!['vendor','cables'].includes(k)));
-  meta.append(field('Additional document fields (JSON object)',JSON.stringify(root,null,2),value=>editMetadata(value,'root'),{type:'textarea'}));panel.append(meta);
+  meta.append(metadataForm('vendor','Additional vendor fields'),metadataForm('root','Additional document fields'));panel.append(meta);
   const actions=node('div',null,'form-actions');actions.append(btn('+ Add category',addCategory,'primary'),btn('Save project backup',downloadBackup));panel.append(actions);layout.append(panel);
   const side=node('aside',null,'panel');side.append(node('h2','Your workspace'));
   const stats=node('div',null,'stat-row');for(const [n,t]of [[Object.keys(project.stock.cables).length,'categories'],[Object.values(project.stock.cables).reduce((s,r)=>s+r.length,0),'cable types'],[project.looms.length,'looms']]){const d=node('div',null,'stat');d.append(node('strong',n),node('span',t));stats.append(d);}side.append(stats);
@@ -86,7 +83,56 @@ function renderVendor(){
   side.append(node('p','Looms and vendor version are saved in project JSON and Excel. The supplied Lampy cable-stock format does not demonstrate loom support.','note warning'));layout.append(side);$('#main').append(layout);
 }
 function offerVendor(name){confirmAction('Add vendor to references',`Add “${name}” to the Lighting Vendors reference? You can set its logo path in Settings.`,()=>change(()=>refs.lighting_vendors.vendors.push({name,logo:''}),{references:true}),'Add vendor');}
-function editMetadata(text,scope){try{const obj=parseJSON(text);if(!object(obj))throw new Error('Metadata must be a JSON object.');const reserved=scope==='vendor'?['name','lengthUnit']:['vendor','cables'];if(Object.keys(obj).some(k=>reserved.includes(k)))throw new Error(`Edit ${reserved.join(' and ')} using their dedicated controls.`);change(()=>{const target=scope==='vendor'?project.stock.vendor:project.stock;for(const key of Object.keys(target))if(!reserved.includes(key))delete target[key];Object.assign(target,obj);});}catch(e){notice(e.message,true);}}
+function metadataTarget(scope,path=[]){
+  let target=scope==='vendor'?project.stock.vendor:project.stock;
+  for(const key of path)target=target[key];return target;
+}
+function metadataForm(scope,title){
+  const host=node('section',null,'metadata-form');
+  const reserved=scope==='vendor'?['name','lengthUnit']:['vendor','cables'];
+  const update=(path,key,value,remove=false)=>change(()=>{const target=metadataTarget(scope,path);if(remove){if(Array.isArray(target))target.splice(Number(key),1);else delete target[key];}else target[key]=value;},{renderPage:false});
+  function add(path){
+    const list=Array.isArray(metadataTarget(scope,path));let nameInput,kind='text';
+    openDialog(list?'Add item':'Add field',body=>{
+      if(!list){const nameField=field('Field name','',()=>{});nameInput=nameField.querySelector('input');body.append(nameField);}
+      const label=node('label','Value type'),select=node('select');
+      for(const [value,text]of [['text','Text'],['number','Number'],['boolean','Yes / No'],['group','Group of fields'],['list','List'],['empty','No value']]){const o=node('option',text);o.value=value;select.append(o);}select.onchange=()=>kind=select.value;label.append(select);body.append(label);
+    },[{label:'Cancel',run:d=>d.close()},{label:list?'Add item':'Add field',cls:'primary',run:d=>{
+      const target=metadataTarget(scope,path),key=list?target.length:nameInput.value.trim();
+      if(!list&&(!key||!safeKey(key)||Object.hasOwn(target,key)||(!path.length&&reserved.includes(key)))){notice('Enter a unique field name. Standard vendor fields use their own controls.',true);return;}
+      update(path,key,({text:'',number:0,boolean:false,group:{},list:[],empty:null})[kind]);d.close();draw();
+    }}]);
+  }
+  function draw(){
+    host.replaceChildren(node('h3',title));
+    function group(parent,path){
+      const target=metadataTarget(scope,path),list=Array.isArray(target);
+      const entries=Object.entries(target).filter(([key])=>path.length||!reserved.includes(key));
+      if(!entries.length)parent.append(node('p',list?'No items yet.':'No additional fields.','muted'));
+      for(const [key,value]of entries){
+        const label=list?`Item ${Number(key)+1}`:key,row=node('div',null,'metadata-row');
+        if(value!==null&&typeof value==='object'){
+          const box=node('fieldset');box.append(node('legend',label));group(box,[...path,key]);row.append(box);
+        }else if(typeof value==='boolean'){
+          const l=node('label',label),select=node('select');for(const [v,t]of [['true','Yes'],['false','No']]){const o=node('option',t);o.value=v;select.append(o);}select.value=String(value);select.onchange=()=>update(path,key,select.value==='true');l.append(select);row.append(l);
+        }else if(value===null){row.append(node('span',`${label}: No value`),btn('Enter text',()=>{update(path,key,'');draw();}));
+        }else{
+          const numeric=typeof value==='number';
+          const l=field(label,value,(text,input)=>{
+            if(numeric&&(!text.trim()||!Number.isFinite(Number(text)))){input.setCustomValidity('Enter a valid number.');input.reportValidity();return;}
+            input.setCustomValidity('');update(path,key,numeric?Number(text):text);input.dataset.draftValue=input.value;
+          },{type:numeric?'number':'textarea'});
+          const input=l.querySelector('input,textarea');if(numeric)input.step='any';else input.rows=2;
+          input.oninput=()=>input.setCustomValidity('');row.append(l);
+        }
+        const remove=btn('Remove',()=>confirmAction('Remove field',`Remove “${label}” and its value?`,()=>{update(path,key,undefined,true);draw();},'Remove'),'danger');remove.setAttribute('aria-label',`Remove ${label}`);row.append(remove);parent.append(row);
+      }
+      parent.append(btn(list?'+ Add item':'+ Add field',()=>add(path)));
+    }
+    group(host,[]);
+  }
+  draw();return host;
+}
 function bumpVersion(major){try{const next=incrementVersion(project.vendorVersion,major);confirmAction('Increment vendor version',`${project.vendorVersion||'(unset)'} → ${next}. This updates your generator backup version only.`,()=>change(()=>project.vendorVersion=next),'Increment');}catch(e){notice(e.message,true);}}
 function addCategory(){let input;openDialog('Add a cable category',body=>{
   body.append(node('p','Choose a category to start with its associated cable types, or type a new name. Lengths start empty.'));
@@ -129,10 +175,10 @@ function renderColourCell(value,host,editor){
   const trigger=btn(hex?(colourPalette.colours[hex]?.names[0]||hex):'Colour',()=>{},'colour-field');trigger.setAttribute('aria-label',host.getAttribute('aria-label'));trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');host.classList.add('colour-cell');paint(host,hex);
   const menu=node('div',null,'colour-menu');menu.setAttribute('popover','auto');menu.id=`colour-${uid()}`;trigger.setAttribute('aria-controls',menu.id);menu.role='listbox';menu.setAttribute('aria-label','Choose colour');
   const options=entries.map(([code,item])=>{const option=btn(item.names[0],()=>{menu.hidePopover();editor.commit(code);},'colour-option');option.role='option';option.setAttribute('aria-selected',String(code===hex));paint(option,code);if(!code)option.classList.add('no-colour');menu.append(option);return option;});
-  menu.onclick=e=>e.stopPropagation();menu.onkeydown=e=>{e.stopPropagation();const i=options.indexOf(document.activeElement);if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();options[e.key==='Home'?0:e.key==='End'?options.length-1:(i+(e.key==='ArrowDown'?1:-1)+options.length)%options.length].focus();}};
+  menu.onclick=e=>e.stopPropagation();menu.onkeydown=e=>{e.stopPropagation();if(e.isComposing)return;if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();menu.hidePopover();editor.edit(e.key);return;}const i=options.indexOf(document.activeElement);if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();options[e.key==='Home'?0:e.key==='End'?options.length-1:(i+(e.key==='ArrowDown'?1:-1)+options.length)%options.length].focus();}};
   menu.addEventListener('toggle',()=>trigger.setAttribute('aria-expanded',String(menu.matches(':popover-open'))));
   trigger.onclick=e=>{e.stopPropagation();if(menu.matches(':popover-open')){menu.hidePopover();return;}const rect=trigger.getBoundingClientRect();menu.style.zoom=String(1/(parseFloat(host.closest('table').style.zoom)||1));menu.style.width=`${rect.width}px`;menu.style.left=`${Math.min(rect.left,window.innerWidth-rect.width-8)}px`;const below=window.innerHeight-rect.bottom-12;menu.style.top=`${below>=180?rect.bottom+5:Math.max(8,rect.top-280)}px`;menu.style.maxHeight=`${below>=180?Math.min(280,below):Math.min(280,rect.top-16)}px`;menu.showPopover();options[Math.max(0,entries.findIndex(([code])=>code===hex))].focus();};
-  trigger.onkeydown=e=>{e.stopPropagation();if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();editor.edit(e.key);return;}if(e.key==='F2'){e.preventDefault();editor.edit();return;}if(e.key==='Tab'){e.preventDefault();editor.tab(e.shiftKey);return;}if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();trigger.click();}};host.append(trigger,menu);
+  trigger.onkeydown=e=>{e.stopPropagation();if(e.isComposing)return;if(e.key==='Enter'){e.preventDefault();editor.enter(e.shiftKey);return;}if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();editor.edit(e.key);return;}if(e.key==='F2'){e.preventDefault();editor.edit();return;}if(e.key==='Tab'){e.preventDefault();editor.tab(e.shiftKey);return;}if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();trigger.click();}};host.append(trigger,menu);
 
 }
 function makeLengthChip(value){

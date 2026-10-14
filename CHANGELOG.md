@@ -1,5 +1,34 @@
 # Changelog
 
+## v1.1.11 — 2026-10-14
+
+Previous version: v1.1.10.
+
+- Enter on the last visible table row adds a blank entry row and selects the same column. Commit valid edits first; invalid entries stay in place. Shift+Enter moves up. Support rebuilt, sorted and filtered tables. Untouched entry rows are temporary UI slots and stay out of exports.
+- Length-colour cells accept typing from the open picker as well as the selected cell. Suggestions include supplied colour names and aliases; Enter accepts the colour and moves down/adds a row. Invalid colours remain editable. Preserve the palette picker and stored colour format.
+- Remove the green accent stripe from added table cells. Retain selection outlines and yellow change highlighting.
+- Updated/upload: `js/grid.js`, `js/app.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+- Validation: 106 automated tests passed. Approved local Chromium tests verified last-row Enter, typed colour selection from the open picker, invalid-colour retention without row creation, Shift+Enter, Enter from colour buttons and removal of green cell accents. No browser console errors in checked flows.
+- Limits: Unused new entry slots disappear when the table is reopened; typing in a later slot materialises preceding rows, as before. Firefox/Safari and live deployment not tested. No upload or deployment performed.
+
+## v1.1.10 — 2026-10-14
+
+Previous version: v1.1.9.
+
+- Change the default editable-column width from 90 px to 150 px across all tables. Preserve manually saved widths, alignment and unrestricted resizing. The row-number gutter remains 42 px.
+- Updated/upload: `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+- Validation: 101 automated tests passed, including the updated default-width and saved-width regression. Browser testing not run for this update; fresh approval is required. No upload or deployment performed.
+
+## v1.1.9 — 2026-10-14
+
+Previous version: v1.1.8.
+
+- Replace vendor-page custom metadata JSON editors with labelled text/number fields and Yes/No choices. Add fields using a name and value type; remove with confirmation. Nested groups and lists use structured controls; imported empty values remain preserved.
+- Preserve field names, numeric/boolean/text types, nested data and the existing cable-stock schema. Reject empty/invalid number edits and duplicate/reserved new field names.
+- Updated: `js/app.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added: `tests/metadata.test.mjs`. Deleted: none.
+- Validation: 101 automated tests passed, including metadata controls, invalid numbers, nested values and export types. Approved local Chromium tests verified field creation, text/number/Yes-No editing, export preview types and saved values after reopening. No console errors in checked flows.
+- Limits: Firefox/Safari and live deployment not tested. No GitHub upload or deployment performed. Existing field types remain fixed; remove and add a field to change its type (empty values offer Enter text).
+
 ## v1.1.8 — 2026-10-14
 
 Previous version: v1.1.7.
