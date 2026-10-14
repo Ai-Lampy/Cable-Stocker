@@ -33,7 +33,7 @@ export function toTSV(rows) { return rows.map(row => row.map(x => { const s=disp
 const el = (tag, text, className) => { const n=document.createElement(tag); if(text!=null)n.textContent=text; if(className)n.className=className; return n; };
 export class Grid {
   constructor(host, options) {
-    this.host=host;host.dataset.lampyGrid='';host.lampyGrid=this; this.o={...options,columns:visibleTableColumns(options.columns)}; this.selection={r:0,c:0,rr:0,cc:0}; this.filter=''; this.sort=null;
+    this.host=host;host.dataset.lampyGrid='';host.lampyGrid=this; this.o={...options,columns:visibleTableColumns(options.columns)}; this.selection={r:0,c:0,rr:0,cc:0}; this.filter=''; const sortKey=['name','vendor','type','length'].find(key=>this.o.columns.some(col=>col.key===key));this.sort=sortKey?{key:sortKey,dir:1}:null;
     try { this.prefs=JSON.parse(localStorage.getItem(`lampy-grid:${options.key}`)) || {}; } catch { this.prefs={}; }
     this.prefs={zoom:1,wrap:true,...this.prefs,...(this.prefs.layoutVersion===2?{}:{widths:{},align:'center',layoutVersion:2})};
     this.render();
@@ -42,7 +42,7 @@ export class Grid {
   indices() {
     let ids=Array.from({length:Math.max(5,this.o.rows().length,...[...(this.entryIds||[])].map(i=>i+1))},(_,i)=>i);
     if(this.filter)ids=ids.filter(i=>this.entryIds?.has(i)||this.o.columns.some(c=>display(this.value(i,c.key)).toLowerCase().includes(this.filter.toLowerCase())));
-    if(this.sort)ids.sort((a,b)=>{const count=this.o.rows().length;if(a>=count||b>=count)return a>=count?(b>=count?0:1):-1;return display(this.value(a,this.sort.key)).localeCompare(display(this.value(b,this.sort.key)),undefined,{numeric:true})*this.sort.dir;});
+    if(this.sort)ids.sort((a,b)=>{const count=this.o.rows().length;if(a>=count||b>=count)return a>=count?(b>=count?0:1):-1;const av=display(this.value(a,this.sort.key)).trim(),bv=display(this.value(b,this.sort.key)).trim();if(!av||!bv)return !av?(!bv?0:1):-1;const an=this.value(a,this.sort.key),bn=this.value(b,this.sort.key);return (typeof an==='number'&&typeof bn==='number'?an-bn:av.localeCompare(bv,undefined,{numeric:true,sensitivity:'base'}))*this.sort.dir;});
     return ids;
   }
   render() {
@@ -77,6 +77,7 @@ export class Grid {
     this.editor.onkeydown=e=>{
       e.stopPropagation();
       if(e.isComposing)return;
+      if(this.suggestionKey(e))return;
       if(e.key==='Tab'){e.preventDefault();this.moveTab(e.shiftKey,true);}
       else if(e.key==='Enter'){e.preventDefault();this.moveEnter(e.shiftKey,true);}
       else if(e.key==='Escape'){e.preventDefault();this.editing=false;this.renderBody();this.focusCell();}
@@ -91,6 +92,7 @@ export class Grid {
     this.renderBody();this.updateStyle();
   }
   renderBody() {
+    this.closeSuggestions();
     this.ids=this.indices();this.table.replaceChildren();this.sizeColumns();
     const head=el('thead'),tr=el('tr');tr.append(el('th','#'));
     this.o.columns.forEach((col,c)=>{
@@ -141,6 +143,7 @@ export class Grid {
     const b=this.bounds();this.table.querySelectorAll('td[data-r]').forEach(td=>{const r=+td.dataset.r,c=+td.dataset.c,selected=r>=b.r&&r<=b.rr&&c>=b.c&&c<=b.cc;td.classList.toggle('selected',selected);td.setAttribute('aria-selected',String(selected));td.querySelector('.fill-handle')?.remove();});
     const {r,c}=this.selection;this.address.textContent=`${String.fromCharCode(65+c)}${r+1}`;
     this.editor.value=this.ids[r]===undefined?'':display(this.value(this.ids[r],this.o.columns[c].key));
+    this.editor.value=this.o.columns[c].editFormat?.(this.editor.value)??this.editor.value;
     this.editorOriginal=this.editor.value;
     this.editor.disabled=!!this.o.readOnly?.(this.ids[r],this.o.columns[c].key);
     this.editor.setAttribute('list',this.o.columns[c].list||'');
@@ -162,7 +165,28 @@ export class Grid {
     const td=this.table.querySelector(`td[data-r="${r}"][data-c="${c}"]`);if(!td)return;
     this.editing=true;this.editor.disabled=false;this.editor.value=initial===undefined?this.editorOriginal:initial;
     this.editor.setAttribute('list',col.list||'');td.replaceChildren(this.editor);this.editor.focus();
+    this.editor.oninput=()=>this.showSuggestions();this.showSuggestions();
     if(initial===undefined)this.editor.select();else this.editor.setSelectionRange(this.editor.value.length,this.editor.value.length);
+  }
+  closeSuggestions(){this.suggestionMenu?.remove();this.suggestionMenu=null;this.suggestionIndex=-1;this.editor?.removeAttribute?.('role');this.editor?.removeAttribute?.('aria-autocomplete');this.editor?.removeAttribute?.('aria-controls');this.editor?.removeAttribute?.('aria-expanded');this.editor?.removeAttribute?.('aria-activedescendant');}
+  showSuggestions(){
+    this.closeSuggestions();const col=this.o.columns[this.selection.c];if(!col.suggestions||!this.editing)return;
+    this.suggestions=col.suggestions(this.editor.value);const menu=el('div',null,'colour-suggestions');menu.id=`suggest-${this.o.key.replace(/[^a-z0-9]/gi,'-')}`;menu.setAttribute('popover','manual');menu.setAttribute('role','listbox');menu.setAttribute('aria-label','Matching colours');
+    const choose=option=>{this.editor.value=option.value;if(this.commitEditor())this.currentGrid().focusCell();};
+    this.suggestions.forEach((option,i)=>{const b=el('button',option.label,'colour-option');b.type='button';b.id=`${menu.id}-${i}`;b.setAttribute('role','option');b.setAttribute('aria-selected','false');b.style.background=option.background;b.style.color=option.color;b.onpointerdown=e=>e.preventDefault();b.onclick=e=>{e.stopPropagation();choose(option);};menu.append(b);});
+    if(!this.suggestions.length)menu.append(el('p','No matching colours. Choose a colour from the supplied palette.'));
+    this.editor.parentElement.append(menu);this.suggestionMenu=menu;const rect=this.editor.getBoundingClientRect();menu.style.zoom=String(1/(this.prefs.zoom||1));menu.style.width=`${Math.max(180,rect.width)}px`;menu.style.left=`${Math.max(8,Math.min(rect.left,window.innerWidth-Math.max(180,rect.width)-8))}px`;menu.style.top=`${Math.min(rect.bottom+4,Math.max(8,window.innerHeight-220))}px`;menu.showPopover();
+    this.editor.setAttribute('role','combobox');this.editor.setAttribute('aria-autocomplete','list');this.editor.setAttribute('aria-controls',menu.id);this.editor.setAttribute('aria-expanded','true');
+  }
+  suggestionKey(e){
+    if(!this.suggestionMenu)return false;
+    if(['ArrowDown','ArrowUp'].includes(e.key)){
+      e.preventDefault();const n=this.suggestions.length;if(!n)return true;
+      this.suggestionIndex=this.suggestionIndex<0?(e.key==='ArrowDown'?0:n-1):(this.suggestionIndex+(e.key==='ArrowDown'?1:-1)+n)%n;
+      [...this.suggestionMenu.querySelectorAll('[role="option"]')].forEach((el,i)=>{el.setAttribute('aria-selected',String(i===this.suggestionIndex));if(i===this.suggestionIndex){this.editor.setAttribute('aria-activedescendant',el.id);el.scrollIntoView({block:'nearest'});}});return true;
+    }
+    if(['Enter','Tab'].includes(e.key)&&this.suggestionIndex>=0)this.editor.value=this.suggestions[this.suggestionIndex].value;
+    return false;
   }
   moveEnter(reverse=false,commit=false){
     const {r,c}=this.selection,id=this.ids[r],key=this.o.columns[c]?.key,last=r===this.ids.length-1;

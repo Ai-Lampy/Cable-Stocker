@@ -96,6 +96,12 @@ export function setCableAdaptor(project, category, index, value) {
   project.adaptors ||= {};const id=project.rowIds[category][index];
   if(value)project.adaptors[id]=true;else delete project.adaptors[id];
 }
+export function colourSuggestions(value,palette){
+  const query=String(value??'').trim().toLowerCase();
+  return [['',{names:[palette.noColour.name,...palette.noColour.aliases]}],...Object.entries(palette.colours)]
+    .filter(([code,item])=>!query||[code,...item.names].some(name=>name.toLowerCase().includes(query)))
+    .map(([value,item])=>({value,label:item.names[0],background:value||'#fff',color:item.fontColour||'#233128'}));
+}
 export function resolveColour(value, palette) {
   const text=String(value??'').trim(),key=text.toLowerCase();
   if(!text||[palette.noColour.name,...palette.noColour.aliases].some(x=>x.toLowerCase()===key))return '';

@@ -33,3 +33,29 @@ test('Enter within a table and Shift+Enter do not append rows',()=>{const g=ente
 test('invalid Enter commit neither moves nor appends',()=>{const g=enterGrid();g.commitEditor=()=>false;assert.equal(g.moveEnter(false,true),false);assert.equal(g.selection.r,4);assert.equal(g.ids.length,5);});
 test('Enter follows a rebuilt grid after committing the last cell',()=>{const g=enterGrid(),next=enterGrid(Array.from({length:5},()=>({name:'Cable'})));g.commitEditor=()=>true;g.currentGrid=()=>next;g.moveEnter(false,true);assert.equal(next.ids.length,6);assert.equal(next.selection.r,5);});
 test('new entry stays visible under filtering and descending sort',()=>{const g=enterGrid([{name:'Match'},{name:'Other'}]);g.filter='match';g.sort={key:'name',dir:-1};g.renderBody();g.selection.r=0;g.moveEnter();assert.deepEqual(g.ids,[0,5]);assert.equal(g.selection.r,1);});
+
+test('colour suggestions filter palette names and aliases without accepting outside values',()=>{
+ const palette=JSON.parse(fs.readFileSync(new URL('../reference/colour_options.json',import.meta.url),'utf8'));
+ assert.deepEqual(M.colourSuggestions('blu',palette).map(x=>x.label),['Blue']);
+ assert.deepEqual(M.colourSuggestions('  RED ',palette).map(x=>x.label),['Red']);
+ assert.deepEqual(M.colourSuggestions('outside-colour',palette),[]);
+ assert.throws(()=>M.resolveColour('outside-colour',palette));
+ for(const choice of M.colourSuggestions('',palette))assert.equal(M.resolveColour(choice.value,palette),choice.value);
+});
+test('invalid pasted palette colours reject the whole edit without changing cells',()=>{
+ const palette=JSON.parse(fs.readFileSync(new URL('../reference/colour_options.json',import.meta.url),'utf8'));
+ const rows=[{name:'original'}],g=editable(rows),col={key:'name',parse:v=>M.resolveColour(v,palette)};
+ assert.equal(g.apply([{id:0,col,text:'Red'},{id:1,col,text:'#123456'}]),false);assert.deepEqual(rows,[{name:'original'}]);
+});
+
+test('tables initialise with ascending name, vendor, cable type or length sorting',()=>{
+ const saved=globalThis.localStorage,render=Grid.prototype.render;
+ try{globalThis.localStorage={getItem:()=>null};Grid.prototype.render=function(){};
+ for(const key of ['name','vendor','type','length']){const g=new Grid({dataset:{}},{columns:[{key}],key:'test'});assert.deepEqual(g.sort,{key,dir:1});}
+ const other=new Grid({dataset:{}},{columns:[{key:'notes'}],key:'test'});assert.equal(other.sort,null);
+ }finally{Grid.prototype.render=render;globalThis.localStorage=saved;}
+});
+test('alphabetical sorting ignores case, compares numbers naturally and leaves blanks last without reordering data',()=>{
+ const rows=[{name:'Zulu'},{name:'cable 10'},{name:''},{name:'Alpha'},{name:'Cable 2'}],before=structuredClone(rows),g=grid(rows);g.sort={key:'name',dir:1};assert.deepEqual(g.indices(),[3,4,1,0,2]);assert.deepEqual(rows,before);
+});
+test('length defaults compare decimal values numerically',()=>{const g=grid([{length:1.2},{length:1.11},{length:10}]);g.o.columns=[{key:'length'}];g.sort={key:'length',dir:1};assert.deepEqual(g.indices(),[1,0,2,3,4]);});

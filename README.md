@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.11 update adds rows with Enter, improves typed colour selection and removes green cell accent stripes. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). v1.1.6 was confirmed in a fresh live Chromium tab on 2026-10-14 after the user's upload. The local v1.1.13 update adds default alphabetical table sorting and includes the earlier palette-only colour suggestions and table improvements. It includes the earlier 150 px defaults and metadata improvements. It includes the v1.1.7 cache fix and has not been deployed.
 
 ## Run locally
 
@@ -202,3 +202,15 @@ Press **Enter** on the last visible table row to show another blank row and move
 In Length colour, type a supplied colour name or alias directly in the selected cell, or start typing while its picker is open. Suggestions include palette names and aliases. **Enter** accepts and moves down; **Tab** accepts and moves right. The picker remains available. Green cell accent stripes are removed; selection outlines and yellow change highlighting remain.
 
 Upload `js/grid.js`, `js/app.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 106 automated tests and approved local Chromium checks passed. Firefox/Safari and deployment were not tested.
+
+## Filtered palette selection — v1.1.12
+
+Type in a Length colour cell to see matching colours from the supplied palette. Matching includes names and aliases. Click a colour, or use Up/Down then Enter/Tab to select it. Escape cancels. Unrecognised text shows **No matching colours** and cannot be saved. Pasted values must also belong to the palette; a rectangular paste containing an unknown colour is rejected without partially changing cells. No external colour data is added.
+
+Upload `js/app.js`, `js/grid.js`, `js/model.js`, `js/version.js`, `css/app.css`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 108 automated tests and approved local Chromium checks passed. Firefox/Safari and deployment were not tested for this release.
+
+## Default sorting — v1.1.13
+
+Tables open sorted A–Z by Name, ignoring case and ordering embedded numbers naturally. Vendor Manifest uses vendor name; loom components use cable type. Length colour has no Name column and sorts numerically by Length. Blank rows stay last. Header sorting and **Clear sort** remain available; export/source order is unchanged. Clear sorting before pasting more rows than are currently visible.
+
+Upload `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md` and `CHANGELOG.md`. No new/deleted files. 111 automated tests passed. Browser testing and deployment were not performed for this update.

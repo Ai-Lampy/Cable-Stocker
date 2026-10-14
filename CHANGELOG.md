@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.1.13 — 2026-10-14
+
+Previous version: v1.1.12.
+
+- Default tables to ascending alphabetical Name order, ignoring case and using natural number ordering. Vendor Manifest sorts by vendor name; loom components sort by cable type. Length colour has no Name column and defaults to numeric Length order.
+- Keep blank entry rows last, manual header sorting and Clear sort. Sorting affects display only; source/export array order is preserved. Clear sort before pasting beyond the visible rows, as with existing sorted tables.
+- Updated/upload: `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+- Validation: 111 automated tests passed. Browser testing not run for this update. No upload or deployment performed.
+
+## v1.1.12 — 2026-10-14
+
+Previous version: v1.1.11.
+
+- Show a live filtered palette list while typing in Length colour cells. Match supplied names, aliases and palette codes; display each matching colour once with its swatch. Show a clear no-match message.
+- Select a suggestion by clicking, or use Up/Down then Enter/Tab. Keep typing focus in the cell; Escape cancels. Existing values open as colour names rather than codes.
+- Accept only values from the supplied palette (including its No Colour option). Reject unknown typed/pasted values; rectangular paste remains atomic. No external colour sources or new arbitrary colours.
+- Updated/upload: `js/app.js`, `js/grid.js`, `js/model.js`, `js/version.js`, `css/app.css`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted: none. Original reference palette unchanged.
+- Validation: 108 automated tests passed, including filtering, allowed palette values and rejected pasted values. Approved local Chromium tests verified prefix filtering, keyboard selection with Tab, mouse selection, no-match feedback, rejected Enter and Escape. No browser console errors in checked flows.
+- Limits: Firefox/Safari not tested for this release. Palette popovers require a modern browser, as before. No upload or deployment performed.
+
 ## v1.1.11 — 2026-10-14
 
 Previous version: v1.1.10.
