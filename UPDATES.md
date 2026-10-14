@@ -7,7 +7,12 @@
 
 ## Completed
 
-- v1.1.20 (local): Connectors category sheets, inferred grouping for existing references, explicit category moves, new-row/approval categories, and complete-list downloads. Added bottom Save table buttons to every shared grid.
+- v1.1.21 (local): Explicit category suggestions in Connectors, including Uncategorised, with filtered typing and mouse/keyboard selection. Bottom Save table now matches the top button’s horizontal alignment, dimensions, border, font and padding.
+- Validation: 129 automated tests passed. Approved local Chromium checks passed dropdown opening, filtering, keyboard Tab selection, mouse selection and moving connectors between sheets. Browser measurements confirmed identical Save button geometry/styling. No console errors. Not uploaded or deployed.
+- Upload: `js/app.js`, `js/grid.js`, `js/version.js`, `css/app.css`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none.
+- Live v1.1.20 browser verification passed category sheets, assignment and bottom Save committing active edits. Address stayed at ailampy.com/cable/. No console errors; temporary test entry removed. No deployment performed by the agent.
+
+- v1.1.20 (live at https://ailampy.com/cable/; verified 2026-10-14): Connectors category sheets, inferred grouping for existing references, explicit category moves, new-row/approval categories, and complete-list downloads. Added bottom Save table buttons to every shared grid.
 - Validation: 129 automated tests and approved local Chromium tests passed for category filtering, new entries, moves, export and bottom Save with an active edit. No console errors. No upload or deployment.
 - Upload: `js/app.js`, `js/model.js`, `js/grid.js`, `js/version.js`, `css/app.css`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted project files: none. Original inputs unchanged.
 

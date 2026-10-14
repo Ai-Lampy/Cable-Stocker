@@ -177,10 +177,10 @@ export class Grid {
   closeSuggestions(){this.suggestionMenu?.remove();this.suggestionMenu=null;this.suggestionIndex=-1;this.editor?.removeAttribute?.('role');this.editor?.removeAttribute?.('aria-autocomplete');this.editor?.removeAttribute?.('aria-controls');this.editor?.removeAttribute?.('aria-expanded');this.editor?.removeAttribute?.('aria-activedescendant');}
   showSuggestions(){
     this.closeSuggestions();const col=this.o.columns[this.selection.c];if(!col.suggestions||!this.editing)return;
-    this.suggestions=col.suggestions(this.editor.value);const menu=el('div',null,'colour-suggestions');menu.id=`suggest-${this.o.key.replace(/[^a-z0-9]/gi,'-')}`;menu.setAttribute('popover','manual');menu.setAttribute('role','listbox');menu.setAttribute('aria-label','Matching colours');
+    this.suggestions=col.suggestions(this.editor.value);const menu=el('div',null,'colour-suggestions');menu.id=`suggest-${this.o.key.replace(/[^a-z0-9]/gi,'-')}`;menu.setAttribute('popover','manual');menu.setAttribute('role','listbox');menu.setAttribute('aria-label',col.suggestionsLabel||'Matching colours');
     const choose=option=>{this.editor.value=option.value;if(this.commitEditor())this.currentGrid().focusCell();};
     this.suggestions.forEach((option,i)=>{const b=el('button',option.label,'colour-option');b.type='button';b.id=`${menu.id}-${i}`;b.setAttribute('role','option');b.setAttribute('aria-selected','false');b.style.background=option.background;b.style.color=option.color;b.onpointerdown=e=>e.preventDefault();b.onclick=e=>{e.stopPropagation();choose(option);};menu.append(b);});
-    if(!this.suggestions.length)menu.append(el('p','No matching colours. Choose a colour from the supplied palette.'));
+    if(!this.suggestions.length)menu.append(el('p',col.noSuggestions||'No matching colours. Choose a colour from the supplied palette.'));
     this.editor.parentElement.append(menu);this.suggestionMenu=menu;const rect=this.editor.getBoundingClientRect();menu.style.zoom=String(1/(this.prefs.zoom||1));menu.style.width=`${Math.max(180,rect.width)}px`;menu.style.left=`${Math.max(8,Math.min(rect.left,window.innerWidth-Math.max(180,rect.width)-8))}px`;menu.style.top=`${Math.min(rect.bottom+4,Math.max(8,window.innerHeight-220))}px`;menu.showPopover();
     this.editor.setAttribute('role','combobox');this.editor.setAttribute('aria-autocomplete','list');this.editor.setAttribute('aria-controls',menu.id);this.editor.setAttribute('aria-expanded','true');
   }

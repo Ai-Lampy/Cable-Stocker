@@ -1,8 +1,21 @@
 # Changelog
 
+## v1.1.21 — 2026-10-14
+
+Previous version: v1.1.20.
+
+- Show an explicit category dropdown when editing a connector Category cell, including Uncategorised entries. Filter available sheets as the user types; support clicking or arrow keys with Enter/Tab. Retain custom category entry and existing colour palette restrictions.
+- Match the bottom Save table button to the top button’s alignment, size, font, border and padding across shared tables.
+- Record live v1.1.20 verification in README.md and UPDATES.md.
+- Updated/upload: `js/app.js`, `js/grid.js`, `js/version.js`, `css/app.css`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. Original inputs unchanged.
+- Validation: 129 automated tests passed. Approved local Chromium checks passed dropdown display/filtering, keyboard and mouse selection, category moves and matching Save button geometry/styling. No console errors. Other browsers not tested.
+- Local only; not uploaded or deployed.
+
 ## v1.1.20 — 2026-10-14
 
 Previous version: v1.1.19.
+
+- Confirmed live at ailampy.com/cable/ on 2026-10-14 after user upload. Chromium tests passed Connectors sheets, category assignment and bottom Save committing active edits. Address retained, no console errors, temporary test entry removed.
 
 - Organise Settings → Connectors into category sheets matching Cable Types, with Uncategorised fallback. Infer existing entries from cable-type connector names/aliases without changing original inputs. Shared entries can appear in multiple inferred sheets; explicit category choices override inference.
 - New connector rows inherit the selected sheet. Category edits move entries; additions, paste, deletion, table preferences and error navigation use the selected sheet. Approval assigns a single usage category when available. Export keeps all sheets in one connector_types.json; stock JSON stays unchanged.
