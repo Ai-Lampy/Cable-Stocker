@@ -4,9 +4,13 @@
 
 Previous version: v1.1.22.
 
+- Live vendor-project verification on 2026-10-14: saving vendor projects and loading them when a vendor is selected passed approved Chromium browser testing at https://ailampy.com/cable/ on v1.1.23 using Siyan LTD. Selecting Siyan LTD found projects/siyan_ltd.lampy-project.json and loaded vendor v2, 4 categories, 17 cable types and 1 loom after confirmation. Save vendor project → Download project JSON produced JSON exactly matching the supplied project. The address stayed at ailampy.com/cable/; no console errors. The project has 3 connectors awaiting review. Native Choose save location was not tested. No upload or deployment performed by the agent.
+- Documentation-only follow-up: updated `UPDATES.md`, `CHANGELOG.md` and `README.md`; app version remains v1.1.23. Recorded cleanup of agent-created test downloads as an ongoing rule. No new or deleted project files.
+
 - Move the bottom Save table action directly below the table rows and ahead of help text. Retain the top button’s horizontal alignment, dimensions and save behaviour across shared grids. Correct the earlier styling-only change.
 - Updated/upload: `js/grid.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted files: none.
-- Validation: 133 automated tests passed. Approved local Chromium confirmed adjacent table/footer placement, equal button geometry and working save action, with no console errors. Other browsers not tested. Not uploaded or deployed.
+- Validation: 133 automated tests passed. Approved local Chromium confirmed adjacent table/footer placement, equal button geometry and working save action, with no console errors. Other browsers not tested.
+- Live verification on 2026-10-14 after user upload: ailampy.com/cable/ displays v1.1.23. Chromium checks passed bottom Save table placement directly below the rows and before help text, matching horizontal alignment/dimensions with the top button, and successful saving. The address stayed at ailampy.com/cable/; no console warnings/errors. No upload or deployment performed by the agent.
 
 ## v1.1.22 — 2026-10-14
 
@@ -18,7 +22,7 @@ Previous version: v1.1.21.
 - Explain manual GitHub upload, public hosted files, exact filenames, new-vendor reference updates and separate reference downloads. Register the new module in release-specific bootstrap imports.
 - Updated/upload: `index.html`, `js/app.js`, `js/version.js`, new `js/vendor-projects.js`, new `tests/vendor-projects.test.mjs`, new `projects/README.md`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Deleted files: none. Original examples/reference inputs unchanged. No real vendor projects fabricated or bundled.
 - Validation: 133 automated tests passed, including filenames/collisions, relative uncached requests, full project preservation, missing/error/mismatched files, stale requests and edits during loading. Approved local Chromium tests passed download to exact filename, loading the downloaded file from an isolated local hosted folder, vendor-selection loading, cancellation, saved version/cable restoration and invalid-file draft preservation. No console warnings/errors in checked flows.
-- Not uploaded or deployed. Native OS save dialog/file writing and non-Chromium browsers were not tested; standard download was tested. Live deployment of this feature remains unverified.
+- Not uploaded or deployed. Native OS save dialog/file writing and non-Chromium browsers were not tested; standard download was tested. Subsequent live saving and vendor-selection loading passed on v1.1.23 using Siyan LTD; see the verification above.
 
 ## v1.1.21 — 2026-10-14
 

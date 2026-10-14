@@ -7,8 +7,10 @@
 
 ## Completed
 
-- v1.1.23 (local): Corrected bottom Save table placement. The button now appears directly after the table rows, before help text, aligned with the top Save button. v1.1.21 had changed styling only, not vertical placement.
-- Validation: 133 automated tests passed. Approved local Chromium checks confirmed zero gap between table container and footer, identical button alignment/dimensions, and successful Save action. No console errors. No upload/deployment; live version could not be rechecked via the available HTTP tools this turn.
+- Live vendor-project verification on 2026-10-14: saving vendor projects and loading them when a vendor is selected passed approved Chromium browser testing at https://ailampy.com/cable/ on v1.1.23 using Siyan LTD. Selecting Siyan LTD found projects/siyan_ltd.lampy-project.json and loaded vendor v2, 4 categories, 17 cable types and 1 loom after confirmation. Save vendor project → Download project JSON produced JSON exactly matching the supplied project. The address stayed at ailampy.com/cable/; no console errors. The project has 3 connectors awaiting review. Native Choose save location was not tested. No upload or deployment performed by the agent.
+
+- v1.1.23 (live at https://ailampy.com/cable/; verified 2026-10-14): Corrected bottom Save table placement. The button now appears directly after the table rows, before help text, aligned with the top Save button. v1.1.21 had changed styling only, not vertical placement.
+- Validation: 133 automated tests passed. Approved local Chromium checks confirmed zero gap between table container and footer, identical button alignment/dimensions, and successful Save action. No console errors. After the user uploaded the files, live Chromium testing confirmed v1.1.23 at ailampy.com/cable/: bottom Save table placement directly below the rows and before help text, identical horizontal alignment/dimensions to the top button, and successful saving all passed. No live console warnings/errors; address retained. No upload or deployment performed by the agent.
 - Upload: `js/grid.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. If earlier updates are not uploaded, include their listed files too (especially `css/app.css` for matching Save button styling).
 
 - v1.1.22 (local): Save full generator vendor projects under projects/ and load them on vendor selection. Added native-save option/download fallback, exact filename guidance, protected replacement and explicit current-vendor reload. Existing Lampy schemas and references unchanged.
@@ -120,6 +122,7 @@
 
 ## Notes
 
+- Delete agent-created test downloads once testing finishes. Preserve user originals and project source files; remove only downloads identified as test artifacts.
 - BUILD_BRIEF.md remains authoritative. Read this file before subsequent changes.
 - The user configured GitHub Pages and uploaded v1.1.5, including the corrected index.html. The release is verified live through ailampy.com/cable/. Future uploads and deployments remain the user's responsibility unless separately authorised.
 - Browser testing was not run for v1.1.2, v1.1.3 or v1.1.4; fresh approval is required. Prior v1.1.1 browser testing remains recorded in CHANGELOG.md.

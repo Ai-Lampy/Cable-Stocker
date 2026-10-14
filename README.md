@@ -2,11 +2,11 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **v1.1.19** was verified live in Chromium on 2026-10-14. Connector fallback, yellow review notification, approval/correction, reference export preview and persistence after reopening passed browser testing. The address stayed at ailampy.com/cable/ and no console errors were found. Temporary test data was removed.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/), running **v1.1.23**. Verified in Chromium on 2026-10-14 after the user's upload. The bottom **Save table** button sits directly below the rows, before help text, with identical horizontal alignment and dimensions to the top button. Placement, alignment and saving passed live browser testing. The address stayed at ailampy.com/cable/ and no console warnings/errors were found.
 
-**Live v1.1.20 verification:** On 2026-10-14, Chromium confirmed v1.1.20 at ailampy.com/cable/, Connectors category sheets, category assignment and the bottom Save table button committing active edits. No console errors; temporary test entry removed.
+Live vendor-project verification on 2026-10-14: saving vendor projects and loading them when a vendor is selected passed approved Chromium browser testing at https://ailampy.com/cable/ on v1.1.23 using Siyan LTD. Selecting Siyan LTD found projects/siyan_ltd.lampy-project.json and loaded vendor v2, 4 categories, 17 cable types and 1 loom after confirmation. Save vendor project → Download project JSON produced JSON exactly matching the supplied project. The address stayed at ailampy.com/cable/; no console errors. The project has 3 connectors awaiting review. Native Choose save location was not tested. No upload or deployment performed by the agent.
 
-**Local update: v1.1.23** moves the bottom Save table button directly below the table rows, before help text, aligned with the top button. It includes v1.1.22’s generator project saving/loading and the earlier category dropdown. It has not been uploaded or deployed.
+Earlier live checks: v1.1.19 passed connector review/approval and persistence; v1.1.20 passed Connectors category sheets, category assignment and bottom-button saving.
 
 ## Saved vendor projects — generator only
 
@@ -60,7 +60,7 @@ For manual GitHub Pages upload, retain the complete folder structure and use thi
 5. Use **Edit lengths**. Type a positive number and press Enter for each chip. Paste separated lists. Backspace removes the last chip when the input is empty. **Copy Lengths** stores a set inside the app. **Apply / Paste Lengths** offers Replace, Merge or Cancel. No unit conversion occurs.
 6. Open **Review & export**. Errors do not block JSON previews, copying or downloads. A downloaded file with errors is not labelled valid.
 
-Changing the vendor name keeps the current stock and asks before doing so when stock exists. Use **New vendor** for an empty document. Imports, category deletion and row deletion have review/confirmation. Undo/redo covers vendor, cable, loom and reference edits for the current session (up to 100 operations).
+Selecting a different vendor looks for its saved project and asks before replacing existing work. Use **New vendor** for an empty document. Imports, category deletion and row deletion have review/confirmation. Undo/redo covers vendor, cable, loom and reference edits for the current session (up to 100 operations).
 
 Plain cable-stock JSON import previews compare against your current draft by matching identical rows first, then matching a single remaining row with the same name in the same category. An unchanged file reports zero changes. Renames and ambiguous duplicate-name edits appear as additions/removals because stock JSON has no persistent row IDs. Project backups retain their existing ID-based comparison. Cancelling leaves your draft untouched; accepting a stock JSON import establishes a fresh baseline.
 
