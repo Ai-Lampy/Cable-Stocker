@@ -12,6 +12,8 @@ Previous version: v1.1.29. Live at https://ailampy.com/cable/ after the user upl
 - The existing draft was preserved. No test data entered or files downloaded; temporary verification tabs closed. Lampy Paperwork was not accessed or changed. No upload or deployment performed by the agent. Other browsers were not tested; existing Paperwork compatibility and user acceptance remain pending.
 - Documentation follow-up — 2026-10-15: updated/upload `UPDATES.md` and `CHANGELOG.md` only to record the live result. App remains v1.1.30; no app code changes or project files added/deleted. Documentation checks passed and the version file is unchanged. Existing browser results recorded without rerunning browser tests for this documentation edit.
 
+- README Vendor-field guidance — 2026-10-15: clarified that Vendor name has no yellow change highlight, retains normal focus styling and still participates in export review. Distinguished Length unit highlighting from table save highlights. README contains current usage only; release notes and test history remain here. Updated/upload: `README.md`, `UPDATES.md`, `CHANGELOG.md`. App remains v1.1.30. Documentation/source checks passed; browser tests were not rerun for this documentation-only change. No app code changes, new/deleted files, uploads or deployment.
+
 ## v1.1.29 — 2026-10-15
 
 Previous version: v1.1.28. Local release for manual upload; not uploaded or deployed.

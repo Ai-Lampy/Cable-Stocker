@@ -7,6 +7,8 @@
 
 ## Completed
 
+- README Vendor-field guidance completed — 2026-10-15: documented Vendor name without yellow highlighting, normal focus styling, export review and separate Length unit/table highlights. Updated/upload `README.md`, `UPDATES.md` and `CHANGELOG.md`; app remains v1.1.30. No app code changes or new/deleted files. Maintenance details are in CHANGELOG.md.
+
 - v1.1.30 (live at https://ailampy.com/cable/; verified 2026-10-15 after user upload): removed the yellow change highlight from the Vendor name field on the Vendor tab. Length-unit and table change highlighting remain intact; vendor changes still appear in export review. Increased the app version and README current project version.
 - Release files: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. Approved live browser testing confirmed the v1.1.30 footer and that the Vendor name field no longer highlights yellow, including after focusing it and tabbing away. The existing Siyan LTD draft was preserved; the address stayed at ailampy.com/cable/. Full verification details are in CHANGELOG.md. Lampy Paperwork untouched; no upload or deployment performed by the agent.
 - Documentation follow-up — 2026-10-15: updated/upload `UPDATES.md` and `CHANGELOG.md` only to record the live result. App remains v1.1.30; no app code changes or new/deleted files. Recorded the completed browser checks without rerunning them for this documentation edit.

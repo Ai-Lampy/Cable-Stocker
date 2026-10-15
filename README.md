@@ -60,6 +60,8 @@ For manual GitHub Pages upload, retain the complete folder structure and use thi
 
 Selecting a different vendor looks for its saved project and asks before replacing existing work. Use **New vendor** for an empty document. Imports, category deletion and row deletion have review/confirmation. Undo/redo covers vendor, cable, loom and reference edits for the current session (up to 100 operations).
 
+On the Vendor tab, **Vendor name** does not show a yellow change highlight. It retains its normal focus outline, and vendor changes still appear in **Review & export**. **Length unit** shows a yellow highlight when it differs from the imported baseline. Table highlights follow the saving rules below.
+
 Plain cable-stock JSON import previews compare against your current draft by matching identical rows first, then matching a single remaining row with the same name in the same category. An unchanged file reports zero changes. Renames and ambiguous duplicate-name edits appear as additions/removals because stock JSON has no persistent row IDs. Project backups retain their existing ID-based comparison. Cancelling leaves your draft untouched; accepting a stock JSON import establishes a fresh baseline.
 
 ## Three output types
@@ -90,7 +92,7 @@ Every cable table, Settings table and the main loom table has **Save table** but
 - Drag a header separator to resize. Focus the separator and use left/right arrows for keyboard resizing. Editable columns can shrink to 1 px (the non-zero geometry guard) and expand again; narrow content is clipped or scrollable without changing its data. The row-number gutter stays 42 px. Chosen widths persist per table, including at different zoom levels.
 - Click a heading to sort ascending/descending. **Clear sort** restores the default ascending order. Search filters displayed rows. Clear the search filter before extending the table with pasted rows; sorting can remain active.
 - Zoom, widths, alignment and wrapping persist per table. Zoom changes the table only. Preferences never enter Lampy JSON.
-- Yellow marks values changed from the imported baseline, or from that table’s last successful **Save table**. Export reviews continue to use the original import baseline and show added and removed rows. Excel imports retain the original baseline; importing another stock JSON establishes a new one.
+- In tables, yellow marks values changed from the imported baseline, or from that table’s last successful **Save table**. Export reviews continue to use the original import baseline and show added and removed rows. Excel imports retain the original baseline; importing another stock JSON establishes a new one.
 
 ## Composite looms
 
