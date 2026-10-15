@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.36.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.37.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 

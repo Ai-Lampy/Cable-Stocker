@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.1.37 — 2026-10-15
+
+Previous version: v1.1.36. Local release for manual upload; not deployed.
+
+- Remove the helper text beneath Length unit and Length display on the Vendor tab. Keep both labels, selectors, layout and unit-change confirmation.
+- Updated/upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New files: none. Deleted the regenerated root `.DS_Store` as cleanup. User project JSON, backups and references preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 161 automated tests passed, including JSON/Excel round trips. All seven JavaScript modules passed syntax checks, all 10 JSON files parsed, local imports resolved, and helper-removal/version consistency checks passed.
+- Browser testing was not run for this update; fresh approval was not requested for this text-only removal. Visual behaviour remains unverified for this release. No temporary files or downloads created. Existing pending Paperwork compatibility and user acceptance remain unchanged.
+
 ## v1.1.36 — 2026-10-15
 
 Previous version: v1.1.35. Local release for manual upload; not deployed.
