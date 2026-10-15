@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.30 — 2026-10-15
+
+Previous version: v1.1.29. Local release for manual upload; not uploaded or deployed.
+
+- Remove the yellow change highlight from the Vendor name field on the Vendor tab. Preserve normal input focus styling, length-unit highlighting and table highlighting. Vendor change tracking and export reviews remain unchanged.
+- Increase `js/version.js` and the README current project version; record completion in UPDATES.md.
+- Updated/upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. User projects, reference JSON and backups preserved. Lampy Paperwork was not accessed or changed.
+- Validation: all 155 existing non-browser tests passed, including vendor change review, JSON/Excel round trips and project loading. All seven app modules passed syntax checks, local imports resolved and all 10 JSON files parsed. Version consistency passed. File hashes confirmed only the five listed files changed; no temporary project artifacts remained.
+- Browser testing not run: no fresh approval for this update. Live v1.1.30 not verified; no upload or deployment performed by the agent. Existing Paperwork compatibility and user acceptance remain pending.
+
 ## v1.1.29 — 2026-10-15
 
 Previous version: v1.1.28. Local release for manual upload; not uploaded or deployed.

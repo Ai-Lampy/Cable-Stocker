@@ -7,6 +7,9 @@
 
 ## Completed
 
+- v1.1.30 (local, not uploaded or deployed) — 2026-10-15: removed the yellow change highlight from the Vendor name field on the Vendor tab. Length-unit and table change highlighting remain intact; vendor changes still appear in export review. Increased the app version and README current project version.
+- Upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. Browser testing not run for this update; non-browser validation recorded in CHANGELOG.md. Lampy Paperwork untouched; no upload or deployment.
+
 - v1.1.29 (local, not uploaded or deployed) — 2026-10-15: removed the helper sentence below the Vendor name field. Retained the vendor selector, project loading and corrected loom guidance. Increased the app version and README current project version. Approved local browser checks confirmed the helper is absent, the input remains visible and the footer shows v1.1.29.
 - Upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. Lampy Paperwork untouched; no upload or deployment. Validation details are in CHANGELOG.md.
 

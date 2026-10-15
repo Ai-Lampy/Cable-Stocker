@@ -64,17 +64,26 @@
     {
       "id": "connector-13",
       "name": "powerCON TRUE1",
-      "aliases": []
+      "aliases": [
+        "T1",
+        "True 1"
+      ]
     },
     {
       "id": "connector-14",
       "name": "13A Plug",
-      "aliases": []
+      "aliases": [
+        "13 Plug",
+        "Plug"
+      ]
     },
     {
       "id": "connector-15",
       "name": "13A Socket",
-      "aliases": []
+      "aliases": [
+        "13 Socket",
+        "Socket"
+      ]
     },
     {
       "id": "connector-16",
@@ -85,6 +94,31 @@
       "id": "connector-17",
       "name": "Tajimi",
       "aliases": []
+    },
+    {
+      "id": "4ba479a3-0fb0-4e54-9426-21d59ad25a63",
+      "name": "CEE 32A 1ø",
+      "aliases": [
+        "32A 1ø"
+      ],
+      "category": "Mains"
+    },
+    {
+      "id": "96ec03c9-5661-4072-98ce-42fdc55b3a5c",
+      "name": "Powerlock (3P + N + E)",
+      "aliases": [
+        "P/Lock",
+        "Locks"
+      ],
+      "category": "Mains"
+    },
+    {
+      "id": "65a1af3b-f733-4962-ae73-c3c02954a297",
+      "name": "CEE 16A 1ø",
+      "aliases": [
+        "16A"
+      ],
+      "category": "TRS"
     }
   ]
 }
