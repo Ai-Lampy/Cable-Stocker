@@ -22,6 +22,7 @@ export function checkStock(stock) {
 export function projectFromStock(stock, filename = '') {
   checkStock(stock);
   const project = {format: 'lampy-cable-generator-project', formatVersion: 1, stock: clone(stock), filename, vendorVersion: '', looms: [], rowIds: {}, baseline: null};
+  importStockLooms(project);
   for (const [category, rows] of Object.entries(stock.cables)) project.rowIds[category] = rows.map(uid);
   project.baseline = snapshot(project);
   return project;
@@ -30,18 +31,48 @@ export function snapshot(project) {
   const {baseline, ...rest} = project;
   return clone(rest);
 }
+// Stock looms use the approved catalogue shape; editor-only details stay in backups.
+const extraFields = (value, keys) => Object.fromEntries(Object.entries(value).filter(([key]) => !keys.includes(key)));
+export function stockLoomJSON(loom) {
+  return {...clone(loom.stockFields || {}),id:loom.id,name:loom.name,lengths:clone(loom.lengths),cables:loom.components.map(c => ({...clone(c.stockFields || {}),cableType:c.type,quantity:c.count}))};
+}
+function importStockLooms(project) {
+  if (!Object.hasOwn(project.stock,'looms')) return;
+  const source=project.stock.looms;
+  if (!Array.isArray(source)) throw new Error('Stock looms must be an array.');
+  const ids=new Set();
+  for (const loom of source) {
+    if (!object(loom) || typeof loom.id!=='string' || !loom.id.trim() || ids.has(loom.id)) throw new Error('Stock looms need unique, non-empty string IDs.');
+    if (typeof loom.name!=='string' || !Array.isArray(loom.lengths) || !Array.isArray(loom.cables) || loom.cables.some(c=>!object(c)||typeof c.cableType!=='string')) throw new Error('Each stock loom needs a name, lengths array and cables array with cableType text.');
+    ids.add(loom.id);
+    const imported={id:loom.id,name:loom.name,lengths:clone(loom.lengths),description:'',components:loom.cables.map((c,index)=>{
+      const component={id:`${loom.id}:component:${index+1}`,type:c.cableType,count:c.quantity,connectors:{},lengths:[]},fields=extraFields(c,['cableType','quantity']);
+      if (Object.keys(fields).length) component.stockFields=clone(fields);
+      return component;
+    })};
+    const fields=extraFields(loom,['id','name','lengths','cables']);
+    if (Object.keys(fields).length) imported.stockFields=clone(fields);
+    const existing=project.looms.find(l=>l.id===loom.id);
+    if (existing && !same(stockLoomJSON(existing),stockLoomJSON(imported))) throw new Error('Project contains conflicting stock and editor looms. Keep the original backup for recovery.');
+    if (!existing) project.looms.push(imported);
+  }
+  project.stockLooms=true;
+  delete project.stock.looms;
+}
 export function restoreProject(value) {
   if (value.format !== 'lampy-cable-generator-project' || value.formatVersion !== 1) throw new Error('Unsupported generator project format.');
   checkStock(value.stock);
   const p = clone(value);
   if (p.adaptors !== undefined && (!object(p.adaptors) || Object.values(p.adaptors).some(v=>v!==true))) throw new Error('Invalid adaptor markers.');
   if (!Array.isArray(p.looms) || !object(p.rowIds)) throw new Error('Incomplete generator project.');
+  importStockLooms(p);
   for (const [cat, rows] of Object.entries(p.stock.cables)) {
     if (!Array.isArray(p.rowIds[cat]) || p.rowIds[cat].length !== rows.length || new Set(p.rowIds[cat]).size !== rows.length) throw new Error(`Invalid row keys in ${cat}.`);
   }
   if (!p.baseline) p.baseline = snapshot(p);
   checkStock(p.baseline.stock);
   if (!object(p.baseline.rowIds) || !Array.isArray(p.baseline.looms)) throw new Error('Invalid project baseline.');
+  importStockLooms(p.baseline);
   if (typeof p.filename !== 'string' || typeof p.vendorVersion !== 'string') throw new Error('Invalid project filename or version.');
   for (const loom of [...p.looms, ...p.baseline.looms]) {
     if (!object(loom) || typeof loom.id !== 'string' || typeof loom.name !== 'string' || !Array.isArray(loom.lengths) || !Array.isArray(loom.components)) throw new Error('Invalid generator loom structure.');
@@ -50,7 +81,11 @@ export function restoreProject(value) {
   return p;
 }
 export function newProject(name = '') { return projectFromStock({vendor: {name, lengthUnit: 'm'}, cables: {}}); }
-export function runtimeJSON(project) { return clone(project.stock); }
+export function runtimeJSON(project) {
+  const stock=clone(project.stock);
+  if (project.looms.length || project.stockLooms) stock.looms=project.looms.map(stockLoomJSON);
+  return stock;
+}
 export function parseLengths(text) {
   const tokens = String(text).trim().split(/[\s,;]+/).filter(Boolean);
   const values = [], duplicates = [];
@@ -198,7 +233,7 @@ export function baselineRow(project, category, index) {
   return oldIndex < 0 ? undefined : project.baseline.stock.cables[category]?.[oldIndex];
 }
 // Plain stock JSON has no row IDs. Reconcile a preview copy only; importing
-// still establishes a fresh baseline and never adds IDs to Lampy JSON.
+// still establishes a fresh baseline. Stock looms have their own stable IDs.
 export function stockImportChanges(incoming, current) {
   const preview = clone(incoming);
   for (const [category, rows] of Object.entries(preview.stock.cables)) {
@@ -220,7 +255,11 @@ export function stockImportChanges(incoming, current) {
     }
     preview.rowIds[category] = rows.map((_, i) => matched.has(i) ? current.rowIds[category][matched.get(i)] : uid());
   }
-  return changes(preview, snapshot(current));
+  const baseline=snapshot(current);
+  // Compare exported loom data, not regenerated editor component IDs or backup-only fields.
+  preview.looms=preview.looms.map(stockLoomJSON);
+  baseline.looms=baseline.looms.map(stockLoomJSON);
+  return changes(preview, baseline);
 }
 export function changes(project, baseline = project.baseline) {
   if (!baseline) return [];
@@ -279,14 +318,16 @@ export function validate(project, refs) {
       }
     });
   }
-  if (project.looms.length) add('warning','Stock / Pre-Made Looms',null,'name','Looms are generator backup data only; Lampy runtime support is unverified.','Keep a project JSON or Excel backup. Runtime JSON does not include these looms.');
+  if (project.looms.length) add('warning','Stock / Pre-Made Looms',null,'name','Stock looms are included in JSON; Lampy Paperwork needs its planned update to use them.','Keep a project JSON or Excel backup for descriptions, connector overrides and component lengths.');
+  const loomIds=new Set();
   project.looms.forEach((loom, i) => {
+    if (typeof loom.id!=='string' || !loom.id.trim() || loomIds.has(loom.id)) add('error','Stock / Pre-Made Looms',i,'name','Loom IDs must be non-empty and unique.','Use a unique ID for each stock loom.');
+    loomIds.add(loom.id);
     if (!loom.name?.trim()) add('error','Stock / Pre-Made Looms',i,'name','Loom name is required.','Name this packaged item.');
     lengths(loom.lengths,'Stock / Pre-Made Looms',i);
     if (!Array.isArray(loom.components) || !loom.components.length) add('error','Stock / Pre-Made Looms',i,'components','A loom needs components.','Add the cables inside one loom.');
     (loom.components || []).forEach((c, j) => {
-      if (!c.type?.trim() || !Number.isInteger(c.count) || c.count <= 0) add('error','Stock / Pre-Made Looms',i,'components',`Component ${j+1} needs a type and positive integer count.`,'Count cables inside one loom, not stock quantities.');
-      if (!object(c.connectors) || !Object.keys(c.connectors).length || Object.values(c.connectors).some(v => typeof v !== 'string' || !v.trim())) add('error','Stock / Pre-Made Looms',i,'components',`Component ${j+1} needs valid connectors.`,'Select a cable type to inherit connectors, or enter overrides.');
+      if (typeof c.type!=='string' || !c.type.trim() || !Number.isSafeInteger(c.count) || c.count <= 0) add('error','Stock / Pre-Made Looms',i,'components',`Component ${j+1} needs a type and positive integer count.`,'Count cables inside one loom, not stock quantities.');
       if (c.lengths?.length) lengths(c.lengths,'Stock / Pre-Made Looms',i,'components');
     });
   });
@@ -340,6 +381,7 @@ export function mergeProjects(current, incoming, partial = false) {
     result.stock = {...result.stock, ...clone(incoming.stock), cables: clone(current.stock.cables)};
     result.vendorVersion = incoming.vendorVersion;
     result.filename = incoming.filename || current.filename;
+    if (incoming.stockLooms) result.stockLooms=true;
   }
   for (const [cat, rows] of Object.entries(incoming.stock.cables)) {
     result.stock.cables[cat] ||= [];

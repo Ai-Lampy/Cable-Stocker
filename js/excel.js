@@ -45,7 +45,7 @@ export function toWorkbook(project,X,{category=null,blank=false}={}) {
     addSheet(X,book,name,rows,[39,30,45,50,50]);addSheet(X,book,'_Components',components,[39,39,28,12,48,32,48]);
   }
   addSheet(X,book,'_Categories',mapping,[31,50,12]);
-  const metadata={format:'lampy-cable-workbook',formatVersion:1,scope:category?'category':'vendor',category,stock:omit(project.stock,['cables']),filename:project.filename,vendorVersion:project.vendorVersion,loomCategory:includeLooms,sourceRows};
+  const metadata={format:'lampy-cable-workbook',formatVersion:1,scope:category?'category':'vendor',category,stock:omit(project.stock,['cables']),stockLooms:!!project.stockLooms,filename:project.filename,vendorVersion:project.vendorVersion,loomCategory:includeLooms,sourceRows};
   const text=json(metadata),meta=[['key','value'],['format','lampy-cable-workbook'],['scope',metadata.scope],['vendor_name',project.stock.vendor.name],['length_unit',project.stock.vendor.lengthUnit],['vendor_version',project.vendorVersion],['filename',project.filename]];
   for(let i=0;i<text.length;i+=30000)meta.push([`json_${String(i/30000).padStart(5,'0')}`,text.slice(i,i+30000)]);
   addSheet(X,book,'_Metadata',meta,[22,65]);return book;
@@ -76,6 +76,7 @@ export function fromWorkbook(book,X,current) {
   const stock=clone(metadata?.stock||{vendor:current.stock.vendor});stock.cables={};
   if(metadata){if(String(editable.vendor_name??'')!==String(stock.vendor.name??''))stock.vendor.name=String(editable.vendor_name??'');if(String(editable.length_unit??'')!==String(stock.vendor.lengthUnit??''))stock.vendor.lengthUnit=String(editable.length_unit??'');}
   const p=projectFromStock(stock, String(editable.filename??metadata?.filename??current.filename));p.vendorVersion=String(editable.vendor_version??metadata?.vendorVersion??current.vendorVersion);p.looms=[];
+  if(metadata?.stockLooms)p.stockLooms=true;
   let mappings=[];
   if(book.Sheets._Categories)mappings=records(book,'_Categories',X,['sheet','category','kind']);
   else mappings=book.SheetNames.filter(n=>!RESERVED.includes(n)).map(n=>({sheet:n,category:n,kind:'cables'}));
@@ -138,6 +139,7 @@ export function fromWorkbook(book,X,current) {
 export function replaceWorkbook(current,incoming,partial,mappings) {
   if(!partial){const result=clone(incoming);result.baseline=clone(current.baseline);return result;}
   const result=clone(current);
+  if(mappings.some(map=>map.kind==='looms')&&incoming.stockLooms)result.stockLooms=true;
   for(const map of mappings){if(map.kind==='looms')result.looms=clone(incoming.looms);else{result.stock.cables[map.category]=clone(incoming.stock.cables[map.category]);result.rowIds[map.category]=clone(incoming.rowIds[map.category]);result.stock.cables[map.category].forEach((_,i)=>setCableAdaptor(result,map.category,i,isCableAdaptor(incoming,map.category,i)));}}
   return result;
 }

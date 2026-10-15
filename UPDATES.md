@@ -3,9 +3,13 @@
 ## Pending
 
 - User acceptance of the initial release in day-to-day cable-stock editing.
-- Confirm an authoritative Lampy Paperwork composite-loom schema before enabling loom fields in its cable-stock export. Until then, generator project JSON and Excel preserve looms separately.
+- Lampy Paperwork needs a separate future update to consume the agreed vendor stock-loom structure. Cable Stocker now exports it; Paperwork changes are outside this release. No implementation or deployment has been performed in Paperwork.
 
 ## Completed
+
+- v1.1.27 (local, not uploaded or deployed): implemented the user-approved stock-loom structure with loom `id`, `name`, numeric available `lengths`, and `cables` entries containing `cableType` / `quantity`. Complete JSON export/import and loom fragment preview/copy/download use this structure. Existing project/Excel backups retain richer loom data; original cable schemas, manifest, references and Siyan project remain unchanged. Replaced the obsolete loom-exclusion notices with the pending Paperwork compatibility notice.
+- Validation: 155 non-browser tests passed, including JSON/Excel round trips, legacy project preservation, import review, invalid data and preview/download controller checks. Browser tests not run, as requested. Lampy Paperwork was not accessed or changed for this update.
+- Upload: `js/app.js`, `js/model.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `tests/loom-stock.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New file: `tests/loom-stock.test.mjs`. Deleted files: none.
 
 - Project-folder documentation and cleanup record — 2026-10-15: corrected `projects/README.md` to identify the included user-supplied Siyan LTD project and its exact upload path. Recorded removal of the regenerated root `.DS_Store` during the preceding audit; no further files deleted in this documentation follow-up. Updated/upload: `projects/README.md`, `UPDATES.md`, `CHANGELOG.md`. App remains v1.1.26; no app code changes or new files. User project JSON, backups and original inputs preserved. Verified the project vendor/filename, local documentation link, unchanged version and that only these three documents changed. Browser tests were not rerun for this documentation-only change. No upload or deployment.
 

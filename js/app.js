@@ -1,7 +1,7 @@
 import {vendorProjectFilename,loadVendorProject} from './vendor-projects.js';
 import {watchUpdates, safeRefresh, freshDocumentURL} from './updates.js';
 import {APP_VERSION} from './version.js';
-import {loomRows,loomOrder,prepareLoomDraft,clone,same,uid,cableTypeSheets,cableTypeRows,connectorTypeSheets,connectorTypeRows,connectorTypeCategories,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,parseLengths,combineLengths,referenceMatch,defaultCable,inheritCableConnectors,fillCableConnectors,connectorReviews,approveConnector,cableNeedsConnectorInputs,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,colourSuggestions,resolveColour,validateLengthColours,changes,validate,normaliseVendorVersion,incrementVersion,mergeProjects,relativePath} from './model.js';
+import {loomRows,loomOrder,prepareLoomDraft,clone,same,uid,cableTypeSheets,cableTypeRows,connectorTypeSheets,connectorTypeRows,connectorTypeCategories,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,stockLoomJSON,parseLengths,combineLengths,referenceMatch,defaultCable,inheritCableConnectors,fillCableConnectors,connectorReviews,approveConnector,cableNeedsConnectorInputs,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,colourSuggestions,resolveColour,validateLengthColours,changes,validate,normaliseVendorVersion,incrementVersion,mergeProjects,relativePath} from './model.js';
 import {Grid,display,sortedLengths} from './grid.js';
 import {toWorkbook,fromWorkbook,replaceWorkbook} from './excel.js';
 
@@ -116,7 +116,7 @@ function metadataTarget(scope,path=[]){
 }
 function metadataForm(scope,title){
   const host=node('section',null,'metadata-form');
-  const reserved=scope==='vendor'?['name','lengthUnit']:['vendor','cables'];
+  const reserved=scope==='vendor'?['name','lengthUnit']:['vendor','cables','looms'];
   const update=(path,key,value,remove=false)=>change(()=>{const target=metadataTarget(scope,path);if(remove){if(Array.isArray(target))target.splice(Number(key),1);else delete target[key];}else target[key]=value;},{renderPage:false});
   function add(path){
     const list=Array.isArray(metadataTarget(scope,path));let nameInput,kind='text';
@@ -299,7 +299,7 @@ function editLoom(existing){
 }
 function renderLooms(){
   heading(LOOMS,'Expand a loom name to show its cable types and quantities.',[btn('Add loom',()=>editLoom(),'primary'),btn('Loom JSON preview',previewLooms),btn('Loom Excel',()=>reviewExport('excel',LOOMS))]);
-  $('#main').append(node('p','Looms are included in generator project JSON and Excel backups. Lampy cable-stock JSON does not include looms.','note warning'));
+  $('#main').append(node('p','Cable-stock JSON includes loom names, IDs, available lengths and cable quantities. Lampy Paperwork needs its planned update to use them. Keep project JSON or Excel for descriptions, connector overrides and component lengths.','note warning'));
   const host=node('div',null,'grid-panel');$('#main').append(host);
   const rows=()=>loomRows(project.looms),value=(row,key)=>key==='name'?(row.component?.type??row.loom.name):key==='count'?(row.component?.count??''):key==='lengths'?(row.component?.lengths??row.loom.lengths):row.component?'':row.loom[key];
   const baseline=row=>{const loom=project.baseline.looms?.find(l=>l.id===row.loom.id);return row.component?loom?.components.find(c=>c.id===row.component.id):loom;};
@@ -380,7 +380,7 @@ function download(name,value,type='application/json'){
 function safeFilename(){return /^[^/\\]+\.json$/i.test(project.filename)?project.filename:'unconfirmed_cable_stock.json';}
 function downloadBackupNow(){download(`${safeFilename().replace(/\.json$/i,'')}.lampy-project.json`,project);dirty=false;save();}
 function downloadBackup(){openDialog('Review project backup',body=>{body.append(node('p','Complete generator backup: cable stock, looms, adaptor markers, vendor version and imported baseline. This file is for reopening in this app.','note'));reviewBody(body);},[{label:'Cancel',run:d=>d.close()},{label:'Download project backup',cls:'primary',run:d=>{downloadBackupNow();d.close();}}]);}
-function previewLooms(){const text=JSON.stringify({format:'lampy-generator-loom-fragment',looms:project.looms},null,2);openDialog('Loom JSON · generator fragment',body=>{body.append(node('p','Generator backup fragment only. This is not a Lampy Paperwork document. Use Save project backup to save a reopenable complete project.','note warning'));reviewBody(body,changes(project).filter(c=>c.category===LOOMS),allIssues().filter(i=>i.category===LOOMS));body.append(node('pre',text));},[{label:'Copy JSON',run:async()=>{try{await navigator.clipboard.writeText(text);notice('Loom fragment copied.');}catch{notice('Select and copy the preview text.',true);}}},{label:'Download fragment',run:()=>download('looms.generator-fragment.json',text)},{label:'Close',run:d=>d.close()}]);}
+function previewLooms(){const text=JSON.stringify({looms:project.looms.map(stockLoomJSON)},null,2);openDialog('Loom JSON · stock fragment',body=>{body.append(node('p','Loom stock fragment only. Use the complete cable-stock export to include vendor details and reopen it in this app. Lampy Paperwork needs its planned update to use these looms.','note warning'));reviewBody(body,changes(project).filter(c=>c.category===LOOMS),allIssues().filter(i=>i.category===LOOMS));body.append(node('pre',text));},[{label:'Copy JSON',run:async()=>{try{await navigator.clipboard.writeText(text);notice('Loom fragment copied.');}catch{notice('Select and copy the preview text.',true);}}},{label:'Download fragment',run:()=>download('looms.fragment.json',text)},{label:'Close',run:d=>d.close()}]);}
 function preview(category){const value=category?{[category]:clone(project.stock.cables[category])}:runtimeJSON(project);const text=JSON.stringify(value,null,2);openDialog(category?`${category} · JSON fragment`:'Complete Lampy cable-stock JSON',body=>{if(category)body.append(node('p','Category fragment only. This is not a complete vendor document.','note warning'));reviewBody(body,changes(project).filter(c=>!category||c.category===category),allIssues().filter(i=>!category||i.category===category));body.append(node('pre',text));},[{label:'Copy JSON',run:async()=>{try{await navigator.clipboard.writeText(text);notice('JSON copied.');}catch{notice('Clipboard unavailable. Select and copy the preview text.',true);}}},{label:category?'Download fragment':'Download cable-stock JSON',run:()=>download(category?`${category.replace(/[/\\]/g,'_')}.fragment.json`:safeFilename(),text)},{label:'Close',run:d=>d.close()}]);}
 function reviewBody(body,changeList=changes(project),issues=allIssues()){
   body.append(node('p',`${changeList.length} changes · ${issues.filter(i=>i.level==='error').length} errors · ${issues.filter(i=>i.level==='warning').length} warnings`,'note'));
@@ -391,7 +391,7 @@ function reviewBody(body,changeList=changes(project),issues=allIssues()){
 }
 function reviewExport(kind='json',category=null,blank=false){
   openDialog(blank?'Blank Excel template':'Review & export',body=>{
-    reviewBody(body);if(kind==='json'&&(project.looms.length||project.vendorVersion||Object.values(project.adaptors||{}).some(Boolean)))body.append(node('p','The Lampy cable-stock download excludes generator looms, adaptor markers and vendor version. Save project JSON or Excel as well to retain them. Imported custom fields remain untouched.','note warning'));
+    reviewBody(body);if(kind==='json'&&(project.looms.length||project.vendorVersion||Object.values(project.adaptors||{}).some(Boolean)))body.append(node('p','The cable-stock download includes stock looms. Adaptor markers, generator vendor version and extra loom details (descriptions, connector overrides and component lengths) stay in project JSON and Excel backups. Save a backup as well to retain them. Imported custom fields remain untouched.','note warning'));
     const choice=node('div',null,'actions');choice.append(btn('Lampy cable-stock JSON',()=>reviewExport('json')),btn('Complete Excel',()=>reviewExport('excel')),btn('Blank Excel template',()=>reviewExport('excel',null,true)),btn('Project backup',downloadBackup));body.append(choice);
     body.append(node('p',kind==='json'?`File: ${safeFilename()}`:`Excel scope: ${category||'complete vendor'}${blank?' · blank template':''}`));
   },[{label:'Cancel',run:d=>d.close()},{label:kind==='json'?'Preview JSON':'Preview workbook layout',run:()=>kind==='json'?preview():workbookPreview(category,blank)},{label:allIssues().some(i=>i.level==='error')?'Download anyway':'Download',cls:'primary',run:d=>{

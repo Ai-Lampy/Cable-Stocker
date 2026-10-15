@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.1.27 — 2026-10-15
+
+Previous version: v1.1.26. Local release for manual upload; not uploaded or deployed.
+
+- Export stock looms at the vendor JSON root using `looms: [{id, name, lengths, cables: [{cableType, quantity}]}]`. Available lengths belong to the complete loom and use the vendor unit. Keep ordinary cable data and manifest entries unchanged.
+- Import this structure into the existing loom editor, preserving stable loom IDs, quantities, length values/order and unknown imported fields. Reject malformed structures and duplicate IDs before replacing a draft. Report invalid lengths/quantities without blocking their export.
+- Update complete JSON previews/downloads and the loom preview/copy/download. The loom-only fragment is now `looms.fragment.json` using the stock structure, replacing the generator-only fragment format/name. Complete vendor filenames are unchanged.
+- Preserve existing project backups, saved vendor projects and Excel layouts, including descriptions, connector overrides and component-specific lengths. Stock export excludes those editor-only fields. Preserve explicit empty loom arrays through project/Excel round trips and avoid false import-preview changes from editor IDs. Safely migrate legacy root loom data without silently overwriting conflicting definitions.
+- Reserve the root `looms` field for the loom editor. Update README usage/example and replace obsolete exclusion messages. Lampy Paperwork needs a separate future update to consume stock looms; it was not accessed or changed during this release.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `tests/loom-stock.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New file: `tests/loom-stock.test.mjs`. Deleted files: none. Original references, images, user project JSON and backups preserved.
+- Validation: 155 non-browser tests passed, including approved-shape JSON round trips, Excel binary round trips, unchanged Siyan backup, empty/deleted looms, unknown fields, quantity/length validation, legacy migration, import reviews, and preview/copy/download controller checks. Browser tests were not run, as requested. These controller checks are not browser or live-site verification.
+- Static validation: all 10 JSON files, seven app modules and test modules passed parsing/syntax checks. Local imports and documentation links resolved; the README JSON example parsed and v1.1.27 references matched. File hashes confirmed original references, user projects, data, images and bundled library unchanged. No temporary artifacts or test downloads were created.
+- Compatibility: existing Lampy Paperwork does not consume these stock-loom definitions yet. Keep project/Excel backups for richer editor data. Day-to-day user acceptance remains pending. No upload or deployment performed.
+
 ## v1.1.26 — 2026-10-15
 
 Previous version: v1.1.25. Live at https://ailampy.com/cable/ after the user uploaded the release; verified 2026-10-15.

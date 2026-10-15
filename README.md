@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.26.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.27.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -66,11 +66,11 @@ Plain cable-stock JSON import previews compare against your current draft by mat
 
 | Output | Purpose | Contents |
 | --- | --- | --- |
-| Lampy cable-stock JSON | File read by Lampy Paperwork | Exact source schema: `vendor`, `cables`, and retained imported custom fields. No editor IDs or preferences. |
+| Lampy cable-stock JSON | Vendor cable and pre-made loom catalogue | `vendor`, `cables`, retained imported custom fields, and optional `looms` using the agreed stock structure. Loom IDs are exported; editor component IDs and preferences are not. Lampy Paperwork requires its planned update to use stock looms. |
 | `*.lampy-project.json` | Reopen vendor work | Cable stock, composite looms, adaptor markers, generator vendor version, filename, row identities and imported baseline. **Not** a Lampy Paperwork input. |
 | `.xlsx` | Spreadsheet editing and backup | Cable categories, adaptor markers, looms/components, vendor metadata, custom fields and stable row keys. |
 
-The supplied cable-stock example has **no loom structure or version field**. V1 keeps newly authored looms and the generator vendor version in project/Excel backups. It warns before a Lampy download that excludes them. Imported runtime version fields and other custom fields stay untouched and can be edited under Custom metadata. The app does not claim Lampy Paperwork can consume composite looms.
+Cable-stock JSON exports pre-made looms using `id`, `name`, available `lengths` and a `cables` array of `cableType` / `quantity` entries. Cable-only files remain unchanged when no looms are present. Generator vendor version, adaptor markers, loom descriptions, connector overrides and component-specific lengths remain in project/Excel backups. Imported custom fields stay preserved. Lampy Paperwork needs its planned update before it can use the stock-loom definitions; exporting them does not update Paperwork.
 
 Vendor versions such as `v2` and `v2.1` are independent of the app version. Major/minor buttons require confirmation. A category JSON preview/download is a labelled fragment, not a complete vendor file.
 
@@ -98,7 +98,29 @@ Add **Stock / Pre-Made Looms** from the category selector, then choose **Add loo
 
 Saved looms appear as parent rows sorted by Name. Set available lengths on the parent row. Expand the arrow beside a name to show components as ordinary 35 px rows in the same table at 100% zoom, under the same column headings. Edit their cable types and quantities directly, or use **Edit loom** to change the name and add/remove components in the side pane. Filtering matches complete loom groups, keeping child rows with their parent. Child rows sort by cable type within each loom by default. Saved looms and quantities remain when you reopen the app in the same browser and origin; expanded/collapsed state resets.
 
-Quantity describes cables **inside one loom**, never the number of looms owned. Recognised cable types inherit connectors when saved from the pane; existing connector overrides, descriptions, optional component lengths and custom fields remain preserved. Use **Save table** to save locally and clear highlights, and project JSON or Excel for a separate backup. New looms are created through **Add loom**, not blank main-table rows. Looms are preserved in generator project JSON and Excel; the supplied Lampy cable-stock schema does not support them.
+Quantity describes cables **inside one loom**, never the number of looms owned. Recognised cable types inherit connectors when saved from the pane; existing connector overrides, descriptions, optional component lengths and custom fields remain preserved. Use **Save table** to save locally and clear highlights, and project JSON or Excel for a separate backup. New looms are created through **Add loom**, not blank main-table rows. Complete cable-stock JSON includes the agreed stock-loom fields. Project JSON and Excel retain the full editor data as well.
+
+The **Loom JSON** preview copies or downloads the same stock structure as a fragment named `looms.fragment.json`. A fragment omits vendor details and ordinary cables; use the complete cable-stock export when you want to reopen the file in the generator.
+
+Example loom fragment:
+
+```json
+{
+  "looms": [
+    {
+      "id": "loom_example",
+      "name": "2-Way Socapex",
+      "lengths": [10, 20, 30],
+      "cables": [
+        { "cableType": "Socapex 19-Pin", "quantity": 2 },
+        { "cableType": "XLR-5", "quantity": 4 }
+      ]
+    }
+  ]
+}
+```
+
+Lengths are positive numbers in `vendor.lengthUnit` (`m` or `ft`) and describe available lengths of the complete loom. Quantity is a positive whole number describing cables inside one loom. Loom IDs must be unique, non-empty strings; the editor generates them for new looms. Importing complete cable-stock JSON restores these definitions into the loom table and establishes a fresh baseline. Unknown imported loom/cable fields remain preserved in exports and backups. Structural errors are rejected before replacing your draft; invalid lengths or quantities appear in Errors and remain exportable for review.
 
 ## Excel format
 
