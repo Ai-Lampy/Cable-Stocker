@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.25.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.26.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -82,7 +82,7 @@ Empty cable and Settings tables show five editable entry rows. Small cable and S
 
 All typing takes place in the selected table cell. Tab/Shift+Tab and Enter accept the edit and move; Escape restores its prior value. Save, sorting and page actions commit valid pending entries first; invalid input stays editable. Length chips and the separate **Edit lengths** dialog remain available, as do checkboxes and colour pickers.
 
-Every cable table, Settings table and the main loom table has **Save table** buttons at the far right above and below the rows. It commits the cell currently being edited and saves the workspace in this browser. A successful save clears that table’s yellow edit and green added-row highlights, including rows hidden by its search. Other tables keep their highlights. Later edits highlight again; the saved visual baseline survives reload. Cell selection remains visible. The original import baseline remains intact for export reviews. Invalid cell input prevents that save and displays a message. Save does not upload or rewrite the hosted files. Download project/Excel backups for vendor work and separate JSON files for Settings data.
+Every cable table, Settings table and the main loom table has **Save table** buttons at the far right above and below the rows. It commits the cell currently being edited and saves the workspace in this browser. A successful save clears that table’s yellow edit highlights, including rows hidden by its search. Other tables keep their highlights. Later edits highlight again; the saved visual baseline survives reload. Cell selection remains visible. The original import baseline remains intact for export reviews. Invalid cell input prevents that save and displays a message. Save does not upload or rewrite the hosted files. Download project/Excel backups for vendor work and separate JSON files for Settings data.
 
 - Arrows, Enter, Tab and Shift+Tab move between cells. Shift+arrows or Shift+click extends a range. Ctrl/⌘ A selects the table.
 - Ctrl/⌘ C and Ctrl/⌘ V copy/paste rectangular Excel-compatible TSV. Quoted multiline cells are supported. Toolbar Copy/Paste uses clipboard permission when available.
@@ -90,7 +90,7 @@ Every cable table, Settings table and the main loom table has **Save table** but
 - Drag a header separator to resize. Focus the separator and use left/right arrows for keyboard resizing. Editable columns can shrink to 1 px (the non-zero geometry guard) and expand again; narrow content is clipped or scrollable without changing its data. The row-number gutter stays 42 px. Chosen widths persist per table, including at different zoom levels.
 - Click a heading to sort ascending/descending. **Clear sort** restores the default ascending order. Search filters displayed rows. Clear the search filter before extending the table with pasted rows; sorting can remain active.
 - Zoom, widths, alignment and wrapping persist per table. Zoom changes the table only. Preferences never enter Lampy JSON.
-- Yellow marks values changed from the imported baseline. Added rows have a green edge. Removed rows appear in review. Excel imports retain the original baseline; importing another stock JSON establishes a new one.
+- Yellow marks values changed from the imported baseline. Added and removed rows appear in review. Excel imports retain the original baseline; importing another stock JSON establishes a new one.
 
 ## Composite looms
 

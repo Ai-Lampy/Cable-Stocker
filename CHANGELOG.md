@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.26 — 2026-10-15
+
+Previous version: v1.1.25. Local release for manual upload; not deployed.
+
+- Correct README wording: yellow edit highlights and added/removed rows in review; remove claims that added rows have green accents.
+- Remove unused formula-bar/cell-address CSS rules and the undisplayed cell-address element and update code. Retain the active cell editor, selection outlines, fill handle and yellow change highlighting.
+- Updated/upload: `js/grid.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted project files: none. Original examples, user project JSON, backups and runtime schemas unchanged.
+- Validation: 138 automated tests passed, including JSON/Excel round trips. All 10 JSON files and all 7 app modules passed parsing/syntax checks. Approved local Chromium checks passed v1.1.26 startup, cable-cell editing with Tab, arrow and range selection, yellow highlighting and Save clearing it, expanded loom quantity editing with Enter, bottom Save and Settings-cell navigation. No console warnings/errors in checked flows. Obsolete code references removed.
+- Cleanup: restored the local test workspace to the supplied Siyan project; closed the test tab and stopped the local server. No downloads or temporary project files created; screenshot retained outside the project as evidence.
+- Limits: Firefox/Safari and live deployment not tested for this release. Existing Lampy loom-schema limitation and pending user acceptance remain unchanged. No upload or deployment performed.
+
 ## v1.1.25 — 2026-10-15
 
 Previous version: v1.1.24. Live at https://ailampy.com/cable/ after the user uploaded the release; verified 2026-10-15.

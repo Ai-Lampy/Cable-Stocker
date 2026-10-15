@@ -7,6 +7,9 @@
 
 ## Completed
 
+- v1.1.26 (local): corrected README green-highlight wording and removed unused formula-bar/cell-address styles and code. 138 automated tests and approved local Chromium checks passed; details in CHANGELOG.md. Existing editing, selection, highlighting and saving retained. No upload/deployment.
+- Upload: `js/grid.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted project files: none.
+
 - README loom-workflow audit — 2026-10-15: clarified Save loom validation/local saving, ordinary 35 px child rows and saved-data persistence. Corrected general table guidance to distinguish the main loom table and side pane from cable/Settings blank-row entry and Save table controls. README contains current usage only; release notes and test history remain in CHANGELOG.md. Updated/upload: `README.md`, `UPDATES.md`, `CHANGELOG.md`. Version remains v1.1.25. Source/documentation checks passed; no browser tests rerun. No app code changes, project files added/deleted, upload or deployment.
 
 - v1.1.25 (live at https://ailampy.com/cable/; verified 2026-10-15): Corrected Add/Edit loom to use a side pane with Loom name and Cable Type / Quantity inputs. Saved parent rows expand into ordinary child rows in the main table. Protected unsaved pane entries and preserved project/Excel data. 138 automated tests and approved local Chromium checks passed; details in CHANGELOG.md. User uploaded the release; no upload/deployment performed by the agent.

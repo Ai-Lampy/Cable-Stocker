@@ -78,7 +78,7 @@ export class Grid {
       catch{this.prefs.highlights=previous;this.o.notice('Data saved, but table highlights could not be saved.',true);}
     },'Save this table locally and clear its edit highlights');save.className='primary save-table';
     this.host.append(toolbar);
-    this.address=el('span');this.editor=el('input');this.editor.className='cell-editor';this.editor.setAttribute('aria-label','Edit selected cell');this.editorOriginal='';this.editing=false;
+    this.editor=el('input');this.editor.className='cell-editor';this.editor.setAttribute('aria-label','Edit selected cell');this.editorOriginal='';this.editing=false;
     this.editor.onclick=e=>e.stopPropagation();this.editor.ondblclick=e=>e.stopPropagation();
     this.editor.onkeydown=e=>{
       e.stopPropagation();
@@ -148,7 +148,7 @@ export class Grid {
   select(r,c,extend=false){if(this.editing){if(!this.commitEditor())return false;const target=this.currentGrid();if(target!==this)return target.select(r,c,extend);}if(!this.ids.length)return; r=Math.max(0,Math.min(this.ids.length-1,r));c=Math.max(0,Math.min(this.o.columns.length-1,c));if(extend){this.selection.rr=r;this.selection.cc=c;}else this.selection={r,c,rr:r,cc:c};this.paint();this.focusCell(extend?r:undefined,extend?c:undefined);}
   paint(){
     const b=this.bounds();this.table.querySelectorAll(':scope > tbody > tr > td[data-r]').forEach(td=>{const r=+td.dataset.r,c=+td.dataset.c,selected=r>=b.r&&r<=b.rr&&c>=b.c&&c<=b.cc;td.classList.toggle('selected',selected);td.setAttribute('aria-selected',String(selected));td.querySelector('.fill-handle')?.remove();});
-    const {r,c}=this.selection;this.address.textContent=`${String.fromCharCode(65+c)}${r+1}`;
+    const {r,c}=this.selection;
     this.editor.value=this.ids[r]===undefined?'':display(this.value(this.ids[r],this.o.columns[c].key));
     this.editor.value=this.o.columns[c].editFormat?.(this.editor.value)??this.editor.value;
     this.editorOriginal=this.editor.value;
