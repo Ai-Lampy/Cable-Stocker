@@ -4,6 +4,8 @@
 
 Previous version: v1.1.25. Live at https://ailampy.com/cable/ after the user uploaded the release; verified 2026-10-15.
 
+- Project-folder documentation and cleanup record — 2026-10-15: corrected `projects/README.md` to identify the included user-supplied Siyan LTD project and its exact upload path. Recorded removal of the regenerated root `.DS_Store` during the preceding audit; no further files deleted in this documentation follow-up. Updated/upload: `projects/README.md`, `UPDATES.md`, `CHANGELOG.md`. App remains v1.1.26; no app code changes or new files. User project JSON, backups and original inputs preserved. Verified the project vendor/filename, local documentation link, unchanged version and that only these three documents changed. Browser tests were not rerun for this documentation-only change. No upload or deployment.
+
 - README table-workflow audit — 2026-10-15: clarified cell selection, typing to replace versus editing existing text, Tab/Shift+Tab/Enter navigation and Escape cancellation. Corrected yellow-highlight guidance to use the table’s last successful Save when available, while export reviews retain the original import baseline. Clarified that either Save table button commits the active edit and preserves visible selection. README contains current usage only; release notes and test history remain in CHANGELOG.md. Updated/upload: `README.md`, `UPDATES.md`, `CHANGELOG.md`. App version remains v1.1.26. Source/documentation checks passed; browser tests were not rerun for this documentation-only change. No app code changes, new/deleted files, upload or deployment.
 
 - Correct README wording: yellow edit highlights and added/removed rows in review; remove claims that added rows have green accents.

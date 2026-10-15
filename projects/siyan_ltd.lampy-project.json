@@ -259,19 +259,20 @@
   "vendorVersion": "v2",
   "looms": [
     {
-      "id": "d9ec8752-065a-43b1-8fc5-c77a15a8c454",
+      "id": "769b5b7d-52f3-4280-8895-bfeb39a7e93c",
       "name": "2-Way Socapex Loom",
       "lengths": [
         10,
         15,
         20,
         25,
-        30
+        30,
+        40
       ],
       "description": "",
       "components": [
         {
-          "id": "f9148d54-453b-4f4d-af8b-95ca8b35e036",
+          "id": "ae44fb54-34bf-45b9-a785-f09b2f1b4a22",
           "type": "Socapex 19-Pin",
           "count": 2,
           "connectors": {
@@ -281,7 +282,7 @@
           "lengths": []
         },
         {
-          "id": "138d9f4d-048d-449c-86d6-6b37af5b91fd",
+          "id": "6d0558d0-bb34-4c72-8bac-e289a8bc401a",
           "type": "XLR-5",
           "count": 4,
           "connectors": {

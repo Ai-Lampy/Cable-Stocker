@@ -6,4 +6,4 @@ Selecting that vendor loads `projects/<generated-vendor-name>.lampy-project.json
 
 These files are for this generator only. Do not put them in Lampy’s cable-stock manifest. Reference edits, including approved connector types, still require their separate reference downloads. Uploaded project files are readable by visitors to the hosted site.
 
-No real vendor project has been included or fabricated. Add your own saved projects here.
+This folder includes your saved **Siyan LTD** project: [siyan_ltd.lampy-project.json](siyan_ltd.lampy-project.json). Keep this file at `projects/siyan_ltd.lampy-project.json` when uploading so the generator can load it when you select Siyan LTD. Add other saved vendor projects here using their generated filenames.
