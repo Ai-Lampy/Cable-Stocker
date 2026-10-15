@@ -27,7 +27,7 @@ Settings → Connectors has one sheet per category, like Cable Types, plus Uncat
 
 New rows inherit the selected category. Double-click the Category cell or press F2 to show available categories, including Uncategorised. Type to filter; click a choice or use arrow keys and Enter/Tab. You can still type a new category. Selecting a category moves the entry to that sheet; an explicit category overrides automatic grouping. Approved connectors inherit their cable category when all reviewed uses share one category; otherwise they start in Uncategorised. The download remains one complete `connector_types.json`, including every sheet. Category metadata stays in this generator reference file, never in Lampy cable-stock JSON.
 
-Both Save table buttons perform the same action: accept a valid pending edit, save locally and clear that table’s edit highlights. The additional button sits directly below the rows, before help text, in every cable, Settings and loom-component table. Its horizontal alignment and dimensions match the top button. Saving locally does not publish files.
+Both Save table buttons perform the same action: accept a valid pending edit, save locally and clear that table’s edit highlights. The additional button sits directly below the rows, before help text, in every cable table, Settings table and the main loom table. Its horizontal alignment and dimensions match the top button. The loom side pane uses **Save loom**. Saving locally does not publish files.
 
 ## Connector review
 
@@ -76,13 +76,13 @@ Vendor versions such as `v2` and `v2.1` are independent of the app version. Majo
 
 ## Tables
 
-All tables default to centred text and 150 px editable columns. The row-number gutter stays 42 px. Manually saved widths remain unchanged. Table zoom and saved edit-highlight baselines are retained. Columns can still shrink to 1 px.
+Cable tables, Settings tables and the main loom table default to centred text and 150 px editable columns. The row-number gutter stays 42 px. Manually saved widths remain unchanged. Table zoom and saved edit-highlight baselines are retained. Columns can still shrink to 1 px.
 
-Empty tables show five editable entry rows. Small tables retain blank entry slots up to five rows. Untouched slots are presentation only: they do not add records, errors or exported rows. Entering data creates the required rows; entering a later slot also creates the preceding rows. Filters can show no matches, and sorting keeps unused slots at the end. **+ Row** still adds an actual record.
+Empty cable and Settings tables show five editable entry rows. Small cable and Settings tables retain blank entry slots up to five rows. Untouched slots are presentation only: they do not add records, errors or exported rows. Entering data creates the required rows; entering a later slot also creates the preceding rows. Filters can show no matches, and sorting keeps unused slots at the end. **+ Row** adds an actual record in those tables. The main loom table shows saved parent rows and their expanded children; use **Add loom** to create a loom.
 
 All typing takes place in the selected table cell. Tab/Shift+Tab and Enter accept the edit and move; Escape restores its prior value. Save, sorting and page actions commit valid pending entries first; invalid input stays editable. Length chips and the separate **Edit lengths** dialog remain available, as do checkboxes and colour pickers.
 
-Every cable, Settings and loom-component table has a prominent **Save table** button at the far right. It commits the cell currently being edited and saves the workspace in this browser. A successful save clears that table’s yellow edit and green added-row highlights, including rows hidden by its search. Other tables keep their highlights. Later edits highlight again; the saved visual baseline survives reload. Cell selection remains visible. The original import baseline remains intact for export reviews. Invalid cell input prevents that save and displays a message. Save does not upload or rewrite the hosted files. Download project/Excel backups for vendor work and separate JSON files for Settings data.
+Every cable table, Settings table and the main loom table has **Save table** buttons at the far right above and below the rows. It commits the cell currently being edited and saves the workspace in this browser. A successful save clears that table’s yellow edit and green added-row highlights, including rows hidden by its search. Other tables keep their highlights. Later edits highlight again; the saved visual baseline survives reload. Cell selection remains visible. The original import baseline remains intact for export reviews. Invalid cell input prevents that save and displays a message. Save does not upload or rewrite the hosted files. Download project/Excel backups for vendor work and separate JSON files for Settings data.
 
 - Arrows, Enter, Tab and Shift+Tab move between cells. Shift+arrows or Shift+click extends a range. Ctrl/⌘ A selects the table.
 - Ctrl/⌘ C and Ctrl/⌘ V copy/paste rectangular Excel-compatible TSV. Quoted multiline cells are supported. Toolbar Copy/Paste uses clipboard permission when available.
@@ -94,9 +94,9 @@ Every cable, Settings and loom-component table has a prominent **Save table** bu
 
 ## Composite looms
 
-Add **Stock / Pre-Made Looms** from the category selector, then choose **Add loom**. A side pane opens with **Loom name** and a two-column **Cable Type / Quantity** table. Use **+ Cable type** to add components, or press Enter on its last row. Tab moves between input cells. **Save loom** validates and adds the finished loom to the main table; closing a changed pane asks before discarding its unsaved entries.
+Add **Stock / Pre-Made Looms** from the category selector, then choose **Add loom**. A side pane opens with **Loom name** and a two-column **Cable Type / Quantity** table. Use **+ Cable type** to add components, or press Enter on its last row. Tab moves between input cells. **Save loom** requires a name, at least one cable type and a positive whole-number quantity for each component. It saves the finished loom locally and adds its parent row to the main table. **Cancel**, Close or Escape asks before discarding changed pane entries; these entries do not become a saved loom until you choose Save loom.
 
-Saved looms appear as parent rows sorted by Name. Set available lengths on the parent row. Expand the arrow beside a name to show components as ordinary rows in the same table. Edit their cable types and quantities directly, or use **Edit loom** to change the name and add/remove components in the side pane. Filtering matches complete loom groups, keeping child rows with their parent. Child rows sort by cable type within each loom by default.
+Saved looms appear as parent rows sorted by Name. Set available lengths on the parent row. Expand the arrow beside a name to show components as ordinary 35 px rows in the same table at 100% zoom, under the same column headings. Edit their cable types and quantities directly, or use **Edit loom** to change the name and add/remove components in the side pane. Filtering matches complete loom groups, keeping child rows with their parent. Child rows sort by cable type within each loom by default. Saved looms and quantities remain when you reopen the app in the same browser and origin; expanded/collapsed state resets.
 
 Quantity describes cables **inside one loom**, never the number of looms owned. Recognised cable types inherit connectors when saved from the pane; existing connector overrides, descriptions, optional component lengths and custom fields remain preserved. Use **Save table** to save locally and clear highlights, and project JSON or Excel for a separate backup. New looms are created through **Add loom**, not blank main-table rows. Looms are preserved in generator project JSON and Excel; the supplied Lampy cable-stock schema does not support them.
 
@@ -211,7 +211,7 @@ Imported field names, types and nested values stay intact in exports. Existing v
 
 ## Enter and typed colours
 
-Press **Enter** on the last visible table row to show another blank row and move into the same column. A valid pending edit is accepted first; invalid input stays in the editor. **Shift+Enter** moves up without adding a row. Unused blank entry rows are temporary and are not exported; typing into a later slot creates preceding required rows.
+In cable and Settings tables, press **Enter** on the last visible row to show another blank row and move into the same column. A valid pending edit is accepted first; invalid input stays in the editor. **Shift+Enter** moves up without adding a row. Unused blank entry rows are temporary and are not exported; typing into a later slot creates preceding required rows. In the loom side pane, Enter on the last component row adds another component input row. Enter in the main loom table does not create a loom; use **Add loom**.
 
 In Length colour, type a supplied colour name or alias directly in the selected cell, or start typing while its picker is open. Suggestions include palette names and aliases. **Enter** accepts and moves down; **Tab** accepts and moves right. The picker remains available. Selection outlines and yellow change highlighting identify selected and changed cells.
 

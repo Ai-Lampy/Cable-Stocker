@@ -4,6 +4,8 @@
 
 Previous version: v1.1.24. Live at https://ailampy.com/cable/ after the user uploaded the release; verified 2026-10-15.
 
+- README loom-workflow audit — 2026-10-15: clarified Save loom validation/local saving, ordinary 35 px child rows and saved-data persistence. Corrected general table guidance to distinguish the main loom table and side pane from cable/Settings blank-row entry and Save table controls. README contains current usage only; release notes and test history remain in CHANGELOG.md. Updated/upload: `README.md`, `UPDATES.md`, `CHANGELOG.md`. Version remains v1.1.25. Source/documentation checks passed; no browser tests rerun. No app code changes, project files added/deleted, upload or deployment.
+
 - Correct the loom layout: Add loom opens a side pane with Loom name and exactly two component columns, Cable Type and Quantity. Save loom validates and adds the finished item; Cancel/Close/Escape protect changed drafts before discarding them. Edit loom uses the same pane.
 - Expand saved parent rows to show ordinary child rows in the same table. Remove the nested component tables. Keep 35 px rows, available lengths on parents, Name sorting, grouped search, inline component editing and top/bottom Save table buttons. Child rows sort within their parent; new looms are created only through the pane.
 - Preserve loom IDs, connector overrides, descriptions, custom fields, component lengths and project/Excel schemas. New components inherit recognised connectors or cable-name fallbacks. Lampy cable-stock JSON remains unchanged and excludes looms.
