@@ -7,8 +7,10 @@
 
 ## Completed
 
-- v1.1.25 (local): Corrected Add/Edit loom to use a side pane with Loom name and Cable Type / Quantity inputs. Saved parent rows expand into ordinary child rows in the main table. Protected unsaved pane entries and preserved project/Excel data. 138 automated tests and approved local Chromium checks passed; details in CHANGELOG.md. No upload/deployment.
+- v1.1.25 (live at https://ailampy.com/cable/; verified 2026-10-15): Corrected Add/Edit loom to use a side pane with Loom name and Cable Type / Quantity inputs. Saved parent rows expand into ordinary child rows in the main table. Protected unsaved pane entries and preserved project/Excel data. 138 automated tests and approved local Chromium checks passed; details in CHANGELOG.md. User uploaded the release; no upload/deployment performed by the agent.
 - Upload: `js/app.js`, `js/model.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted project files: none.
+- Live verification: approved Chromium testing passed Add loom opening the Loom name and Cable Type / Quantity side pane, Save loom adding a parent, expanded components appearing as ordinary 35 px child rows, bottom Save table accepting a quantity edit, and persistence after reopening. The address stayed at ailampy.com/cable/. After an initial stale-cache failure, a fresh load succeeded and normal cached startup also passed. No console warnings/errors in the successful flow. Test loom removed; original loom JSON matched the pre-test snapshot. No files downloaded during the successful check.
+- Documentation follow-up — 2026-10-15: updated UPDATES.md and CHANGELOG.md with the live result. App remains v1.1.25. Upload only these two documents for this follow-up; no project files added/deleted, uploads or deployment.
 
 - v1.1.24 (local): Stock / Pre-Made Looms now uses a parent table by loom name, with available lengths and expandable cable-type/quantity tables. Preserved project/Excel data and protected pending component edits. 136 automated tests and approved local Chromium checks passed; details in CHANGELOG.md. No upload/deployment.
 - Upload: `js/app.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted project files: none.

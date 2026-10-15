@@ -2,7 +2,7 @@
 
 ## v1.1.25 — 2026-10-15
 
-Previous version: v1.1.24. Local release for manual upload; not deployed.
+Previous version: v1.1.24. Live at https://ailampy.com/cable/ after the user uploaded the release; verified 2026-10-15.
 
 - Correct the loom layout: Add loom opens a side pane with Loom name and exactly two component columns, Cable Type and Quantity. Save loom validates and adds the finished item; Cancel/Close/Escape protect changed drafts before discarding them. Edit loom uses the same pane.
 - Expand saved parent rows to show ordinary child rows in the same table. Remove the nested component tables. Keep 35 px rows, available lengths on parents, Name sorting, grouped search, inline component editing and top/bottom Save table buttons. Child rows sort within their parent; new looms are created only through the pane.
@@ -10,7 +10,10 @@ Previous version: v1.1.24. Local release for manual upload; not deployed.
 - Updated/upload: `js/app.js`, `js/model.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted project files: none. Removed superseded nested-table rendering/styles. User project JSON, original examples and backups preserved.
 - Validation: 138 automated tests passed, including JSON/Excel round trips, draft validation, hierarchy ordering and field preservation. All 10 JSON files parsed and all 7 JavaScript modules passed syntax checks. Approved local Chromium checks passed two-column pane layout, required-name/component/positive-quantity validation, Enter row creation, Tab movement, Save, protected cancellation, ordinary 35 px child rows, inline quantity edits, grouped filtering, bottom Save, parent lengths, connector inheritance in JSON preview and persistence after reopening. No console warnings/errors in the final checked flow.
 - Cleanup: local browser test workspace restored to the supplied Siyan project; test server stopped. No test downloads created. Screenshots retained outside the project folder as visual evidence.
-- Limits: Firefox/Safari, native save pickers and live deployment not tested for this release. Loom expansion is session-only. Pending authoritative Lampy loom-schema support remains unchanged. No upload or deployment performed.
+- Live verification — 2026-10-15: after the user re-uploaded model.js and excel.js, approved Chromium testing confirmed v1.1.25 at https://ailampy.com/cable/. Add loom opened the side pane with Loom name and exactly two component columns, Cable Type and Quantity. Save loom added the parent; expansion displayed ordinary 35 px child rows in the same table, with no nested tables. Bottom Save table accepted a pending quantity edit; the saved loom and edited quantity survived reopening. The address stayed at ailampy.com/cable/.
+- Live startup initially used stale cached files. A fresh load succeeded, then startup with normal caching also passed. No console warnings/errors in the successful flow. Removed the temporary test loom and confirmed original loom JSON exactly matched the pre-test snapshot. No files downloaded during this successful check; temporary scripts from the preceding failed verification had already been deleted.
+- Documentation follow-up: updated/upload `UPDATES.md` and `CHANGELOG.md` only. App version remains v1.1.25; no app code changes or project files added/deleted. Existing browser results recorded without rerunning browser tests for this documentation edit.
+- Limits: Firefox/Safari and native save pickers were not tested for this release. Loom expansion is session-only. Pending authoritative Lampy loom-schema support remains unchanged. No upload or deployment performed by the agent.
 
 ## v1.1.24 — 2026-10-15
 
