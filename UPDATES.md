@@ -7,6 +7,8 @@
 
 ## Completed
 
+- v1.1.35 (local release for manual upload) — 2026-10-15: placed Length unit and Length display beside each other in one row, each at 40% width. Upload: `js/app.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. 161 automated tests and static checks passed; browser testing not run for this update. Lampy Paperwork untouched; no upload or deployment.
+
 - v1.1.34 (local release for manual upload) — 2026-10-15: added Length display choices for metric (m / Meter) and imperial (ft / ' / Feet). Length chips, headings and length-colour cells use the selected label. Project/Excel backups retain a separate choice for each unit; runtime JSON units and numeric lengths stay unchanged. Upload: `js/app.js`, `js/model.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. 161 automated tests and static checks passed. Browser testing was not run, as requested. Lampy Paperwork untouched; no upload or deployment.
 
 - v1.1.33 (local release for manual upload) — 2026-10-15: Vendor name starts at half width and grows to fit longer names within the available field space; the clear button moves with it and stays directly on its right. New projects start at vendor version v1; existing saved/imported versions remain unchanged. Upload: `js/app.js`, `js/model.js`, `css/app.css`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. 157 automated tests and static checks passed. Browser testing was not run, as requested. Lampy Paperwork untouched; no upload or deployment.

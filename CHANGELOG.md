@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.1.35 — 2026-10-15
+
+Previous version: v1.1.34. Local release for manual upload; not deployed.
+
+- Place Length unit and Length display next to each other in a shared row spanning the Vendor details form. Each field uses 40% of that row, separated by a 16 px gap. Keep existing unit confirmation, display preferences and numeric data unchanged.
+- Update the app version and README usage. Updated/upload: `js/app.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. User project JSON, backups and original inputs preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 161 automated tests passed. All seven app modules passed syntax checks; all 10 JSON files parsed; local imports and version consistency passed. Source/CSS checks confirmed field order and 40% column widths.
+- Browser testing was not run for this update; visual layout remains unverified. No temporary files or downloads created. Existing Paperwork compatibility and day-to-day acceptance remain pending.
+
 ## v1.1.34 — 2026-10-15
 
 Previous version: v1.1.33. Local release for manual upload; not deployed.
