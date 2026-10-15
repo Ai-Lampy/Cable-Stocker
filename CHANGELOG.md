@@ -2,13 +2,15 @@
 
 ## v1.1.30 — 2026-10-15
 
-Previous version: v1.1.29. Local release for manual upload; not uploaded or deployed.
+Previous version: v1.1.29. Live at https://ailampy.com/cable/ after the user uploaded the release; verified 2026-10-15.
 
 - Remove the yellow change highlight from the Vendor name field on the Vendor tab. Preserve normal input focus styling, length-unit highlighting and table highlighting. Vendor change tracking and export reviews remain unchanged.
 - Increase `js/version.js` and the README current project version; record completion in UPDATES.md.
 - Updated/upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. User projects, reference JSON and backups preserved. Lampy Paperwork was not accessed or changed.
 - Validation: all 155 existing non-browser tests passed, including vendor change review, JSON/Excel round trips and project loading. All seven app modules passed syntax checks, local imports resolved and all 10 JSON files parsed. Version consistency passed. File hashes confirmed only the five listed files changed; no temporary project artifacts remained.
-- Browser testing not run: no fresh approval for this update. Live v1.1.30 not verified; no upload or deployment performed by the agent. Existing Paperwork compatibility and user acceptance remain pending.
+- Browser testing was not run during implementation. The first live check still showed v1.1.29 and a yellow Vendor name highlight, including after reloading without browser cache. After the user re-uploaded `js/app.js` and `js/version.js`, approved live browser testing on 2026-10-15 confirmed the v1.1.30 footer and that the Vendor name field no longer highlights yellow for the existing Siyan LTD draft, including after focusing it and tabbing away. The field had a white input background, a transparent label background and no `inline-changed` class. The address stayed at ailampy.com/cable/.
+- The existing draft was preserved. No test data entered or files downloaded; temporary verification tabs closed. Lampy Paperwork was not accessed or changed. No upload or deployment performed by the agent. Other browsers were not tested; existing Paperwork compatibility and user acceptance remain pending.
+- Documentation follow-up — 2026-10-15: updated/upload `UPDATES.md` and `CHANGELOG.md` only to record the live result. App remains v1.1.30; no app code changes or project files added/deleted. Documentation checks passed and the version file is unchanged. Existing browser results recorded without rerunning browser tests for this documentation edit.
 
 ## v1.1.29 — 2026-10-15
 

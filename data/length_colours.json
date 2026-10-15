@@ -1,4 +1,101 @@
 {
   "source": "New generator dataset for vendor length colour assignments. Palette: reference/colour_options.json. Not a Lampy cable-stock schema.",
-  "items": []
+  "items": [
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 1,
+      "colour1": "#000000",
+      "colour2": "",
+      "colour3": ""
+    },
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 3,
+      "colour1": "#914F21",
+      "colour2": "",
+      "colour3": ""
+    },
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 5,
+      "colour1": "#FF0000",
+      "colour2": "",
+      "colour3": ""
+    },
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 7,
+      "colour1": "#FF881A",
+      "colour2": "",
+      "colour3": ""
+    },
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 10,
+      "colour1": "#FFFF3D",
+      "colour2": "",
+      "colour3": ""
+    },
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 15,
+      "colour1": "#00B311",
+      "colour2": "",
+      "colour3": ""
+    },
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 20,
+      "colour1": "#008EE6",
+      "colour2": "",
+      "colour3": ""
+    },
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 25,
+      "colour1": "#9C54FF",
+      "colour2": "",
+      "colour3": ""
+    },
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 30,
+      "colour1": "",
+      "colour2": "",
+      "colour3": ""
+    },
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 40,
+      "colour1": "#FFFFFF",
+      "colour2": "#FFFFFF",
+      "colour3": ""
+    },
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 1.5,
+      "colour1": "#000000",
+      "colour2": "",
+      "colour3": ""
+    },
+    {
+      "vendor": "Siyan LTD",
+      "unit": "m",
+      "length": 50,
+      "colour1": "#FFFF3D",
+      "colour2": "#FFFFFF",
+      "colour3": "#FFFFFF"
+    }
+  ]
 }
