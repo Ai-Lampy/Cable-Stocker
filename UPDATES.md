@@ -7,6 +7,8 @@
 
 ## Completed
 
+- v1.1.36 (local release for manual upload) — 2026-10-15: corrected the layout so Vendor name, Length unit and Length display share the same desktop row. Unit/display each occupy 40% of the right-hand area, rather than a separate full-width row. Shortened dropdown labels to fit. Updated/upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; also include `css/app.css` from v1.1.35 if not already uploaded. New/deleted files: none. 161 automated tests and approved local browser checks passed. Lampy Paperwork untouched; no upload or deployment.
+
 - v1.1.35 (local release for manual upload) — 2026-10-15: placed Length unit and Length display beside each other in one row, each at 40% width. Upload: `js/app.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. 161 automated tests and static checks passed; browser testing not run for this update. Lampy Paperwork untouched; no upload or deployment.
 
 - v1.1.34 (local release for manual upload) — 2026-10-15: added Length display choices for metric (m / Meter) and imperial (ft / ' / Feet). Length chips, headings and length-colour cells use the selected label. Project/Excel backups retain a separate choice for each unit; runtime JSON units and numeric lengths stay unchanged. Upload: `js/app.js`, `js/model.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. 161 automated tests and static checks passed. Browser testing was not run, as requested. Lampy Paperwork untouched; no upload or deployment.

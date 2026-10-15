@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.36 — 2026-10-15
+
+Previous version: v1.1.35. Local release for manual upload; not deployed.
+
+- Correct the previous layout: remove the full-row span from the unit/display group so it sits beside Vendor name. Each unit field occupies 40% of the right-hand form area. At the existing narrow-screen breakpoint, the pair stacks below Vendor name.
+- Use compact unit labels (Metric (m) / Imperial (ft)) and display labels (m / Meter / ft / ' / Feet) so the choices fit the smaller controls. Preserve confirmation, preferences and numeric values.
+- Updated/upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Also upload `css/app.css` from v1.1.35 if it has not been uploaded; its 40% width rule is required and unchanged in this fix. New/deleted files: none. Project JSON, backups and references preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 161 automated tests passed; all seven JavaScript modules passed syntax checks, all 10 JSON files parsed, local imports resolved and version consistency passed. Approved local browser checks measured all three controls at the same vertical position (457.59 px). Each unit/display control measured 130.46 px within a 326.16 px group (40%). Metric/imperial switching, display selection and remembering the metric choice passed; no console warnings/errors in checked flows.
+- Cleanup: restored the local test workspace from the supplied Siyan project, closed the temporary browser tab and stopped the server. No downloads or temporary project files created; screenshot saved outside the project. Narrow-screen layout, other browsers and live deployment were not tested.
+
 ## v1.1.35 — 2026-10-15
 
 Previous version: v1.1.34. Local release for manual upload; not deployed.
