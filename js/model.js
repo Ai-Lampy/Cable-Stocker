@@ -63,6 +63,7 @@ export function restoreProject(value) {
   if (value.format !== 'lampy-cable-generator-project' || value.formatVersion !== 1) throw new Error('Unsupported generator project format.');
   checkStock(value.stock);
   const p = clone(value);
+  checkLengthDisplay(p.lengthDisplay);checkLengthDisplay(p.baseline?.lengthDisplay);
   if (p.adaptors !== undefined && (!object(p.adaptors) || Object.values(p.adaptors).some(v=>v!==true))) throw new Error('Invalid adaptor markers.');
   if (!Array.isArray(p.looms) || !object(p.rowIds)) throw new Error('Incomplete generator project.');
   importStockLooms(p);
@@ -79,6 +80,18 @@ export function restoreProject(value) {
     for (const c of loom.components) if (!object(c) || typeof c.id !== 'string' || typeof c.type !== 'string' || !object(c.connectors) || !Array.isArray(c.lengths)) throw new Error('Invalid generator component structure.');
   }
   return p;
+}
+export const LENGTH_DISPLAYS = {m:['m','Meter'],ft:['ft',"'",'Feet']};
+export function checkLengthDisplay(value){
+  if(value!==undefined&&(!object(value)||Object.entries(value).some(([unit,label])=>!LENGTH_DISPLAYS[unit]?.includes(label))))throw new Error('Invalid length display preference.');
+  return value;
+}
+export function lengthUnitLabel(project,unit=project.stock.vendor.lengthUnit){
+  const label=project.lengthDisplay?.[unit];return LENGTH_DISPLAYS[unit]?.includes(label)?label:unit;
+}
+export function formatLength(value,project){
+  if(value==='')return '';
+  const unit=lengthUnitLabel(project);return `${value}${unit==="'"?'':' '}${unit||''}`.trim();
 }
 export function newProject(name = '') {
   const project=projectFromStock({vendor: {name, lengthUnit: 'm'}, cables: {}});
@@ -383,6 +396,7 @@ export function mergeProjects(current, incoming, partial = false) {
   if (!partial) {
     result.stock = {...result.stock, ...clone(incoming.stock), cables: clone(current.stock.cables)};
     result.vendorVersion = incoming.vendorVersion;
+    if(incoming.lengthDisplay!==undefined)result.lengthDisplay=clone(checkLengthDisplay(incoming.lengthDisplay));else delete result.lengthDisplay;
     result.filename = incoming.filename || current.filename;
     if (incoming.stockLooms) result.stockLooms=true;
   }

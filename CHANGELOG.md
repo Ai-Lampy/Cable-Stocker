@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.34 — 2026-10-15
+
+Previous version: v1.1.33. Local release for manual upload; not deployed.
+
+- Add a Length display selector for the chosen vendor unit: metric `m` / `Meter`; imperial `ft` / `'` / `Feet`, with examples. Apply the format to length chips, length-dialog units, vendor/category summaries, loom headings and length-colour headings/cells. Feet marked with an apostrophe have no intervening space, such as `10'`.
+- Store per-unit display preferences in generator project backups and Excel metadata. Preserve legacy project files without inserting defaults; reject invalid preference values. Full workbook imports adopt incoming preferences, while partial category imports retain the current vendor's preferences. The format does not convert values, change colour lookup units or add fields to cable-stock JSON.
+- Update the app version and README usage. Updated/upload: `js/app.js`, `js/model.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. User project JSON, references and backups preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 161 automated tests passed, including all five labels, unchanged runtime units/lengths, project/Excel round trips, legacy backups, full/partial imports and invalid preferences. All seven app modules passed syntax checks; all 10 JSON files parsed; local module imports and version consistency passed.
+- Browser testing was not run, as requested. Visual selector/layout behaviour remains unverified for this release. No temporary files or downloads created. Existing Paperwork loom compatibility and day-to-day user acceptance remain pending.
+
 ## v1.1.33 — 2026-10-15
 
 Previous version: v1.1.32. Local release for manual upload; not deployed.

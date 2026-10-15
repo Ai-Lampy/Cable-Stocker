@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.33.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.34.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -51,7 +51,7 @@ For manual GitHub Pages upload, retain the complete folder structure and use thi
 
 ## Work with cable stock
 
-1. Select a vendor, or enter a new vendor name. New vendors start in metres. Imported feet remain feet.
+1. Select a vendor, or enter a new vendor name. New vendors start in metres. Imported feet remain feet. After choosing **Length unit**, choose **Length display**: metric offers `m` or `Meter`; imperial offers `ft`, `'` or `Feet`. For example, 10 displays as `10 m`, `10 Meter`, `10 ft`, `10'` or `10 Feet`. The choice applies to length chips, headings and length-colour cells. It remembers a separate format for each unit in your vendor project/Excel backups. Cable-stock JSON keeps `m` or `ft` and numeric lengths; changing the display never converts values.
 2. Confirm the output filename. The supplied manifest confirms `christie_lites_cable.json` for Christie Lites UK. Its Lampy Paperwork destination is `json/cable/christie_lites_cable.json`.
 3. Add categories with **+**. Choose a name/alias from the dropdown or type a category. Recognised categories start with their associated cable types and connector defaults, with empty lengths. Custom categories start empty. The selected category wording remains in vendor data; adding an existing category does not replace its rows.
 4. Ordinary cables hide direction and Start / male / End / female columns. When a category contains adaptors, those columns appear for adaptor rows; ordinary rows stay blank and read-only in those columns. Mark a row **Adaptor** to edit its direction and endpoints. Existing direction fields remain in Lampy JSON for compatibility. Add a row. Select a cell and type to replace its contents directly in that cell; double-click or press F2 to edit existing text. Press Enter to accept and move down, or Tab to accept and move right (Shift+Tab moves left). Escape cancels the pending cell edit. Invalid entries remain in the cell for correction. Selecting a cable reference on a new row prefills connectors. Adaptor endpoint overrides remain editable. Hidden connector and custom data remain in JSON and Excel exports.
@@ -163,7 +163,7 @@ All tables hide raw JSON columns, including cable custom fields, reference conne
 
 Settings notes and table hints have an **Ok** button. Acknowledgements are saved in this browser by note text, so unchanged notes stay hidden across visits and reloads; new or changed notes appear. If storage is unavailable, acknowledgement lasts for the current session. Vendor/unit context and validation errors remain visible.
 
-Length colour cells show the vendor unit as a suffix, for example **12.5 ft** or **3.5 m**; the column heading also names the unit. In-cell editing and JSON downloads use the numeric length only. Changing units does not convert numbers or mix assignments between units/vendors.
+Length colour cells use the selected display format as a suffix, for example **12.5 ft**, **12.5'** or **3.5 Meter**; the column heading also names the unit. In-cell editing and JSON downloads use the numeric length only. Changing units does not convert numbers or mix assignments between units/vendors.
 
 Lighting Vendors automatically adds missing vendors to Vendor Manifest on startup and after edits. Existing catalogue paths remain untouched. New paths use `json/cable/<vendor_name>_cable.json`, with lowercase underscores and numbered suffixes for collisions. Removing or renaming a vendor does not delete its older manifest entry automatically. Review those entries manually. This creates lookup entries, not the referenced cable-stock files. Download `manifest.json` to retain the expanded catalogue; the supplied original stays unchanged.
 

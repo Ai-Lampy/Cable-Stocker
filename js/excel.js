@@ -1,4 +1,4 @@
-import {clone, parseJSON, parseLengths, projectFromStock, snapshot, uid, object, safeKey, isCableAdaptor, setCableAdaptor} from './model.js';
+import {checkLengthDisplay,clone, parseJSON, parseLengths, projectFromStock, snapshot, uid, object, safeKey, isCableAdaptor, setCableAdaptor} from './model.js';
 
 export const CABLE_COLUMNS = ['key','name','direction','start_connector','end_connector','lengths','connectors_json','custom_json','adaptor'];
 const LOOM_COLUMNS = ['key','name','lengths','description','custom_json'];
@@ -46,6 +46,7 @@ export function toWorkbook(project,X,{category=null,blank=false}={}) {
   }
   addSheet(X,book,'_Categories',mapping,[31,50,12]);
   const metadata={format:'lampy-cable-workbook',formatVersion:1,scope:category?'category':'vendor',category,stock:omit(project.stock,['cables']),stockLooms:!!project.stockLooms,filename:project.filename,vendorVersion:project.vendorVersion,loomCategory:includeLooms,sourceRows};
+  if(project.lengthDisplay!==undefined)metadata.lengthDisplay=clone(checkLengthDisplay(project.lengthDisplay));
   const text=json(metadata),meta=[['key','value'],['format','lampy-cable-workbook'],['scope',metadata.scope],['vendor_name',project.stock.vendor.name],['length_unit',project.stock.vendor.lengthUnit],['vendor_version',project.vendorVersion],['filename',project.filename]];
   for(let i=0;i<text.length;i+=30000)meta.push([`json_${String(i/30000).padStart(5,'0')}`,text.slice(i,i+30000)]);
   addSheet(X,book,'_Metadata',meta,[22,65]);return book;
@@ -76,6 +77,8 @@ export function fromWorkbook(book,X,current) {
   const stock=clone(metadata?.stock||{vendor:current.stock.vendor});stock.cables={};
   if(metadata){if(String(editable.vendor_name??'')!==String(stock.vendor.name??''))stock.vendor.name=String(editable.vendor_name??'');if(String(editable.length_unit??'')!==String(stock.vendor.lengthUnit??''))stock.vendor.lengthUnit=String(editable.length_unit??'');}
   const p=projectFromStock(stock, String(editable.filename??metadata?.filename??current.filename));p.vendorVersion=String(editable.vendor_version??metadata?.vendorVersion??current.vendorVersion);p.looms=[];
+  const lengthDisplay=metadata?metadata.lengthDisplay:current.lengthDisplay;
+  if(lengthDisplay!==undefined)p.lengthDisplay=clone(checkLengthDisplay(lengthDisplay));
   if(metadata?.stockLooms)p.stockLooms=true;
   let mappings=[];
   if(book.Sheets._Categories)mappings=records(book,'_Categories',X,['sheet','category','kind']);

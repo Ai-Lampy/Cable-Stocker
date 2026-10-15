@@ -273,3 +273,30 @@ test('new-project version default does not overwrite saved versions or invent an
  for(const version of ['', 'v2.1']){const p=M.newProject('Existing');p.vendorVersion=version;assert.equal(M.restoreProject(M.clone(p)).vendorVersion,version);assert.equal(roundtrip(p).project.vendorVersion,version);}
  assert.equal(fresh().vendorVersion,'');
 });
+
+test('length display formats change labels without changing stock units or numeric values',()=>{
+ const p=fresh(),stock=M.runtimeJSON(p);
+ for(const [unit,labels] of Object.entries(M.LENGTH_DISPLAYS)){
+  p.stock.vendor.lengthUnit=unit;
+  for(const label of labels){p.lengthDisplay={[unit]:label};assert.equal(M.lengthUnitLabel(p),label);assert.equal(M.formatLength(12.5,p),`12.5${label==="'"?'':' '}${label}`);assert.equal(M.formatLength('',p),'');assert.equal(M.runtimeJSON(p).vendor.lengthUnit,unit);assert.deepEqual(M.runtimeJSON(p).cables,stock.cables);assert.equal(M.runtimeJSON(p).lengthDisplay,undefined);}
+ }
+ delete p.lengthDisplay;assert.equal(M.lengthUnitLabel(p),'ft');
+});
+test('length display choices survive project and Excel backups while legacy projects stay unchanged',()=>{
+ const p=fresh();p.lengthDisplay={m:'Meter',ft:"'"};
+ assert.deepEqual(M.restoreProject(M.clone(p)).lengthDisplay,p.lengthDisplay);
+ const r=roundtrip(p).project;assert.deepEqual(r.lengthDisplay,p.lengthDisplay);assert.deepEqual(M.runtimeJSON(r),M.runtimeJSON(p));
+ const legacy=fresh();assert.deepEqual(M.restoreProject(M.clone(legacy)),legacy);assert.equal(roundtrip(legacy).project.lengthDisplay,undefined);
+});
+test('full workbook replacement and merge use incoming display choices; partial imports keep current choices',()=>{
+ const current=fresh();current.lengthDisplay={m:'Meter',ft:'Feet'};
+ const incoming=roundtrip(fresh()).project;incoming.lengthDisplay={m:'m',ft:"'"};
+ assert.deepEqual(replaceWorkbook(current,incoming,false,[]).lengthDisplay,incoming.lengthDisplay);
+ assert.deepEqual(M.mergeProjects(current,incoming).lengthDisplay,incoming.lengthDisplay);
+ assert.deepEqual(replaceWorkbook(current,incoming,true,[]).lengthDisplay,current.lengthDisplay);
+ assert.deepEqual(M.mergeProjects(current,incoming,true).lengthDisplay,current.lengthDisplay);
+ const old=fresh();assert.equal(M.mergeProjects(current,old).lengthDisplay,undefined);
+});
+test('unsupported length display choices are rejected before restoring a project',()=>{
+ for(const value of [null,[],{m:'Feet'},{ft:'Meter'},{yards:'yd'}]){const p=fresh();p.lengthDisplay=value;assert.throws(()=>M.restoreProject(p),/Invalid length display/);}
+});
