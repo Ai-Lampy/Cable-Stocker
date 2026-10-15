@@ -7,6 +7,9 @@
 
 ## Completed
 
+- v1.1.25 (local): Corrected Add/Edit loom to use a side pane with Loom name and Cable Type / Quantity inputs. Saved parent rows expand into ordinary child rows in the main table. Protected unsaved pane entries and preserved project/Excel data. 138 automated tests and approved local Chromium checks passed; details in CHANGELOG.md. No upload/deployment.
+- Upload: `js/app.js`, `js/model.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted project files: none.
+
 - v1.1.24 (local): Stock / Pre-Made Looms now uses a parent table by loom name, with available lengths and expandable cable-type/quantity tables. Preserved project/Excel data and protected pending component edits. 136 automated tests and approved local Chromium checks passed; details in CHANGELOG.md. No upload/deployment.
 - Upload: `js/app.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted project files: none.
 

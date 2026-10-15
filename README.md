@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.24.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.25.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -94,9 +94,11 @@ Every cable, Settings and loom-component table has a prominent **Save table** bu
 
 ## Composite looms
 
-Add **Stock / Pre-Made Looms** from the category selector, then choose **+ Loom**. Enter its name, available lengths and optional description in the parent row. Looms appear in a table sorted by Name. Use the arrow beside a loom name to expand or collapse its component table.
+Add **Stock / Pre-Made Looms** from the category selector, then choose **Add loom**. A side pane opens with **Loom name** and a two-column **Cable Type / Quantity** table. Use **+ Cable type** to add components, or press Enter on its last row. Tab moves between input cells. **Save loom** validates and adds the finished loom to the main table; closing a changed pane asks before discarding its unsaved entries.
 
-Enter each **Cable type** and **Quantity** in the expanded table. Quantity is a positive whole number describing cables **inside one loom**, never the number of looms owned. Recognised cable types inherit connectors; existing connector overrides and optional component lengths remain preserved. Use **Save table** to save locally, and project JSON or Excel for a separate backup. The parent table’s Save accepts valid pending component edits; invalid entries must be corrected before collapsing. Sorting, filtering, resizing and top/bottom Save buttons work as in the other tables.
+Saved looms appear as parent rows sorted by Name. Set available lengths on the parent row. Expand the arrow beside a name to show components as ordinary rows in the same table. Edit their cable types and quantities directly, or use **Edit loom** to change the name and add/remove components in the side pane. Filtering matches complete loom groups, keeping child rows with their parent. Child rows sort by cable type within each loom by default.
+
+Quantity describes cables **inside one loom**, never the number of looms owned. Recognised cable types inherit connectors when saved from the pane; existing connector overrides, descriptions, optional component lengths and custom fields remain preserved. Use **Save table** to save locally and clear highlights, and project JSON or Excel for a separate backup. New looms are created through **Add loom**, not blank main-table rows. Looms are preserved in generator project JSON and Excel; the supplied Lampy cable-stock schema does not support them.
 
 ## Excel format
 
@@ -189,7 +191,7 @@ For updates to an existing installation, use the file lists in [CHANGELOG.md](CH
 
 The app checks its own `js/version.js` on startup, every five minutes while visible, and when you return to the tab (checks are throttled to once per 30 seconds). Newer releases show a persistent banner with **Save & refresh**. Offline/failed checks do not interrupt editing. The version file is read as text, with an uncached request; no remote JavaScript is executed by the checker.
 
-Save & refresh accepts one pending valid table edit, saves the complete project and reference edits locally, verifies both stored values and reloads. Your imported baseline, looms, custom fields and unexported status remain intact. It refuses to reload with invalid cells, unfinished form fields, an open dialog/import, multiple pending loom-table entries, a storage error or a detected conflicting tab. Finish those entries or resolve the conflict first. The button never refreshes automatically.
+Save & refresh accepts one pending valid table edit, saves the complete project and reference edits locally, verifies both stored values and reloads. Your imported baseline, looms, custom fields and unexported status remain intact. It refuses to reload with invalid cells, unfinished form fields, an open dialog/import, multiple pending table entries, a storage error or a detected conflicting tab. Finish those entries or resolve the conflict first. The button never refreshes automatically.
 
 After refresh, the Vendor page opens; undo/redo history, table selection, temporary filters and the internal Copy Lengths buffer reset. Saved stock/reference data and persisted table preferences remain. Drafts are specific to this browser and origin: switching between GitHub Pages and ailampy.com does not transfer them. Local storage is not a separate backup.
 
@@ -219,11 +221,11 @@ Type in a Length colour cell to see matching colours from the supplied palette. 
 
 ## Default sorting
 
-Tables open sorted A–Z by Name, ignoring case and ordering embedded numbers naturally. Vendor Manifest uses vendor name; loom components use cable type. Length colour has no Name column and sorts numerically by Length. Blank rows stay last. Header sorting and **Clear sort** remain available; export/source order is unchanged. Clear the search filter before pasting more rows than are currently visible. Sorting can remain active.
+Tables open sorted A–Z by Name, ignoring case and ordering embedded numbers naturally. Vendor Manifest uses vendor name. Loom children stay grouped beneath their parent. Length colour has no Name column and sorts numerically by Length. Blank rows stay last. Header sorting and **Clear sort** remain available; export/source order is unchanged. Clear the search filter before pasting more rows than are currently visible. Sorting can remain active.
 
 ## Clear sort
 
-**Clear sort** restores Name A–Z (vendor name for Manifest, cable type for loom components, numeric Length for Length colour). It does not remove the default sorting or clear your search. Invalid pending edits must be corrected first. Pasting additional rows works with sorting active.
+**Clear sort** restores Name A–Z (vendor name for Manifest, numeric Length for Length colour). It does not remove the default sorting or clear your search. Invalid pending edits must be corrected first. Pasting additional rows works with sorting active.
 
 ## Vendor version entry
 

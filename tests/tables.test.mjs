@@ -87,15 +87,27 @@ test('loom parent edits preserve components, IDs and custom data',()=>{
  const p=JSON.parse(vm.runInContext('JSON.stringify(project)',ctx));
  assert.equal(p.looms[0].name,'Renamed');assert.deepEqual(p.looms[0].lengths,[20,10]);assert.equal(p.looms[0].components[0].count,2);assert.equal(p.looms[0].components[0].connectors.male,'custom');assert.deepEqual(p.looms[0].custom,{keep:true});assert.deepEqual(M.restoreProject(p).looms,p.looms);
 });
-test('new loom rows and expanded components retain independent identities and quantities',()=>{
- const ctx=loomController();
- vm.runInContext(`captured[0].add();captured[0].add();captured[0].details(project.looms[1]);captured.at(-1).apply([{id:0,col:{key:'type'},value:'DMX'},{id:0,col:{key:'count'},value:4}],true);`,ctx);
- const looms=JSON.parse(vm.runInContext('JSON.stringify(project.looms)',ctx));assert.notEqual(looms[0].id,looms[1].id);assert.deepEqual(looms[0].components,[]);assert.equal(looms[1].components[0].count,4);assert.deepEqual(looms[1].components[0].connectors,{male:'XLR-5',female:'XLR-5'});
- assert.equal(vm.runInContext('expandedLooms.size',ctx),2);
+test('loom display keeps children with their parent through sorting, collapse and search',()=>{
+ const looms=[{id:'z',name:'Zulu',lengths:[],components:[{id:'z1',type:'DMX',count:2}]},{id:'a',name:'Alpha',lengths:[20],components:[{id:'a1',type:'Power',count:4}]}],before=structuredClone(looms),rows=M.loomRows(looms);
+ assert.deepEqual(M.loomOrder(rows,new Set()),[2,0]);
+ assert.deepEqual(M.loomOrder(rows,new Set(['a'])),[2,3,0]);
+ assert.deepEqual(M.loomOrder(rows,new Set(),'DMX'),[0,1]);
+ assert.deepEqual(M.loomOrder(rows,new Set(['z']),'',{key:'name',dir:-1}),[0,1,2]);assert.deepEqual(looms,before);
 });
-test('loom collapse and table save guard commits pending editors and stops on invalid input',()=>{
- const ctx=loomController();
- vm.runInContext(`let commits=0;document.querySelectorAll=()=>[{lampyGrid:{editing:true,commitEditor:()=>{commits++;return false;}}}];`,ctx);
- assert.equal(vm.runInContext('commitLoomEditors()',ctx),false);assert.equal(vm.runInContext('captured[0].add()',ctx),false);assert.equal(vm.runInContext('project.looms.length',ctx),0);
- vm.runInContext(`document.querySelectorAll=()=>[{lampyGrid:{editing:true,commitEditor:()=>{commits++;return true;}}}];`,ctx);assert.equal(vm.runInContext('commitLoomEditors()',ctx),true);
+test('loom pane validates a separate draft and preserves IDs, lengths, custom data and overrides',()=>{
+ const draft={id:'loom',name:'  Test loom  ',lengths:[20,10],description:'Keep',custom:{yes:true},components:[{id:'a',type:'DMX',count:'4',connectors:{male:'Override',female:'Override'},lengths:[10],custom:7},{id:'b',type:'Custom',count:'2',connectors:{},lengths:[]}]},before=structuredClone(draft);
+ const saved=M.prepareLoomDraft(draft,[]);assert.deepEqual(draft,before);assert.equal(saved.name,'Test loom');assert.equal(saved.components[0].count,4);assert.equal(saved.components[0].connectors.male,'Override');assert.deepEqual(saved.lengths,[20,10]);assert.deepEqual(saved.custom,{yes:true});assert.equal(saved.components[0].custom,7);assert.deepEqual(saved.components[1].connectors,{male:'Custom',female:'Custom'});
+ const refs=[{name:'DMX',aliases:['DMX5'],connectors:{male:'XLR5',female:'XLR5'}}];draft.components[1].type='DMX5';assert.equal(M.prepareLoomDraft(draft,refs).components[1].connectors.male,'XLR5');
+ for(const count of ['',0,-1,1.5,'bad']){draft.components[0].count=count;assert.throws(()=>M.prepareLoomDraft(draft,refs),/Quantity/);}
+ draft.components=[];assert.throws(()=>M.prepareLoomDraft(draft,refs),/at least one/);draft.name=' ';assert.throws(()=>M.prepareLoomDraft(draft,refs),/loom name/);
+});
+test('loom child edits target their own component and cannot create unsaved parent rows',()=>{
+ const ctx=loomController();vm.runInContext(`project.looms.push({...newLoom(),name:'Original',components:[{id:'part',type:'DMX',count:2,connectors:{male:'custom'},lengths:[]}]});captured[0].apply([{id:1,col:{key:'count'},value:6}],false);`,ctx);
+ assert.equal(vm.runInContext('project.looms[0].components[0].count',ctx),6);assert.equal(vm.runInContext('project.looms[0].name',ctx),'Original');assert.equal(vm.runInContext('captured[0].newEntries',ctx),false);
+ const g=editable([{name:'Existing'}]);g.o.newEntries=false;assert.equal(g.apply([{id:1,col:{key:'name'},text:'Uncreated'}]),false);assert.deepEqual(g.o.rows(),[{name:'Existing'}]);
+});
+
+test('loom child display sorts by cable type and quantity without moving components between parents',()=>{
+ const looms=[{id:'a',name:'Alpha',lengths:[],components:[{type:'Zulu',count:1},{type:'Beta',count:4}]}],rows=M.loomRows(looms),expanded=new Set(['a']);
+ assert.deepEqual(M.loomOrder(rows,expanded),[0,2,1]);assert.deepEqual(M.loomOrder(rows,expanded,'',{key:'count',dir:1}),[0,1,2]);assert.equal(looms[0].components[0].type,'Zulu');
 });

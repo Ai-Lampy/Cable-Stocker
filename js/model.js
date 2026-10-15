@@ -374,3 +374,28 @@ export function connectorTypeCategories(row,refs){
 }
 export function connectorTypeSheets(refs){return [...new Set([...(refs.categories?.items||[]).map(r=>r.name),...(refs.connector_types?.items||[]).flatMap(row=>connectorTypeCategories(row,refs)),''])];}
 export function connectorTypeRows(rows,category,refs){return rows.filter(row=>connectorTypeCategories(row,refs).includes(category));}
+
+// View rows reference saved looms; hierarchy never enters project/runtime JSON.
+export function loomRows(looms){return looms.flatMap(loom=>[{loom,component:null},...loom.components.map(component=>({loom,component}))]);}
+export function loomOrder(rows,expanded,filter='',sort={key:'name',dir:1}){
+  const query=filter.trim().toLocaleLowerCase(),groups=[];
+  rows.forEach((row,id)=>{if(!row.component)groups.push({row,id,children:[]});else groups.at(-1).children.push(id);});
+  const text=row=>[row.loom.name,row.loom.description,...row.loom.lengths,...row.loom.components.flatMap(c=>[c.type,c.count])].join(' ').toLocaleLowerCase();
+  const value=row=>sort?.key==='lengths'?row.loom.lengths.join(', '):sort?.key==='description'?row.loom.description||'':row.loom.name;
+  groups.sort((a,b)=>String(value(a.row)).localeCompare(String(value(b.row)),undefined,{numeric:true,sensitivity:'base'})*(sort?.dir||1));
+  return groups.filter(g=>!query||text(g.row).includes(query)).flatMap(g=>{
+    const children=[...g.children].sort((a,b)=>{const x=rows[a].component,y=rows[b].component;return (sort?.key==='count'?x.count-y.count:x.type.localeCompare(y.type,undefined,{numeric:true,sensitivity:'base'}))*(sort?.dir||1);});
+    return [g.id,...(expanded.has(g.row.loom.id)||query?children:[])];
+  });
+}
+export function prepareLoomDraft(draft,cableTypes){
+  const result=clone(draft);result.name=result.name.trim();
+  if(!result.name)throw new Error('Enter a loom name.');
+  if(!result.components.length)throw new Error('Add at least one cable type and quantity.');
+  for(const c of result.components){
+    c.type=c.type.trim();if(!c.type)throw new Error('Enter a cable type for every component.');
+    if(!Number.isSafeInteger(Number(c.count))||Number(c.count)<1)throw new Error('Quantity must be a positive whole number.');c.count=Number(c.count);
+    if(!Object.keys(c.connectors).length){const ref=referenceMatch(cableTypes,c.type);c.connectors=clone(ref?.connectors||{male:c.type,female:c.type});}
+  }
+  return result;
+}

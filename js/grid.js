@@ -44,6 +44,7 @@ export class Grid {
   resetWidths(){if(this.editing&&!this.commitEditor())return false;const target=this.currentGrid();target.prefs.widths={};target.pref();target.renderBody();return true;}
   pref() { try {localStorage.setItem(`lampy-grid:${this.o.key}`, JSON.stringify(this.prefs));} catch {this.o.notice('Table preferences could not be saved.');} }
   indices() {
+    if(this.o.order)return this.o.order(this.filter,this.sort);
     let ids=Array.from({length:Math.max(5,this.o.rows().length,...[...(this.entryIds||[])].map(i=>i+1))},(_,i)=>i);
     if(this.filter)ids=ids.filter(i=>this.entryIds?.has(i)||this.o.columns.some(c=>display(this.value(i,c.key)).toLowerCase().includes(this.filter.toLowerCase())));
     if(this.sort)ids.sort((a,b)=>{const count=this.o.rows().length;if(a>=count||b>=count)return a>=count?(b>=count?0:1):-1;const av=display(this.value(a,this.sort.key)).trim(),bv=display(this.value(b,this.sort.key)).trim();if(!av||!bv)return !av?(!bv?0:1):-1;const an=this.value(a,this.sort.key),bn=this.value(b,this.sort.key);return (typeof an==='number'&&typeof bn==='number'?an-bn:av.localeCompare(bv,undefined,{numeric:true,sensitivity:'base'}))*this.sort.dir;});
@@ -53,7 +54,7 @@ export class Grid {
     this.host.replaceChildren();
     const toolbar=el('div',null,'grid-toolbar');
     const button=(label,fn,title)=>{const b=el('button',label);b.type='button';if(title)b.title=title;b.onclick=fn;toolbar.append(b);return b;};
-    button('+ Row',()=>{if(this.o.add()===false)return;this.render();});
+    button(this.o.addLabel||'+ Row',()=>{if(this.o.add()===false)return;this.render();});
     button('Undo',()=>this.o.undo()); button('Redo',()=>this.o.redo());
     button('Copy',()=>this.copy()); button('Paste',()=>this.pasteClipboard());
     button('Fill down',()=>this.fill());
@@ -98,7 +99,6 @@ export class Grid {
     this.renderBody();this.updateStyle();
   }
   renderBody() {
-    if(this.o.details&&this.table){for(const host of this.table.querySelectorAll('[data-lampy-grid]')){const child=host.lampyGrid;if(child?.editing&&!child.commitEditor())return false;}}
     this.closeSuggestions();
     this.ids=this.indices();this.table.replaceChildren();this.sizeColumns();
     const head=el('thead'),tr=el('tr');tr.append(el('th','#'));
@@ -112,7 +112,7 @@ export class Grid {
     });head.append(tr);this.table.append(head);
     const body=el('tbody');
     this.ids.forEach((id,r)=>{
-      const row=this.o.rows()[id],tr=el('tr');const num=el('th',String(r+1));num.scope='row';tr.append(num);
+      const row=this.o.rows()[id],tr=el('tr',null,this.o.rowClass?.(row)||'');const num=el('th',String(r+1));num.scope='row';tr.append(num);
       this.o.columns.forEach((col,c)=>{
         const td=el('td');td.dataset.r=r;td.dataset.c=c;td.tabIndex=-1;td.setAttribute('role','gridcell');td.setAttribute('aria-label',`${col.label}, row ${r+1}`);
         const saved=this.prefs.highlights?.context===this.o.highlightContext?this.prefs.highlights:null;
@@ -134,13 +134,6 @@ export class Grid {
         td.onpointerenter=()=>{if(this.filling){this.selection.rr=r;this.selection.cc=c;this.paint();}};
         tr.append(td);
       });body.append(tr);
-      if(row&&this.o.details){
-        const detail=this.o.details(row,id);if(detail){
-          const child=el('tr',null,'grid-detail-row'),cell=el('td',null,'grid-detail-cell');cell.colSpan=this.o.columns.length+1;
-          for(const event of ['keydown','copy','paste','click','dblclick','pointerenter'])cell.addEventListener(event,e=>e.stopPropagation());
-          cell.append(detail);child.append(cell);body.append(child);
-        }
-      }
     });this.table.append(body);
     if(!this.ids.length){const row=el('tr'),td=el('td','No rows. Add a row or clear your search.');td.colSpan=this.o.columns.length+1;row.append(td);body.append(row);}
     this.selection.r=Math.max(0,Math.min(this.selection.r,this.ids.length-1));this.selection.rr=Math.max(0,Math.min(this.selection.rr,this.ids.length-1));this.paint();
@@ -209,7 +202,7 @@ export class Grid {
     const target=this.currentGrid();
     target.entryIds=new Set([...(target.entryIds||[]),...(this.entryIds||[])]);
     const column=Math.max(0,target.o.columns.findIndex(col=>col.key===key));
-    if(!reverse&&last){
+    if(!reverse&&last&&target.o.newEntries!==false){
       // A blank entry slot is UI only until the user enters data.
       const next=Math.max(5,target.o.rows().length,...target.ids.map(i=>i+1),...[...target.entryIds].map(i=>i+1));
       target.entryIds.add(next);target.renderBody();target.select(target.ids.indexOf(next),column);
@@ -257,11 +250,12 @@ export class Grid {
   }catch(error){this.o.notice(error.message,true);}}
   apply(patches,allowNew=false){try{
     if(this.editing&&!this.commitEditor())return false;
+    if(this.o.newEntries===false&&patches.some(p=>p.id>=this.o.rows().length))throw new Error('Use Add loom to create a saved loom.');
     // Parse every cell before mutating anything: a bad rectangle is atomic.
     const parsed=patches.filter(p=>{
       if(p.id>=this.o.rows().length&&!String(p.text).trim())return false;
       if(!this.o.readOnly?.(p.id,p.col.key,patches))return true;
-      if(String(p.text).trim())throw new Error('This field is editable only for adaptors.');
+      if(String(p.text).trim())throw new Error(this.o.readOnlyMessage||'This field is editable only for adaptors.');
       return false;
     }).map(p=>({...p,value:parseCell(p.text,p.col)}));
     if(!parsed.length){this.renderBody();return true;}

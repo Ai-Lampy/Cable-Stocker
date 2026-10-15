@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.25 — 2026-10-15
+
+Previous version: v1.1.24. Local release for manual upload; not deployed.
+
+- Correct the loom layout: Add loom opens a side pane with Loom name and exactly two component columns, Cable Type and Quantity. Save loom validates and adds the finished item; Cancel/Close/Escape protect changed drafts before discarding them. Edit loom uses the same pane.
+- Expand saved parent rows to show ordinary child rows in the same table. Remove the nested component tables. Keep 35 px rows, available lengths on parents, Name sorting, grouped search, inline component editing and top/bottom Save table buttons. Child rows sort within their parent; new looms are created only through the pane.
+- Preserve loom IDs, connector overrides, descriptions, custom fields, component lengths and project/Excel schemas. New components inherit recognised connectors or cable-name fallbacks. Lampy cable-stock JSON remains unchanged and excludes looms.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted project files: none. Removed superseded nested-table rendering/styles. User project JSON, original examples and backups preserved.
+- Validation: 138 automated tests passed, including JSON/Excel round trips, draft validation, hierarchy ordering and field preservation. All 10 JSON files parsed and all 7 JavaScript modules passed syntax checks. Approved local Chromium checks passed two-column pane layout, required-name/component/positive-quantity validation, Enter row creation, Tab movement, Save, protected cancellation, ordinary 35 px child rows, inline quantity edits, grouped filtering, bottom Save, parent lengths, connector inheritance in JSON preview and persistence after reopening. No console warnings/errors in the final checked flow.
+- Cleanup: local browser test workspace restored to the supplied Siyan project; test server stopped. No test downloads created. Screenshots retained outside the project folder as visual evidence.
+- Limits: Firefox/Safari, native save pickers and live deployment not tested for this release. Loom expansion is session-only. Pending authoritative Lampy loom-schema support remains unchanged. No upload or deployment performed.
+
 ## v1.1.24 — 2026-10-15
 
 Previous version: v1.1.23. Local release for manual upload; not deployed.

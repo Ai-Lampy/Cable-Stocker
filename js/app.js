@@ -1,8 +1,8 @@
 import {vendorProjectFilename,loadVendorProject} from './vendor-projects.js';
 import {watchUpdates, safeRefresh, freshDocumentURL} from './updates.js';
 import {APP_VERSION} from './version.js';
-import {clone,same,uid,cableTypeSheets,cableTypeRows,connectorTypeSheets,connectorTypeRows,connectorTypeCategories,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,parseLengths,combineLengths,referenceMatch,defaultCable,inheritCableConnectors,fillCableConnectors,connectorReviews,approveConnector,cableNeedsConnectorInputs,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,colourSuggestions,resolveColour,validateLengthColours,changes,validate,normaliseVendorVersion,incrementVersion,mergeProjects,relativePath} from './model.js';
-import {Grid,display} from './grid.js';
+import {loomRows,loomOrder,prepareLoomDraft,clone,same,uid,cableTypeSheets,cableTypeRows,connectorTypeSheets,connectorTypeRows,connectorTypeCategories,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,parseLengths,combineLengths,referenceMatch,defaultCable,inheritCableConnectors,fillCableConnectors,connectorReviews,approveConnector,cableNeedsConnectorInputs,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,colourSuggestions,resolveColour,validateLengthColours,changes,validate,normaliseVendorVersion,incrementVersion,mergeProjects,relativePath} from './model.js';
+import {Grid,display,sortedLengths} from './grid.js';
 import {toWorkbook,fromWorkbook,replaceWorkbook} from './excel.js';
 
 const $=selector=>document.querySelector(selector);
@@ -255,35 +255,72 @@ function lengthEditor(target,after){
 }
 const expandedLooms=new Set();
 function newLoom(){return {id:uid(),name:'',lengths:[],description:'',components:[]};}
-function commitLoomEditors(){
-  for(const host of document.querySelectorAll('#main [data-lampy-grid]')){const table=host.lampyGrid;if(table?.editing&&!table.commitEditor())return false;}
-  return true;
+function editLoom(existing){
+  if(grid?.editing&&!grid.commitEditor())return false;
+  const draft=existing?clone(existing):newLoom(),original=clone(draft),workspace=project;
+  const pane=node('dialog',null,'loom-pane');pane.id='loom-pane';pane.setAttribute('aria-labelledby','loom-pane-title');
+  const title=node('h2',existing?'Edit loom':'Add loom');title.id='loom-pane-title';
+  const header=node('div',null,'dialog-head'),body=node('div',null,'loom-pane-body'),footer=node('div',null,'dialog-actions');
+  const warning=node('p',null,'note error-note');warning.hidden=true;warning.setAttribute('role','alert');
+  const discard=node('div',null,'loom-discard');discard.hidden=true;
+  const close=()=>{pane.close();pane.remove();};
+  const cancel=()=>{if(same(draft,original)){close();return;}discard.hidden=false;};
+  const closeButton=btn('×',cancel,'dialog-close');closeButton.setAttribute('aria-label','Close loom pane');header.append(title,closeButton);
+  const nameLabel=node('label','Loom name'),name=node('input');name.value=draft.name;name.required=true;name.oninput=()=>{draft.name=name.value;warning.hidden=true;};nameLabel.append(name);
+  const table=node('table',null,'loom-entry-table');table.setAttribute('aria-label','Loom components');
+  const head=node('thead'),headRow=node('tr');headRow.append(node('th','Cable Type'),node('th','Quantity'));head.append(headRow);const tbody=node('tbody');table.append(head,tbody);
+  function addComponent(){draft.components.push({id:uid(),type:'',count:1,connectors:{},lengths:[]});draw();tbody.lastElementChild.querySelector('input').focus();}
+  function draw(){
+    tbody.replaceChildren();draft.components.forEach((component,index)=>{
+      const row=node('tr'),typeCell=node('td'),qtyCell=node('td'),type=node('input'),qty=node('input');
+      type.value=component.type;type.setAttribute('list','cables-list');type.setAttribute('aria-label',`Cable Type, component ${index+1}`);type.oninput=()=>{component.type=type.value;warning.hidden=true;};
+      qty.type='number';qty.min='1';qty.step='1';qty.value=component.count;qty.setAttribute('aria-label',`Quantity, component ${index+1}`);qty.oninput=()=>{component.count=qty.value;warning.hidden=true;};
+      for(const [col,input]of [type,qty].entries())input.onkeydown=e=>{
+        if(e.key==='Enter'){e.preventDefault();if(index===draft.components.length-1)addComponent();tbody.children[index+1]?.querySelectorAll('input')[col]?.focus();}
+        if(e.key==='Tab'){const inputs=[...tbody.querySelectorAll('input')],next=inputs[inputs.indexOf(input)+(e.shiftKey?-1:1)];if(next){e.preventDefault();next.focus();}}
+      };
+      const remove=btn('×',()=>{draft.components.splice(index,1);draw();},'remove-component');remove.setAttribute('aria-label',`Remove component ${index+1}`);
+      typeCell.append(type);qtyCell.append(qty,remove);row.append(typeCell,qtyCell);tbody.append(row);
+    });
+  }
+  draw();
+  body.append(nameLabel,node('p','Add the cable types and quantities inside one loom. Available lengths are edited on the saved loom row.','muted'),table,btn('+ Cable type',addComponent),warning,discard);
+  discard.append(node('p','Discard your unsaved loom changes?'),btn('Keep editing',()=>discard.hidden=true),btn('Discard changes',close,'danger'));
+  footer.append(btn('Cancel',cancel),btn('Save loom',()=>{
+    try{
+      if(project!==workspace||saveBlocked)throw new Error('The workspace changed. Keep this pane open and copy your entries before reloading.');
+      const saved=prepareLoomDraft(draft,refs.cable_types.items),index=existing?project.looms.findIndex(l=>l.id===existing.id):-1;
+      if(existing&&index<0)throw new Error('This loom no longer exists.');
+      change(()=>{if(existing)project.looms[index]=saved;else project.looms.push(saved);project.loomTab=true;});
+      close();notice('Loom saved locally; download a project backup to keep a separate copy.');
+    }catch(e){warning.textContent=e.message;warning.hidden=false;}
+  },'primary'));
+  pane.append(header,body,footer);pane.oncancel=e=>{e.preventDefault();cancel();};document.body.append(pane);pane.showModal();name.focus();return false;
 }
 function renderLooms(){
-  heading(LOOMS,'Expand a loom to edit the cable types and quantities inside one packaged item.',[btn('+ Loom',()=>{if(!commitLoomEditors())return;change(()=>{const loom=newLoom();project.loomTab=true;project.looms.push(loom);expandedLooms.add(loom.id);});},'primary'),btn('Loom JSON preview',previewLooms),btn('Loom Excel',()=>reviewExport('excel',LOOMS))]);
-  $('#main').append(node('p','Looms are included in generator project JSON and Excel backups. They are excluded from the Lampy cable-stock export because its supplied schema has no demonstrated loom structure.','note warning'));
+  heading(LOOMS,'Expand a loom name to show its cable types and quantities.',[btn('Add loom',()=>editLoom(),'primary'),btn('Loom JSON preview',previewLooms),btn('Loom Excel',()=>reviewExport('excel',LOOMS))]);
+  $('#main').append(node('p','Looms are included in generator project JSON and Excel backups. Lampy cable-stock JSON does not include looms.','note warning'));
   const host=node('div',null,'grid-panel');$('#main').append(host);
-  grid=new Grid(host,{current:()=>grid,key:'looms',label:LOOMS,highlightContext:JSON.stringify([project.stock.vendor,project.baseline]),rowKey:r=>r.id,
-    columns:[{key:'name',label:'Name',render:(value,cell,editor)=>{
-      const loom=project.looms[editor.rowId];
-      if(loom){const toggle=btn(expandedLooms.has(loom.id)?'▾':'▸',e=>{e.stopPropagation();if(!commitLoomEditors())return;if(expandedLooms.has(loom.id))expandedLooms.delete(loom.id);else expandedLooms.add(loom.id);grid.currentGrid().renderBody();},'loom-toggle');toggle.setAttribute('aria-label',`${expandedLooms.has(loom.id)?'Collapse':'Expand'} ${loom.name||'unnamed loom'}`);toggle.setAttribute('aria-expanded',String(expandedLooms.has(loom.id)));cell.append(toggle);}
-      cell.append(node('span',value,'cell-text'));
-    }},{key:'lengths',label:`Available lengths (${project.stock.vendor.lengthUnit})`,type:'lengths'},{key:'description',label:'Description'}],
-    rows:()=>project.looms,get:(r,k)=>r[k],details:loom=>expandedLooms.has(loom.id)?loomComponents(loom):null,
-    changed:(i,k)=>{const old=project.baseline.looms?.find(l=>l.id===project.looms[i].id);return !!old&&!same(old[k],project.looms[i][k]);},added:i=>!project.baseline.looms?.some(l=>l.id===project.looms[i].id),
-    add:()=>{if(!commitLoomEditors())return false;change(()=>{const loom=newLoom();project.looms.push(loom);expandedLooms.add(loom.id);},{renderPage:false});},
-    apply:(patches,allowNew)=>change(()=>{for(const p of patches){while(project.looms.length<=p.id){if(!allowNew)throw new Error('Loom no longer exists.');project.looms.push(newLoom());}project.looms[p.id][p.col.key]=p.value;}project.loomTab=true;},{renderPage:false}),
-    remove:ids=>confirmAction('Delete looms',`Delete ${ids.length} selected loom(s) and their components? Undo is available.`,()=>change(()=>{for(const i of ids.sort((a,b)=>b-a))project.looms.splice(i,1);}),'Delete looms'),
-    undo,redo,notice,save:()=>commitLoomEditors()&&saveTable(),saved:renderAll,lengthChip:makeLengthChip,lengths:i=>lengthEditor(project.looms[i],renderAll)});
-}
-function loomComponents(loom){
-  const detail=node('section',null,'loom-components');detail.dataset.loomId=loom.id;
-  detail.append(node('h3',`Components of ${loom.name||'unnamed loom'}`),node('p','Quantity is the number of each cable type inside one loom.','muted'));
-  const host=node('div',null,'grid-panel');detail.append(host);
-  const baseline=project.baseline.looms?.find(l=>l.id===loom.id);
-  new Grid(host,{key:`loom-components:${loom.id}`,highlightContext:JSON.stringify(project.baseline),rowKey:r=>r.id,label:`Components of ${loom.name}`,columns:[{key:'type',label:'Cable type',list:'cables-list',width:220},{key:'count',label:'Quantity',type:'integer',width:145},{key:'connectors',label:'Connectors / overrides',type:'json',width:300},{key:'lengths',label:'Optional component lengths',type:'lengths',width:260}],rows:()=>loom.components,get:(r,k)=>r[k],changed:(i,k)=>{const old=baseline?.components.find(c=>c.id===loom.components[i].id);return !!old&&!same(old[k],loom.components[i][k]);},added:i=>!baseline?.components.some(c=>c.id===loom.components[i].id),
-      add:()=>change(()=>loom.components.push({id:uid(),type:'',count:1,connectors:{},lengths:[]}),{renderPage:false}),apply:(patches,allowNew)=>change(()=>{for(const p of patches){while(loom.components.length<=p.id){if(!allowNew)throw new Error('Missing component.');loom.components.push({id:uid(),type:'',count:1,connectors:{},lengths:[]});}const c=loom.components[p.id];if(p.col.key==='type'&&!Object.keys(c.connectors).length){const ref=referenceMatch(refs.cable_types.items,p.value);if(ref)c.connectors=clone(ref.connectors);}c[p.col.key]=p.value;}},{renderPage:false}),remove:ids=>confirmAction('Delete components',`Delete ${ids.length} component(s)?`,()=>change(()=>{for(const i of ids.sort((a,b)=>b-a))loom.components.splice(i,1);}),'Delete'),undo,redo,notice,save:saveTable,saved:renderAll,lengthChip:makeLengthChip,lengths:i=>lengthEditor(loom.components[i],renderAll)});
-  return detail;
+  const rows=()=>loomRows(project.looms),value=(row,key)=>key==='name'?(row.component?.type??row.loom.name):key==='count'?(row.component?.count??''):key==='lengths'?(row.component?.lengths??row.loom.lengths):row.component?'':row.loom[key];
+  const baseline=row=>{const loom=project.baseline.looms?.find(l=>l.id===row.loom.id);return row.component?loom?.components.find(c=>c.id===row.component.id):loom;};
+  grid=new Grid(host,{current:()=>grid,key:'looms',label:LOOMS,highlightContext:JSON.stringify([project.stock.vendor,project.baseline]),rowKey:r=>r.component?`${r.loom.id}:${r.component.id}`:r.loom.id,
+    newEntries:false,addLabel:'Add loom',rows,get:value,order:(filter,sort)=>loomOrder(rows(),expandedLooms,filter,sort),rowClass:row=>row.component?'loom-child-row':'loom-parent-row',
+    columns:[{key:'name',label:'Name / Cable Type',render:(text,cell,editor)=>{
+      const row=rows()[editor.rowId];if(!row)return;
+      if(!row.component){const open=expandedLooms.has(row.loom.id)||!!grid?.filter;
+        const toggle=btn(open?'▾':'▸',e=>{e.stopPropagation();if(grid.editing&&!grid.commitEditor())return;if(grid.filter){notice('Clear the search to collapse matching looms.');return;}if(expandedLooms.has(row.loom.id))expandedLooms.delete(row.loom.id);else expandedLooms.add(row.loom.id);grid.renderBody();},'loom-toggle');toggle.setAttribute('aria-label',`${open?'Collapse':'Expand'} ${row.loom.name}`);toggle.setAttribute('aria-expanded',String(open));cell.append(toggle);
+      }
+      cell.append(node('span',text,'cell-text'));
+      if(!row.component){const edit=btn('Edit loom',e=>{e.stopPropagation();editLoom(row.loom);},'cell-action');edit.setAttribute('aria-label',`Edit loom ${row.loom.name}`);cell.append(edit);}
+    }},{key:'count',label:'Quantity',type:'integer'},{key:'lengths',label:`Available lengths (${project.stock.vendor.lengthUnit})`,type:'lengths',render:(lengths,cell,editor)=>{
+      const row=rows()[editor.rowId],chips=node('div',null,'cell-chips');for(const length of sortedLengths(lengths))chips.append(makeLengthChip(length));cell.append(chips);
+      if(!row.component)cell.append(btn('Edit lengths',e=>{e.stopPropagation();if(grid.editing&&!grid.commitEditor())return;lengthEditor(row.loom,renderAll);},'cell-action'));
+    }}],
+    readOnly:(i,key)=>{const row=rows()[i];return !row||(!row.component&&key==='count')||(!!row.component&&key==='lengths');},readOnlyMessage:'Edit loom quantities on child rows and available lengths on the parent row.',
+    changed:(i,key)=>{const row=rows()[i],old=baseline(row);return !!old&&!(!row.component&&key==='count')&&!same(key==='name'&&row.component?old.type:old[key],value(row,key));},added:i=>!baseline(rows()[i]),
+    add:()=>editLoom(),apply:patches=>{const before=rows();change(()=>{for(const p of patches){const row=before[p.id];if(!row)throw new Error('Use Add loom to create a loom.');const target=row.component||row.loom,key=row.component&&p.col.key==='name'?'type':p.col.key;target[key]=p.value;}},{renderPage:false});},
+    remove:ids=>{const selected=ids.map(i=>rows()[i]),parents=new Set(selected.filter(r=>!r.component).map(r=>r.loom.id));confirmAction('Delete loom rows','Delete the selected rows? Deleting a parent also deletes its components. Undo is available.',()=>change(()=>{for(const row of selected)if(row.component&&!parents.has(row.loom.id))row.loom.components=row.loom.components.filter(c=>c.id!==row.component.id);project.looms=project.looms.filter(l=>!parents.has(l.id));}),'Delete rows');},
+    undo,redo,notice,save:saveTable,saved:renderAll,lengthChip:makeLengthChip,lengths:i=>lengthEditor(rows()[i].loom,renderAll)});
 }
 function refRows(key=settingsTab){return refs[key].items||refs[key].vendors||refs[key].catalogues;}
 function refColumns(key,includeHidden=false){if(key==='length_colours')return [{key:'length',label:`Length (${project.stock.vendor.lengthUnit})`,type:'positive',format:value=>value===''?'':`${value} ${project.stock.vendor.lengthUnit}`},...['colour1','colour2','colour3'].map((key,i)=>({key,label:`Colour ${i+1}`,width:180,suggestions:v=>colourSuggestions(v,colourPalette),editFormat:v=>colourPalette.colours[v]?.names[0]||v,parse:v=>resolveColour(v,colourPalette),render:renderColourCell}))];if(key==='manifest')return [{key:'vendor',label:'vendor',width:280,list:'vendors-list'},{key:'file',label:'file',width:500}];if(key==='lighting_vendors')return [{key:'name',label:'Name',width:280},{key:'logo',label:'Logo path',width:400}];const columns=[{key:'name',label:'Canonical name',width:230},{key:'aliases',label:'Aliases (comma-separated)',type:'aliases',width:300}];if(key==='connector_types')columns.push({key:'category',label:'Category',width:180,suggestions:value=>connectorTypeSheets(refs).filter(name=>(name||'Uncategorised').toLocaleLowerCase().includes(String(value).trim().toLocaleLowerCase())).map(name=>({value:name,label:name||'Uncategorised'})),suggestionsLabel:'Available categories',noSuggestions:'No matching categories. Type a new category or clear the cell for Uncategorised.'});if(key==='cable_types')columns.push({key:'adaptor',label:'Adaptor',type:'boolean',width:105},{key:'category',label:'Default category',list:'categories-list',width:180},{key:'direction',label:'Direction',list:'directions-list',width:170},{key:'connectors',label:'Default connectors JSON',type:'json',width:350});return key==='cable_types'?columns.filter(c=>includeHidden||c.key!=='direction'||cableTypeRows(refs.cable_types.items,cableTypesSheet).some(r=>r.adaptor)):columns;}
@@ -336,7 +373,7 @@ function renderErrors(){
   const groups=Map.groupBy?Map.groupBy(issues,x=>x.category):issues.reduce((m,i)=>(m.has(i.category)?m.get(i.category).push(i):m.set(i.category,[i]),m),new Map());
   for(const [category,items]of groups){const group=node('section',null,'issue-group');group.append(node('h2',category));for(const issue of items){const detail=node('details',null,'issue'),summary=node('summary');summary.append(node('span',issue.level,`severity ${issue.level}`),node('span',`${issue.row!=null?`Row ${issue.row+1}: `:''}${issue.message}`));detail.append(summary,node('p',issue.fix),btn(issue.connectorReview?'Review connector':'Jump to field',()=>issue.connectorReview?reviewConnector(issue.connectorReview):jump(issue)));group.append(detail);}$('#main').append(group);}
 }
-function jump(issue){if(issue.category.startsWith('Settings: ')){settingsTab=issue.category.slice(10);if(settingsTab==='connector_types')connectorTypesSheet=connectorTypeCategories(refRows('connector_types')[issue.row],refs)[0];if(settingsTab==='cable_types')cableTypesSheet=refRows('cable_types')[issue.row]?.category||'';navigate('settings');}else if(issue.category==='Vendor'){navigate('vendor');const labels={name:'Vendor name',lengthUnit:'Length unit',filename:'Cable-stock output filename',vendorVersion:'Vendor version'};const label=[...document.querySelectorAll('#main label')].find(l=>l.firstChild?.textContent===labels[issue.field]);label?.querySelector('input,select')?.focus();return;}else if(issue.category===LOOMS){const loom=project.looms[issue.row||0];if(loom)expandedLooms.add(loom.id);navigate('looms');[...document.querySelectorAll('[data-loom-id]')].find(el=>el.dataset.loomId===loom?.id)?.scrollIntoView({block:'center'});return;}else {navigate(`category:${issue.category}`);if(['start','end','connectors','direction'].includes(issue.field)&&!isCableAdaptor(project,issue.category,issue.row)){editCableConnectors(issue.category,issue.row);return;}}if(grid&&issue.row!=null){let row=['Settings: cable_types','Settings: connector_types'].includes(issue.category)?grid.o.rows().indexOf(refRows(settingsTab)[issue.row]):issue.row;if(issue.category==='Settings: length_colours'){const target=refRows('length_colours')[issue.row];row=grid.o.rows().indexOf(target);if(row<0){notice(`This colour assignment belongs to ${target?.vendor||'an unset vendor'} (${target?.unit||'unit unset'}). Select that vendor and unit on the Vendor tab to edit it.`,true);return;}}const col=Math.max(0,grid.o.columns.findIndex(c=>c.key===issue.field));grid.select(Math.max(0,grid.ids.indexOf(row)),col);}}
+function jump(issue){if(issue.category.startsWith('Settings: ')){settingsTab=issue.category.slice(10);if(settingsTab==='connector_types')connectorTypesSheet=connectorTypeCategories(refRows('connector_types')[issue.row],refs)[0];if(settingsTab==='cable_types')cableTypesSheet=refRows('cable_types')[issue.row]?.category||'';navigate('settings');}else if(issue.category==='Vendor'){navigate('vendor');const labels={name:'Vendor name',lengthUnit:'Length unit',filename:'Cable-stock output filename',vendorVersion:'Vendor version'};const label=[...document.querySelectorAll('#main label')].find(l=>l.firstChild?.textContent===labels[issue.field]);label?.querySelector('input,select')?.focus();return;}else if(issue.category===LOOMS){const loom=project.looms[issue.row||0];if(loom)expandedLooms.add(loom.id);navigate('looms');const id=grid.o.rows().findIndex(row=>row.loom.id===loom?.id&&!row.component);if(id>=0)grid.select(grid.ids.indexOf(id),0);return;}else {navigate(`category:${issue.category}`);if(['start','end','connectors','direction'].includes(issue.field)&&!isCableAdaptor(project,issue.category,issue.row)){editCableConnectors(issue.category,issue.row);return;}}if(grid&&issue.row!=null){let row=['Settings: cable_types','Settings: connector_types'].includes(issue.category)?grid.o.rows().indexOf(refRows(settingsTab)[issue.row]):issue.row;if(issue.category==='Settings: length_colours'){const target=refRows('length_colours')[issue.row];row=grid.o.rows().indexOf(target);if(row<0){notice(`This colour assignment belongs to ${target?.vendor||'an unset vendor'} (${target?.unit||'unit unset'}). Select that vendor and unit on the Vendor tab to edit it.`,true);return;}}const col=Math.max(0,grid.o.columns.findIndex(c=>c.key===issue.field));grid.select(Math.max(0,grid.ids.indexOf(row)),col);}}
 function download(name,value,type='application/json'){
   const blob=value instanceof Blob?value:new Blob([typeof value==='string'?value:JSON.stringify(value,null,2)+'\n'],{type});const url=URL.createObjectURL(blob),a=node('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);notice(`Download requested: ${name}`);
 }
@@ -391,10 +428,10 @@ async function start(){
     syncVendorManifest(refs);loaded=true;if(fillCableConnectors(project,refs)){dirty=true;save();}renderAll();
     $('#settings-button').onclick=()=>navigate('settings');$('#errors-button').onclick=()=>navigate('errors');$('#import-button').onclick=()=>$('#file-input').click();$('#export-button').onclick=()=>reviewExport('json');$('#backup-button').onclick=downloadBackup;
     $('#file-input').onchange=async e=>{const file=e.target.files[0];e.target.value='';importPending=true;try{await importFile(file);}finally{importPending=false;}};document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>navigate(b.dataset.page));$('.brand').onclick=e=>{e.preventDefault();navigate('vendor');};
-    window.addEventListener('beforeunload',e=>{if(!updateReload&&(dirty||refDirty||[...document.querySelectorAll('[data-lampy-grid]')].some(el=>el.lampyGrid.editing&&el.lampyGrid.editor.value!==el.lampyGrid.editorOriginal))){e.preventDefault();e.returnValue='';}});
+    window.addEventListener('beforeunload',e=>{if(!updateReload&&(dirty||refDirty||$('#loom-pane')?.open||[...document.querySelectorAll('[data-lampy-grid]')].some(el=>el.lampyGrid.editing&&el.lampyGrid.editor.value!==el.lampyGrid.editorOriginal))){e.preventDefault();e.returnValue='';}});
     window.addEventListener('storage',e=>{if((e.key===KEYS.draft&&e.newValue!==lastSavedDraft)||(e.key===KEYS.prefs&&e.newValue!==lastSavedRefs)){saveBlocked=true;saveError='Another tab changed this workspace. Save your backups before reloading.';status();notice(saveError,true);}});
     document.addEventListener('click',e=>{for(const host of document.querySelectorAll('[data-lampy-grid]')){const g=host.lampyGrid;if(g.editing&&!g.table.contains(e.target)&&!g.commitEditor()){e.preventDefault();e.stopImmediatePropagation();return;}}},true);
-    document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!e.target.closest('input,textarea,table')&&!$('#dialog').open){e.preventDefault();e.shiftKey?redo():undo();}});
+    document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!e.target.closest('input,textarea,table')&&!$('#dialog').open&&!$('#loom-pane')?.open){e.preventDefault();e.shiftKey?redo():undo();}});
     if(!saveError)save();
     watchUpdates(APP_VERSION,version=>{
       const banner=$('#update-notice');banner.hidden=false;
@@ -404,7 +441,7 @@ async function start(){
     $('#refresh-update').onclick=()=>{
       try{
         safeRefresh({
-          blocked:()=>{if(importPending)return 'Wait for the import preview before updating.';if($('#dialog').open)return 'Finish or close the open dialog before updating.';
+          blocked:()=>{if(importPending)return 'Wait for the import preview before updating.';if($('#dialog').open||$('#loom-pane')?.open)return 'Finish or close the open dialog before updating.';
             if(saveBlocked)return saveError||'Saving is paused. Download backups before reloading.';
             const pending=[...document.querySelectorAll('#main [data-draft-value]')].find(el=>el.value!==el.dataset.draftValue);
             if(pending){pending.focus();return 'Finish this field before updating. Your entry has been kept.';}return '';},
