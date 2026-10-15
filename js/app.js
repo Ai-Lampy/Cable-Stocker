@@ -299,7 +299,6 @@ function editLoom(existing){
 }
 function renderLooms(){
   heading(LOOMS,'Expand a loom name to show its cable types and quantities.',[btn('Add loom',()=>editLoom(),'primary'),btn('Loom JSON preview',previewLooms),btn('Loom Excel',()=>reviewExport('excel',LOOMS))]);
-  $('#main').append(node('p','Cable-stock JSON includes loom names, IDs, available lengths and cable quantities. Lampy Paperwork needs its planned update to use them. Keep project JSON or Excel for descriptions, connector overrides and component lengths.','note warning'));
   const host=node('div',null,'grid-panel');$('#main').append(host);
   const rows=()=>loomRows(project.looms),value=(row,key)=>key==='name'?(row.component?.type??row.loom.name):key==='count'?(row.component?.count??''):key==='lengths'?(row.component?.lengths??row.loom.lengths):row.component?'':row.loom[key];
   const baseline=row=>{const loom=project.baseline.looms?.find(l=>l.id===row.loom.id);return row.component?loom?.components.find(c=>c.id===row.component.id):loom;};

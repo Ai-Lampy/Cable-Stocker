@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.1.31 — 2026-10-15
+
+Previous version: v1.1.30. Local release for manual upload; not deployed.
+
+- Remove the warning banner above the Stock / Pre-Made Looms table. Loom editing, validation and JSON/Excel output are unchanged; compatibility guidance remains available in the README and export review.
+- Increase `js/version.js` and the README current project version.
+- Updated/upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. User project JSON, backups and original inputs preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: all 155 existing non-browser tests passed, including JSON/Excel round trips and loom editing/import/export regressions. All seven app modules passed syntax checks, local imports resolved and all 10 JSON files parsed. Version consistency and removal of the Looms-tab warning passed. Browser testing was not run for this update. Paperwork loom support and day-to-day user acceptance remain pending.
+
 ## v1.1.30 — 2026-10-15
 
 Previous version: v1.1.29. Live at https://ailampy.com/cable/ after the user uploaded the release; verified 2026-10-15.
@@ -14,16 +23,18 @@ Previous version: v1.1.29. Live at https://ailampy.com/cable/ after the user upl
 
 - README Vendor-field guidance — 2026-10-15: clarified that Vendor name has no yellow change highlight, retains normal focus styling and still participates in export review. Distinguished Length unit highlighting from table save highlights. README contains current usage only; release notes and test history remain here. Updated/upload: `README.md`, `UPDATES.md`, `CHANGELOG.md`. App remains v1.1.30. Documentation/source checks passed; browser tests were not rerun for this documentation-only change. No app code changes, new/deleted files, uploads or deployment.
 
+- Status correction and cleanup — 2026-10-15: corrected the v1.1.29 live status in `UPDATES.md` and this changelog using the preceding browser observations. Removed the regenerated root `.DS_Store` after checking references and open-file use. Updated/upload: `UPDATES.md`, `CHANGELOG.md`. New files: none. Deleted: root `.DS_Store`. App remains v1.1.30. File hashes confirmed all other files, including project JSON, backups and app code, were unchanged; JSON parsing and version checks passed. Browser tests were not rerun for this documentation/cleanup task. No upload or deployment.
+
 ## v1.1.29 — 2026-10-15
 
-Previous version: v1.1.28. Local release for manual upload; not uploaded or deployed.
+Previous version: v1.1.28. Observed live at https://ailampy.com/cable/ on 2026-10-15 during the initial v1.1.30 check; subsequently superseded by v1.1.30.
 
 - Remove the helper sentence below the Vendor name field. Retain the field label, searchable vendor selector and existing saved-project loading behaviour. The corrected loom guidance remains in Your workspace.
 - Increase `js/version.js` and the README current project version. Record successful live v1.1.28 verification below.
 - Updated/upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. User projects, backups and original inputs preserved. Lampy Paperwork was not accessed or changed.
 - Approved local browser checks confirmed the Vendor name helper is absent, its input remains visible, corrected loom guidance is retained and the footer displays v1.1.29. No test data entered or files downloaded; test tabs closed and the local test server stopped. Screenshot evidence retained outside the project folder.
 - Validation: all 155 existing non-browser tests passed, including JSON/Excel round trips and vendor-project loading. All seven app modules passed syntax checks, local imports resolved and all 10 JSON files parsed. Version consistency and removal of the helper sentence passed. File hashes confirmed only the five listed files changed; no temporary project artifacts remained.
-- Limits: v1.1.29 has not been uploaded or verified live. Other browsers were not tested. Lampy Paperwork compatibility and day-to-day acceptance remain pending. No upload or deployment performed by the agent.
+- Live observation: the initial v1.1.30 verification loaded v1.1.29, including after a reload without browser cache. The footer displayed v1.1.29; Vendor name still had the yellow highlight expected before the v1.1.30 fix. This confirms v1.1.29 was served live, not a full live regression test of that release. Other browsers were not tested. Lampy Paperwork compatibility and day-to-day acceptance remain pending. No upload or deployment performed by the agent.
 
 ## v1.1.28 — 2026-10-15
 
