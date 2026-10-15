@@ -7,6 +7,9 @@
 
 ## Completed
 
+- v1.1.24 (local): Stock / Pre-Made Looms now uses a parent table by loom name, with available lengths and expandable cable-type/quantity tables. Preserved project/Excel data and protected pending component edits. 136 automated tests and approved local Chromium checks passed; details in CHANGELOG.md. No upload/deployment.
+- Upload: `js/app.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted project files: none.
+
 - README rule audit completed: remaining browser/Excel test history removed from README and retained in CHANGELOG.md; dataset guidance describes current use. Setup, usage and upload instructions retained. Documentation-only update to README.md, CHANGELOG.md and UPDATES.md; app remains v1.1.23. No files added/deleted or deployment.
 
 - Documentation maintenance — 2026-10-14 (app remains v1.1.23): Corrected README upload guidance to include projects/ and saved vendor project JSON. Removed release notes, historical test reports and superseded instructions from README; retained current setup, usage, upload and troubleshooting guidance, with release history in CHANGELOG.md. Recorded the preceding removal of root .DS_Store. User project JSON, backups and app files preserved. Changed/upload: README.md, UPDATES.md, CHANGELOG.md. No new files; no further files deleted in this documentation follow-up. No upload or deployment.

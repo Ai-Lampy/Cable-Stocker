@@ -53,7 +53,7 @@ export class Grid {
     this.host.replaceChildren();
     const toolbar=el('div',null,'grid-toolbar');
     const button=(label,fn,title)=>{const b=el('button',label);b.type='button';if(title)b.title=title;b.onclick=fn;toolbar.append(b);return b;};
-    button('+ Row',()=>{this.o.add();this.render();});
+    button('+ Row',()=>{if(this.o.add()===false)return;this.render();});
     button('Undo',()=>this.o.undo()); button('Redo',()=>this.o.redo());
     button('Copy',()=>this.copy()); button('Paste',()=>this.pasteClipboard());
     button('Fill down',()=>this.fill());
@@ -98,6 +98,7 @@ export class Grid {
     this.renderBody();this.updateStyle();
   }
   renderBody() {
+    if(this.o.details&&this.table){for(const host of this.table.querySelectorAll('[data-lampy-grid]')){const child=host.lampyGrid;if(child?.editing&&!child.commitEditor())return false;}}
     this.closeSuggestions();
     this.ids=this.indices();this.table.replaceChildren();this.sizeColumns();
     const head=el('thead'),tr=el('tr');tr.append(el('th','#'));
@@ -133,6 +134,13 @@ export class Grid {
         td.onpointerenter=()=>{if(this.filling){this.selection.rr=r;this.selection.cc=c;this.paint();}};
         tr.append(td);
       });body.append(tr);
+      if(row&&this.o.details){
+        const detail=this.o.details(row,id);if(detail){
+          const child=el('tr',null,'grid-detail-row'),cell=el('td',null,'grid-detail-cell');cell.colSpan=this.o.columns.length+1;
+          for(const event of ['keydown','copy','paste','click','dblclick','pointerenter'])cell.addEventListener(event,e=>e.stopPropagation());
+          cell.append(detail);child.append(cell);body.append(child);
+        }
+      }
     });this.table.append(body);
     if(!this.ids.length){const row=el('tr'),td=el('td','No rows. Add a row or clear your search.');td.colSpan=this.o.columns.length+1;row.append(td);body.append(row);}
     this.selection.r=Math.max(0,Math.min(this.selection.r,this.ids.length-1));this.selection.rr=Math.max(0,Math.min(this.selection.rr,this.ids.length-1));this.paint();
@@ -146,17 +154,17 @@ export class Grid {
   currentGrid(){return this.host.isConnected?this:(this.o.current?.()||[...document.querySelectorAll('[data-lampy-grid]')].map(el=>el.lampyGrid).find(g=>g.o.key===this.o.key)||this);}
   select(r,c,extend=false){if(this.editing){if(!this.commitEditor())return false;const target=this.currentGrid();if(target!==this)return target.select(r,c,extend);}if(!this.ids.length)return; r=Math.max(0,Math.min(this.ids.length-1,r));c=Math.max(0,Math.min(this.o.columns.length-1,c));if(extend){this.selection.rr=r;this.selection.cc=c;}else this.selection={r,c,rr:r,cc:c};this.paint();this.focusCell(extend?r:undefined,extend?c:undefined);}
   paint(){
-    const b=this.bounds();this.table.querySelectorAll('td[data-r]').forEach(td=>{const r=+td.dataset.r,c=+td.dataset.c,selected=r>=b.r&&r<=b.rr&&c>=b.c&&c<=b.cc;td.classList.toggle('selected',selected);td.setAttribute('aria-selected',String(selected));td.querySelector('.fill-handle')?.remove();});
+    const b=this.bounds();this.table.querySelectorAll(':scope > tbody > tr > td[data-r]').forEach(td=>{const r=+td.dataset.r,c=+td.dataset.c,selected=r>=b.r&&r<=b.rr&&c>=b.c&&c<=b.cc;td.classList.toggle('selected',selected);td.setAttribute('aria-selected',String(selected));td.querySelector('.fill-handle')?.remove();});
     const {r,c}=this.selection;this.address.textContent=`${String.fromCharCode(65+c)}${r+1}`;
     this.editor.value=this.ids[r]===undefined?'':display(this.value(this.ids[r],this.o.columns[c].key));
     this.editor.value=this.o.columns[c].editFormat?.(this.editor.value)??this.editor.value;
     this.editorOriginal=this.editor.value;
     this.editor.disabled=!!this.o.readOnly?.(this.ids[r],this.o.columns[c].key);
     this.editor.setAttribute('list',this.o.columns[c].list||'');
-    const last=this.table.querySelector(`td[data-r="${b.rr}"][data-c="${b.cc}"]`);
+    const last=this.table.querySelector(`:scope > tbody > tr > td[data-r="${b.rr}"][data-c="${b.cc}"]`);
     if(last){const h=el('span',null,'fill-handle');h.title='Drag to copy selected cells';h.onpointerdown=e=>{e.stopPropagation();e.preventDefault();this.filling=clone(this.bounds());const finish=()=>{const source=this.filling;this.filling=null;this.filled=true;this.fill(source);document.removeEventListener('pointerup',finish);};document.addEventListener('pointerup',finish);};last.append(h);}
   }
-  focusCell(r=this.selection.r,c=this.selection.c){const td=this.table.querySelector(`td[data-r="${r}"][data-c="${c}"]`);td?.focus({preventScroll:true});td?.scrollIntoView({block:'nearest',inline:'nearest'});}
+  focusCell(r=this.selection.r,c=this.selection.c){const td=this.table.querySelector(`:scope > tbody > tr > td[data-r="${r}"][data-c="${c}"]`);td?.focus({preventScroll:true});td?.scrollIntoView({block:'nearest',inline:'nearest'});}
   commitEditor(){
     if(!this.editing&&this.editor.value===this.editorOriginal)return true;
     const {r,c}=this.selection;if(this.ids[r]===undefined)return true;
@@ -168,7 +176,7 @@ export class Grid {
   edit(r,c,initial){
     this.select(r,c);if(this.editing)return;
     const col=this.o.columns[c];if(this.o.readOnly?.(this.ids[r],col.key))return;
-    const td=this.table.querySelector(`td[data-r="${r}"][data-c="${c}"]`);if(!td)return;
+    const td=this.table.querySelector(`:scope > tbody > tr > td[data-r="${r}"][data-c="${c}"]`);if(!td)return;
     this.editing=true;this.editor.disabled=false;this.editor.value=initial===undefined?this.editorOriginal:initial;
     this.editor.setAttribute('list',col.list||'');td.replaceChildren(this.editor);this.editor.focus();
     this.editor.oninput=()=>this.showSuggestions();this.showSuggestions();

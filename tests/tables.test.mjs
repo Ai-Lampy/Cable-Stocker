@@ -67,3 +67,35 @@ test('sorted paste can extend the table without overwriting rows hidden by displ
 test('Reset widths changes only the active grid widths, retaining its other preferences',()=>{const g=enterGrid(),other=enterGrid();g.prefs={widths:{name:600},align:'right',zoom:1.2};other.prefs={widths:{name:300}};g.pref=()=>{g.saved=structuredClone(g.prefs);};assert.equal(g.resetWidths(),true);assert.deepEqual(g.prefs,{widths:{},align:'right',zoom:1.2});assert.deepEqual(g.saved,g.prefs);assert.equal(g.columnWidth(g.o.columns[0]),150);assert.equal(other.prefs.widths.name,300);});
 test('Reset widths refuses invalid edits and follows a rebuilt active table',()=>{const g=enterGrid(),next=enterGrid();g.editing=true;g.prefs.widths={name:400};g.commitEditor=()=>false;assert.equal(g.resetWidths(),false);assert.equal(g.prefs.widths.name,400);g.commitEditor=()=>true;g.currentGrid=()=>next;next.prefs.widths={name:500};next.pref=()=>{};g.resetWidths();assert.deepEqual(next.prefs.widths,{});});
 test('length chips sort numerically without mutating source values or hiding invalid entries',()=>{const values=[20,1.5,10,2,2,'invalid',null];assert.deepEqual(sortedLengths(values),[1.5,2,2,10,20,'invalid',null]);assert.deepEqual(values,[20,1.5,10,2,2,'invalid',null]);});
+
+function loomController(){
+ const ctx=controller();
+ vm.runInContext(`
+ const captured=[];
+ const fakeNode=()=>({dataset:{},append(){},setAttribute(){}});
+ document.createElement=fakeNode;document.querySelector=()=>fakeNode();document.querySelectorAll=()=>[];
+ Grid=class{constructor(host,o){this.o=o;captured.push(o);}};
+ heading=()=>{};change=fn=>fn();
+ refs={cable_types:{items:[{name:'DMX',aliases:[],connectors:{male:'XLR-5',female:'XLR-5'}}]}};
+ project=newProject('Test');renderLooms();
+ `,ctx);return ctx;
+}
+test('loom parent edits preserve components, IDs and custom data',()=>{
+ const ctx=loomController();
+ vm.runInContext(`project.looms.push({...newLoom(),name:'Original',custom:{keep:true},components:[{id:'part',type:'DMX',count:2,connectors:{male:'custom',female:'custom'},lengths:[]}]});
+ captured[0].apply([{id:0,col:{key:'name'},value:'Renamed'},{id:0,col:{key:'lengths'},value:[20,10]}],false);`,ctx);
+ const p=JSON.parse(vm.runInContext('JSON.stringify(project)',ctx));
+ assert.equal(p.looms[0].name,'Renamed');assert.deepEqual(p.looms[0].lengths,[20,10]);assert.equal(p.looms[0].components[0].count,2);assert.equal(p.looms[0].components[0].connectors.male,'custom');assert.deepEqual(p.looms[0].custom,{keep:true});assert.deepEqual(M.restoreProject(p).looms,p.looms);
+});
+test('new loom rows and expanded components retain independent identities and quantities',()=>{
+ const ctx=loomController();
+ vm.runInContext(`captured[0].add();captured[0].add();captured[0].details(project.looms[1]);captured.at(-1).apply([{id:0,col:{key:'type'},value:'DMX'},{id:0,col:{key:'count'},value:4}],true);`,ctx);
+ const looms=JSON.parse(vm.runInContext('JSON.stringify(project.looms)',ctx));assert.notEqual(looms[0].id,looms[1].id);assert.deepEqual(looms[0].components,[]);assert.equal(looms[1].components[0].count,4);assert.deepEqual(looms[1].components[0].connectors,{male:'XLR-5',female:'XLR-5'});
+ assert.equal(vm.runInContext('expandedLooms.size',ctx),2);
+});
+test('loom collapse and table save guard commits pending editors and stops on invalid input',()=>{
+ const ctx=loomController();
+ vm.runInContext(`let commits=0;document.querySelectorAll=()=>[{lampyGrid:{editing:true,commitEditor:()=>{commits++;return false;}}}];`,ctx);
+ assert.equal(vm.runInContext('commitLoomEditors()',ctx),false);assert.equal(vm.runInContext('captured[0].add()',ctx),false);assert.equal(vm.runInContext('project.looms.length',ctx),0);
+ vm.runInContext(`document.querySelectorAll=()=>[{lampyGrid:{editing:true,commitEditor:()=>{commits++;return true;}}}];`,ctx);assert.equal(vm.runInContext('commitLoomEditors()',ctx),true);
+});

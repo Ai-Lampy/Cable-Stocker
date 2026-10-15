@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Current app version:** v1.1.23.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.24.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -94,7 +94,9 @@ Every cable, Settings and loom-component table has a prominent **Save table** bu
 
 ## Composite looms
 
-Add **Stock / Pre-Made Looms** from the category selector. Set its name, optional description and available lengths. Add components with cable type, positive whole-number count, inherited connectors and optional connector/length overrides. Counts represent cables **inside one loom**, never the number of looms owned.
+Add **Stock / Pre-Made Looms** from the category selector, then choose **+ Loom**. Enter its name, available lengths and optional description in the parent row. Looms appear in a table sorted by Name. Use the arrow beside a loom name to expand or collapse its component table.
+
+Enter each **Cable type** and **Quantity** in the expanded table. Quantity is a positive whole number describing cables **inside one loom**, never the number of looms owned. Recognised cable types inherit connectors; existing connector overrides and optional component lengths remain preserved. Use **Save table** to save locally, and project JSON or Excel for a separate backup. The parent table’s Save accepts valid pending component edits; invalid entries must be corrected before collapsing. Sorting, filtering, resizing and top/bottom Save buttons work as in the other tables.
 
 ## Excel format
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.24 — 2026-10-15
+
+Previous version: v1.1.23. Local release for manual upload; not deployed.
+
+- Replace separate loom cards with a Name-sorted parent table containing loom name, available lengths and description. Expand a name to edit its cable types and quantities in a component table; quantities describe cables inside one loom.
+- Retain shared table editing, filtering, resizing, top/bottom saving, undo and length chips. Keep expansion tied to loom identity. Scope nested table selection and events to their own grid, and protect pending component edits before collapsing or rebuilding the parent table.
+- Preserve existing project/Excel loom structures, IDs, connectors, custom data and source length order. Lampy runtime JSON still excludes looms because its supplied schema has no demonstrated loom support.
+- Updated/upload: `js/app.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted project files: none. Removed obsolete loom-card rendering/styles. Original project JSON, references and backups unchanged.
+- Validation: 136 automated tests passed, including parent edits preserving component/custom data, separate loom identities, inherited connectors and pending-editor guards; existing JSON/Excel round-trip tests passed. Approved local Chromium checks passed existing loom expansion, new loom name/length/component entry, quantity editing with Tab, parent Save accepting a pending quantity, collapse/reopen, filtering, persistence in a new tab and invalid-quantity protection. No browser console warnings/errors in checked flows. Local test workspace restored to the original Siyan project; no test downloads created.
+- Limits: Firefox/Safari and live deployment not tested for this release. Loom expansion is session-only; saved loom contents persist. No upload or deployment performed.
+
 ## v1.1.23 — 2026-10-14
 
 Previous version: v1.1.22.
