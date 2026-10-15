@@ -1,8 +1,19 @@
 # Changelog
 
+## v1.1.28 — 2026-10-15
+
+Previous version: v1.1.27. Local release for manual upload; not uploaded or deployed.
+
+- Correct the Vendor-page help text: cable-stock JSON includes loom names, IDs, available lengths and cable quantities. Explain that Lampy Paperwork needs its separate planned update to use them.
+- Clarify that project JSON/Excel also retain the vendor version, loom descriptions, connector overrides and component lengths. No import/export or data behaviour changed.
+- Increase the app version in `js/version.js` and update the README current project version. Mark the wording correction complete in UPDATES.md.
+- Updated/upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted files: none. User projects, backups and original inputs preserved. Lampy Paperwork was not accessed or changed.
+- Validation: all 155 existing non-browser tests passed, including JSON/Excel round trips and loom import/export. All seven app modules passed syntax checks and local imports resolved; all 10 JSON files parsed. Verified corrected help text, version consistency and that only the five listed files changed. No temporary project artifacts created.
+- Browser testing not run: no fresh approval for this update. Live v1.1.28 not verified; no upload or deployment performed. Lampy Paperwork compatibility and day-to-day acceptance remain pending.
+
 ## v1.1.27 — 2026-10-15
 
-Previous version: v1.1.26. Local release for manual upload; not uploaded or deployed.
+Previous version: v1.1.26. Live at https://ailampy.com/cable/ after the user uploaded the release; verified 2026-10-15.
 
 - Export stock looms at the vendor JSON root using `looms: [{id, name, lengths, cables: [{cableType, quantity}]}]`. Available lengths belong to the complete loom and use the vendor unit. Keep ordinary cable data and manifest entries unchanged.
 - Import this structure into the existing loom editor, preserving stable loom IDs, quantities, length values/order and unknown imported fields. Reject malformed structures and duplicate IDs before replacing a draft. Report invalid lengths/quantities without blocking their export.
@@ -10,9 +21,13 @@ Previous version: v1.1.26. Local release for manual upload; not uploaded or depl
 - Preserve existing project backups, saved vendor projects and Excel layouts, including descriptions, connector overrides and component-specific lengths. Stock export excludes those editor-only fields. Preserve explicit empty loom arrays through project/Excel round trips and avoid false import-preview changes from editor IDs. Safely migrate legacy root loom data without silently overwriting conflicting definitions.
 - Reserve the root `looms` field for the loom editor. Update README usage/example and replace obsolete exclusion messages. Lampy Paperwork needs a separate future update to consume stock looms; it was not accessed or changed during this release.
 - Updated/upload: `js/app.js`, `js/model.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `tests/loom-stock.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New file: `tests/loom-stock.test.mjs`. Deleted files: none. Original references, images, user project JSON and backups preserved.
-- Validation: 155 non-browser tests passed, including approved-shape JSON round trips, Excel binary round trips, unchanged Siyan backup, empty/deleted looms, unknown fields, quantity/length validation, legacy migration, import reviews, and preview/copy/download controller checks. Browser tests were not run, as requested. These controller checks are not browser or live-site verification.
+- Initial local validation: 155 non-browser tests passed, including approved-shape JSON round trips, Excel binary round trips, unchanged Siyan backup, empty/deleted looms, unknown fields, quantity/length validation, legacy migration, import reviews, and preview/copy/download controller checks. Browser tests were not run during implementation, as requested. These controller checks are not browser or live-site verification.
 - Static validation: all 10 JSON files, seven app modules and test modules passed parsing/syntax checks. Local imports and documentation links resolved; the README JSON example parsed and v1.1.27 references matched. File hashes confirmed original references, user projects, data, images and bundled library unchanged. No temporary artifacts or test downloads were created.
-- Compatibility: existing Lampy Paperwork does not consume these stock-loom definitions yet. Keep project/Excel backups for richer editor data. Day-to-day user acceptance remains pending. No upload or deployment performed.
+- Live verification — 2026-10-15: approved browser testing confirmed v1.1.27 at https://ailampy.com/cable/. Exported Siyan LTD’s cable-stock JSON, imported the downloaded file through the import review, then exported again. Both downloaded JSON files contained identical data. The 2-Way Socapex Loom preserved its ID/name, available lengths of 10, 15, 20, 25 and 30 m, and cable quantities of Socapex 19-Pin ×2 and XLR-5 ×4. The imported table displayed the same lengths and expanded cable quantities; the address stayed at ailampy.com/cable/.
+- Live-test cleanup: restored the original browser draft/preferences exactly, closed the test tab and deleted both test JSON downloads. Screenshot evidence remains outside the project folder. Lampy Paperwork was not accessed or changed; no upload or deployment performed by the agent.
+- Wording issue identified during verification: the Vendor page contained an outdated help sentence about loom support. The tested export/import worked; this sentence was corrected locally in v1.1.28.
+- Documentation follow-up — 2026-10-15: updated/upload `UPDATES.md` and `CHANGELOG.md` only to record the live result. App version remains v1.1.27; no app code changes or project files added/deleted. Existing browser results recorded without rerunning browser tests for this documentation edit.
+- Compatibility: existing Lampy Paperwork does not consume these stock-loom definitions yet. Keep project/Excel backups for richer editor data. Day-to-day user acceptance remains pending. No upload or deployment performed by the agent.
 
 ## v1.1.26 — 2026-10-15
 
