@@ -2,14 +2,18 @@
 
 ## v1.1.26 — 2026-10-15
 
-Previous version: v1.1.25. Local release for manual upload; not deployed.
+Previous version: v1.1.25. Live at https://ailampy.com/cable/ after the user uploaded the release; verified 2026-10-15.
+
+- README table-workflow audit — 2026-10-15: clarified cell selection, typing to replace versus editing existing text, Tab/Shift+Tab/Enter navigation and Escape cancellation. Corrected yellow-highlight guidance to use the table’s last successful Save when available, while export reviews retain the original import baseline. Clarified that either Save table button commits the active edit and preserves visible selection. README contains current usage only; release notes and test history remain in CHANGELOG.md. Updated/upload: `README.md`, `UPDATES.md`, `CHANGELOG.md`. App version remains v1.1.26. Source/documentation checks passed; browser tests were not rerun for this documentation-only change. No app code changes, new/deleted files, upload or deployment.
 
 - Correct README wording: yellow edit highlights and added/removed rows in review; remove claims that added rows have green accents.
 - Remove unused formula-bar/cell-address CSS rules and the undisplayed cell-address element and update code. Retain the active cell editor, selection outlines, fill handle and yellow change highlighting.
 - Updated/upload: `js/grid.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted project files: none. Original examples, user project JSON, backups and runtime schemas unchanged.
 - Validation: 138 automated tests passed, including JSON/Excel round trips. All 10 JSON files and all 7 app modules passed parsing/syntax checks. Approved local Chromium checks passed v1.1.26 startup, cable-cell editing with Tab, arrow and range selection, yellow highlighting and Save clearing it, expanded loom quantity editing with Enter, bottom Save and Settings-cell navigation. No console warnings/errors in checked flows. Obsolete code references removed.
 - Cleanup: restored the local test workspace to the supplied Siyan project; closed the test tab and stopped the local server. No downloads or temporary project files created; screenshot retained outside the project as evidence.
-- Limits: Firefox/Safari and live deployment not tested for this release. Existing Lampy loom-schema limitation and pending user acceptance remain unchanged. No upload or deployment performed.
+- Live verification: Approved live Chromium testing on 2026-10-15 confirmed v1.1.26 at https://ailampy.com/cable/. Table editing and Tab navigation, single-cell and range selection, yellow edit highlighting, and Save table accepting an active edit and clearing highlighting all passed. Saved changes survived reopening. The address stayed at ailampy.com/cable/; no console warnings/errors in the checked flows. Test values were restored and the original cable JSON matched the pre-test snapshot exactly. No downloads, uploads or deployment performed by the agent.
+- Documentation follow-up — 2026-10-15: updated/upload `UPDATES.md` and `CHANGELOG.md` only to record the live result. App version remains v1.1.26. No app code changes or project files added/deleted. Existing browser results recorded; browser tests were not rerun for this documentation edit.
+- Limits: Firefox/Safari were not tested for this release. Existing Lampy loom-schema limitation and pending user acceptance remain unchanged. No upload or deployment performed by the agent.
 
 ## v1.1.25 — 2026-10-15
 
