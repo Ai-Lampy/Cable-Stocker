@@ -261,3 +261,15 @@ test('approved connectors inherit one usage category without adding category to 
  const p=fresh(),r=M.clone(refs);p.stock.cables.Test=[M.defaultCable(null,'Unlisted')];M.fillCableConnectors(p,r);M.approveConnector(p,r,'Unlisted','Approved');
  assert.equal(r.connector_types.items.at(-1).category,'Test');assert.equal(p.stock.cables.Test[0].category,undefined);
 });
+
+test('new projects start at v1 with a matching baseline and retain it in project and Excel backups',()=>{
+ for(const name of ['', 'New vendor']){
+  const p=M.newProject(name);assert.equal(p.vendorVersion,'v1');assert.equal(p.baseline.vendorVersion,'v1');assert.deepEqual(M.changes(p),[]);
+  assert.equal(M.restoreProject(M.clone(p)).vendorVersion,'v1');assert.equal(roundtrip(p).project.vendorVersion,'v1');
+  assert.deepEqual(M.runtimeJSON(p),{vendor:{name,lengthUnit:'m'},cables:{}});
+ }
+});
+test('new-project version default does not overwrite saved versions or invent an imported stock version',()=>{
+ for(const version of ['', 'v2.1']){const p=M.newProject('Existing');p.vendorVersion=version;assert.equal(M.restoreProject(M.clone(p)).vendorVersion,version);assert.equal(roundtrip(p).project.vendorVersion,version);}
+ assert.equal(fresh().vendorVersion,'');
+});

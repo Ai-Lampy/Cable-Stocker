@@ -7,6 +7,8 @@
 
 ## Completed
 
+- v1.1.33 (local release for manual upload) — 2026-10-15: Vendor name starts at half width and grows to fit longer names within the available field space; the clear button moves with it and stays directly on its right. New projects start at vendor version v1; existing saved/imported versions remain unchanged. Upload: `js/app.js`, `js/model.js`, `css/app.css`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. 157 automated tests and static checks passed. Browser testing was not run, as requested. Lampy Paperwork untouched; no upload or deployment.
+
 - v1.1.32 (local release for manual upload) — 2026-10-15: Vendor name opens an alphabetical list of all vendors, filters typed text and supports mouse/keyboard selection. Input uses 50% of its field width with a ❌ clear-search button on the right. Clearing search preserves the loaded project. Updated the app version and current README usage. Upload: `js/app.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. Automated and approved local browser checks passed; details in CHANGELOG.md. Lampy Paperwork untouched; no upload or deployment.
 
 - v1.1.31 (local release for manual upload) — 2026-10-15: removed the warning banner above the Stock / Pre-Made Looms table. Updated the app version and README current project version. Upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. Non-browser validation is recorded in CHANGELOG.md; browser testing was not run for this update. Lampy Paperwork untouched; no upload or deployment.

@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.33 — 2026-10-15
+
+Previous version: v1.1.32. Local release for manual upload; not deployed.
+
+- Let the Vendor input grow from its 50% starting width to fit its current text using a hidden text measure with matching font and padding. Update the measure for initial values, typing, clearing and restoration. Keep the clear button in the same flex row with an 8 px gap so it moves directly alongside the input as it expands or shrinks. Cap growth at the available space beside the button; exceptionally long names scroll within the input.
+- Start every newly created project at vendor version v1, including New vendor and empty projects created when no saved vendor file exists. Initialise the matching baseline to avoid a false version change. Preserve saved/imported project versions and existing cable-stock JSON schemas.
+- Update the app version and current README guidance. Updated/upload: `js/app.js`, `js/model.js`, `css/app.css`, `js/version.js`, `tests/core.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. User project JSON, backups and references preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 157 automated tests passed, including new default-version/baseline assertions, project/Excel preservation of v1 and existing versions, JSON/Excel round trips and vendor loading. All seven app modules passed syntax checks; all 10 JSON files parsed; local module imports and version consistency passed. Source checks confirmed the growing input and clear button share a flex row with reserved button space.
+- Browser testing was not run, as requested. Visual width, button movement and cross-browser layout remain unverified for this release. No temporary files or test downloads created. Existing Paperwork compatibility and day-to-day user acceptance remain pending.
+
 ## v1.1.32 — 2026-10-15
 
 Previous version: v1.1.31. Local release for manual upload; not deployed.

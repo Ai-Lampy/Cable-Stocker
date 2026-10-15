@@ -63,17 +63,18 @@ function confirmAction(title,message,onConfirm,label='Continue'){openDialog(titl
 function requireSafe(message,fn){if(dirty)confirmAction('Protect your draft',message,fn);else fn();}
 function chosenFilename(name){const path=refs.manifest.catalogues.find(v=>v.vendor===name)?.file;return path?path.split('/').at(-1):'';}
 function vendorSelector(){
-  const host=node('div',null,'vendor-field'),label=node('label','Vendor name'),controls=node('div',null,'vendor-controls'),box=node('div',null,'vendor-input-wrap'),input=node('input'),list=node('div',null,'vendor-options');
+  const host=node('div',null,'vendor-field'),label=node('label','Vendor name'),controls=node('div',null,'vendor-controls'),box=node('div',null,'vendor-input-wrap'),input=node('input'),measure=node('span',null,'vendor-input-measure'),list=node('div',null,'vendor-options');
   input.id='vendor-name-input';input.type='text';input.value=project.stock.vendor.name;input.dataset.draftValue=input.value;input.autocomplete='off';
+  measure.setAttribute('aria-hidden','true');const fit=()=>{measure.textContent=input.value+'\u00a0';};fit();
   label.htmlFor=input.id;input.setAttribute('role','combobox');input.setAttribute('aria-autocomplete','list');input.setAttribute('aria-controls','vendor-options');input.setAttribute('aria-expanded','false');
   list.id='vendor-options';list.setAttribute('role','listbox');list.setAttribute('aria-label','Available vendors');list.hidden=true;
   let active=-1,options=[];
   const close=()=>{list.hidden=true;input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');active=-1;};
-  const restore=()=>{input.value=project.stock.vendor.name;input.dataset.draftValue=input.value;};
+  const restore=()=>{input.value=project.stock.vendor.name;input.dataset.draftValue=input.value;fit();};
   const commit=name=>{close();restore();if(String(name).trim())selectVendorProject(name);};
   const highlight=()=>{options.forEach((option,i)=>option.setAttribute('aria-selected',String(i===active)));if(active>=0){input.setAttribute('aria-activedescendant',options[active].id);options[active].scrollIntoView({block:'nearest'});}else input.removeAttribute('aria-activedescendant');};
   const show=(query='')=>{
-    list.replaceChildren();options=[];active=-1;
+    fit();list.replaceChildren();options=[];active=-1;
     const names=[...new Set((refs.lighting_vendors?.vendors||[]).map(v=>v.name))].sort((a,b)=>a.localeCompare(b));
     for(const name of names.filter(name=>name.toLocaleLowerCase().includes(query.toLocaleLowerCase()))){
       const option=node('div',name,'vendor-option');option.id=`vendor-option-${options.length}`;option.setAttribute('role','option');option.setAttribute('aria-selected','false');
@@ -94,7 +95,7 @@ function vendorSelector(){
   const clear=btn('❌',()=>{input.value='';input.focus();show();},'vendor-clear');clear.setAttribute('aria-label','Clear vendor search');clear.title='Clear vendor search';clear.onmousedown=e=>e.preventDefault();
   input.onblur=e=>{if(e.relatedTarget===clear){close();return;}const value=input.value;close();restore();if(value.trim()&&value!==project.stock.vendor.name)selectVendorProject(value);};
   clear.onblur=e=>{if(e.relatedTarget!==input){close();restore();}};
-  box.append(input,list);controls.append(box,clear);host.append(label,controls);return host;
+  box.append(measure,input,list);controls.append(box,clear);host.append(label,controls);return host;
 }
 function renderVendor(){
   heading('Vendor setup','Choose a vendor, set its unit once, then build its cable categories.',[btn('Import JSON / Excel',()=>$('#file-input').click()),btn('New vendor',()=>requireSafe('Start a new vendor? Your current autosaved draft will be replaced. Download a project backup first if you need it.',()=>{change(()=>project=newProject());navigate('vendor');}))]);

@@ -80,7 +80,10 @@ export function restoreProject(value) {
   }
   return p;
 }
-export function newProject(name = '') { return projectFromStock({vendor: {name, lengthUnit: 'm'}, cables: {}}); }
+export function newProject(name = '') {
+  const project=projectFromStock({vendor: {name, lengthUnit: 'm'}, cables: {}});
+  project.vendorVersion='v1';project.baseline=snapshot(project);return project;
+}
 export function runtimeJSON(project) {
   const stock=clone(project.stock);
   if (project.looms.length || project.stockLooms) stock.looms=project.looms.map(stockLoomJSON);

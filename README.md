@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.32.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.33.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -60,7 +60,7 @@ For manual GitHub Pages upload, retain the complete folder structure and use thi
 
 Selecting a different vendor looks for its saved project and asks before replacing existing work. Use **New vendor** for an empty document. Imports, category deletion and row deletion have review/confirmation. Undo/redo covers vendor, cable, loom and reference edits for the current session (up to 100 operations).
 
-On the Vendor tab, select **Vendor name** to show all available vendors in alphabetical order. Type to filter, click a vendor, or use the arrow keys and Enter/Tab to choose one. You can also type a new name and press Enter or leave the field. The text box uses half its field width, with a **❌** button on its right to clear the search text and show all vendors. Clearing the search does not delete or replace your loaded project; leaving it blank or pressing Escape restores the current vendor name. Switching vendors keeps the existing project-replacement confirmation.
+On the Vendor tab, select **Vendor name** to show all available vendors in alphabetical order. Type to filter, click a vendor, or use the arrow keys and Enter/Tab to choose one. You can also type a new name and press Enter or leave the field. The text box starts at half its field width and grows to fit longer names as you type or select them, up to the available space beside the **❌** clear-search button. The clear button moves with the field, staying directly to its right as it grows or shrinks. Very long names scroll within the input when no more space is available. The clear button empties the search text and shows all vendors. Clearing the search does not delete or replace your loaded project; leaving it blank or pressing Escape restores the current vendor name. Switching vendors keeps the existing project-replacement confirmation.
 
 **Vendor name** does not show a yellow change highlight. It retains its normal focus outline, and vendor changes still appear in **Review & export**. **Length unit** shows a yellow highlight when it differs from the imported baseline. Table highlights follow the saving rules below.
 
@@ -76,7 +76,7 @@ Plain cable-stock JSON import previews compare against your current draft by mat
 
 Cable-stock JSON exports pre-made looms using `id`, `name`, available `lengths` and a `cables` array of `cableType` / `quantity` entries. Cable-only files remain unchanged when no looms are present. Generator vendor version, adaptor markers, loom descriptions, connector overrides and component-specific lengths remain in project/Excel backups. Imported custom fields stay preserved. Lampy Paperwork needs its planned update before it can use the stock-loom definitions; exporting them does not update Paperwork.
 
-Vendor versions such as `v2` and `v2.1` are independent of the app version. Major/minor buttons require confirmation. A category JSON preview/download is a labelled fragment, not a complete vendor file.
+New projects start at vendor version **v1**, including an empty project started when no saved vendor project exists. Saved and imported project versions remain unchanged. Vendor versions such as `v2` and `v2.1` are independent of the app version. Major/minor buttons require confirmation. A category JSON preview/download is a labelled fragment, not a complete vendor file.
 
 ## Tables
 
