@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.32 — 2026-10-15
+
+Previous version: v1.1.31. Local release for manual upload; not deployed.
+
+- Replace the Vendor-page native datalist with an accessible dropdown that opens with all available vendors in alphabetical order, even when a vendor is already selected. Filter as you type; support mouse selection, arrow keys, Enter/Tab, Escape and custom names.
+- Set the Vendor text input to 50% of its existing field width and add a ❌ clear-search button to its right. Clearing search shows every vendor without deleting or replacing the loaded project. Empty blur/Escape restores the current vendor name; project switching retains its existing confirmation and loading safeguards.
+- Preserve normal focus styling without yellow Vendor-name change highlighting. Keep error navigation targeting the input, and retain the shared vendor datalist for Settings tables.
+- Updated/upload: `js/app.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. User project JSON, references, backups and Lampy schemas preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 155 automated tests passed, including JSON/Excel round trips and vendor-project loading. All seven JavaScript modules passed syntax checks, local imports resolved and all 10 JSON files parsed. Approved local browser checks passed all 15 vendors appearing with an existing name, filtering, mouse loading of the saved Siyan project, keyboard Enter/Tab selection, switch cancellation, custom-name confirmation, clearing without changing the loaded project, Escape/blank restoration and absence of yellow highlighting. Measured input width 163.07 px within a 326.15 px field (50%). No browser console errors or warnings in checked flows.
+- Cleanup: temporary local browser tab closed and server stopped; no test downloads or temporary project files created. Screenshot evidence saved outside the project. Other browsers and live deployment were not tested. Existing Paperwork compatibility and day-to-day user acceptance remain pending.
+
 ## v1.1.31 — 2026-10-15
 
 Previous version: v1.1.30. Local release for manual upload; not deployed.

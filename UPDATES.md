@@ -7,6 +7,8 @@
 
 ## Completed
 
+- v1.1.32 (local release for manual upload) — 2026-10-15: Vendor name opens an alphabetical list of all vendors, filters typed text and supports mouse/keyboard selection. Input uses 50% of its field width with a ❌ clear-search button on the right. Clearing search preserves the loaded project. Updated the app version and current README usage. Upload: `js/app.js`, `css/app.css`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. Automated and approved local browser checks passed; details in CHANGELOG.md. Lampy Paperwork untouched; no upload or deployment.
+
 - v1.1.31 (local release for manual upload) — 2026-10-15: removed the warning banner above the Stock / Pre-Made Looms table. Updated the app version and README current project version. Upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. Non-browser validation is recorded in CHANGELOG.md; browser testing was not run for this update. Lampy Paperwork untouched; no upload or deployment.
 
 - Status correction and cleanup — 2026-10-15: corrected v1.1.29 to record that it was observed live before v1.1.30 replaced it. Removed the regenerated root `.DS_Store`. Updated/upload `UPDATES.md` and `CHANGELOG.md` only; app remains v1.1.30. Project JSON, backups and all app files preserved. No upload or deployment.

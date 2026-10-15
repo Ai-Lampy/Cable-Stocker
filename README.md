@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.31.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.32.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -60,7 +60,9 @@ For manual GitHub Pages upload, retain the complete folder structure and use thi
 
 Selecting a different vendor looks for its saved project and asks before replacing existing work. Use **New vendor** for an empty document. Imports, category deletion and row deletion have review/confirmation. Undo/redo covers vendor, cable, loom and reference edits for the current session (up to 100 operations).
 
-On the Vendor tab, **Vendor name** does not show a yellow change highlight. It retains its normal focus outline, and vendor changes still appear in **Review & export**. **Length unit** shows a yellow highlight when it differs from the imported baseline. Table highlights follow the saving rules below.
+On the Vendor tab, select **Vendor name** to show all available vendors in alphabetical order. Type to filter, click a vendor, or use the arrow keys and Enter/Tab to choose one. You can also type a new name and press Enter or leave the field. The text box uses half its field width, with a **❌** button on its right to clear the search text and show all vendors. Clearing the search does not delete or replace your loaded project; leaving it blank or pressing Escape restores the current vendor name. Switching vendors keeps the existing project-replacement confirmation.
+
+**Vendor name** does not show a yellow change highlight. It retains its normal focus outline, and vendor changes still appear in **Review & export**. **Length unit** shows a yellow highlight when it differs from the imported baseline. Table highlights follow the saving rules below.
 
 Plain cable-stock JSON import previews compare against your current draft by matching identical rows first, then matching a single remaining row with the same name in the same category. An unchanged file reports zero changes. Renames and ambiguous duplicate-name edits appear as additions/removals because stock JSON has no persistent row IDs. Project backups retain their existing ID-based comparison. Cancelling leaves your draft untouched; accepting a stock JSON import establishes a fresh baseline.
 
