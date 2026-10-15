@@ -1,15 +1,26 @@
 # Changelog
 
+## v1.1.29 — 2026-10-15
+
+Previous version: v1.1.28. Local release for manual upload; not uploaded or deployed.
+
+- Remove the helper sentence below the Vendor name field. Retain the field label, searchable vendor selector and existing saved-project loading behaviour. The corrected loom guidance remains in Your workspace.
+- Increase `js/version.js` and the README current project version. Record successful live v1.1.28 verification below.
+- Updated/upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted files: none. User projects, backups and original inputs preserved. Lampy Paperwork was not accessed or changed.
+- Approved local browser checks confirmed the Vendor name helper is absent, its input remains visible, corrected loom guidance is retained and the footer displays v1.1.29. No test data entered or files downloaded; test tabs closed and the local test server stopped. Screenshot evidence retained outside the project folder.
+- Validation: all 155 existing non-browser tests passed, including JSON/Excel round trips and vendor-project loading. All seven app modules passed syntax checks, local imports resolved and all 10 JSON files parsed. Version consistency and removal of the helper sentence passed. File hashes confirmed only the five listed files changed; no temporary project artifacts remained.
+- Limits: v1.1.29 has not been uploaded or verified live. Other browsers were not tested. Lampy Paperwork compatibility and day-to-day acceptance remain pending. No upload or deployment performed by the agent.
+
 ## v1.1.28 — 2026-10-15
 
-Previous version: v1.1.27. Local release for manual upload; not uploaded or deployed.
+Previous version: v1.1.27. Live at https://ailampy.com/cable/ after the user uploaded the release; verified 2026-10-15.
 
 - Correct the Vendor-page help text: cable-stock JSON includes loom names, IDs, available lengths and cable quantities. Explain that Lampy Paperwork needs its separate planned update to use them.
 - Clarify that project JSON/Excel also retain the vendor version, loom descriptions, connector overrides and component lengths. No import/export or data behaviour changed.
 - Increase the app version in `js/version.js` and update the README current project version. Mark the wording correction complete in UPDATES.md.
 - Updated/upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Added/deleted files: none. User projects, backups and original inputs preserved. Lampy Paperwork was not accessed or changed.
 - Validation: all 155 existing non-browser tests passed, including JSON/Excel round trips and loom import/export. All seven app modules passed syntax checks and local imports resolved; all 10 JSON files parsed. Verified corrected help text, version consistency and that only the five listed files changed. No temporary project artifacts created.
-- Browser testing not run: no fresh approval for this update. Live v1.1.28 not verified; no upload or deployment performed. Lampy Paperwork compatibility and day-to-day acceptance remain pending.
+- Browser testing was not run during implementation. Subsequent approved live browser inspection on 2026-10-15 confirmed the v1.1.28 footer and corrected Vendor-page help text covering loom JSON fields, the pending Paperwork update and richer project/Excel backups. The address stayed at ailampy.com/cable/. No draft edits or downloads; test tab closed. Lampy Paperwork was not accessed or changed. No upload or deployment performed by the agent. Lampy Paperwork compatibility and day-to-day acceptance remain pending.
 
 ## v1.1.27 — 2026-10-15
 
