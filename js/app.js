@@ -1,7 +1,7 @@
 import {vendorProjectFilename,loadVendorProject} from './vendor-projects.js';
 import {watchUpdates, safeRefresh, freshDocumentURL} from './updates.js';
 import {APP_VERSION} from './version.js';
-import {isLoomCategory,referenceLoom,replaceLoomReferences,LENGTH_DISPLAYS,lengthUnitLabel,formatLength,loomRows,loomOrder,prepareLoomDraft,clone,same,uid,cableTypeSheets,cableTypeRows,connectorTypeSheets,connectorTypeRows,connectorTypeCategories,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,stockLoomJSON,parseLengths,combineLengths,referenceMatch,defaultCable,inheritCableConnectors,fillCableConnectors,connectorReviews,approveConnector,cableNeedsConnectorInputs,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,colourSuggestions,resolveColour,validateLengthColours,changes,validate,normaliseVendorVersion,incrementVersion,mergeProjects,relativePath} from './model.js';
+import {removeProjectCategory,isLoomCategory,referenceLoom,replaceLoomReferences,LENGTH_DISPLAYS,lengthUnitLabel,formatLength,loomRows,loomOrder,prepareLoomDraft,clone,same,uid,cableTypeSheets,cableTypeRows,connectorTypeSheets,connectorTypeRows,connectorTypeCategories,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,stockLoomJSON,parseLengths,combineLengths,referenceMatch,defaultCable,inheritCableConnectors,fillCableConnectors,connectorReviews,approveConnector,cableNeedsConnectorInputs,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,colourSuggestions,resolveColour,validateLengthColours,changes,validate,normaliseVendorVersion,incrementVersion,mergeProjects,relativePath} from './model.js';
 import {Grid,display,sortedLengths} from './grid.js';
 import {toWorkbook,fromWorkbook,replaceWorkbook} from './excel.js';
 
@@ -44,7 +44,12 @@ function renderShell(){
   $('#vendor-summary').textContent=`${count} cable types · ${project.looms.length} looms · ${lengthUnitLabel(project)||'unit unset'}${project.vendorVersion?` · Vendor ${project.vendorVersion}`:''}`;
   const logo=$('#vendor-logo');logo.replaceChildren();const record=refs.lighting_vendors?.vendors.find(v=>v.name===project.stock.vendor.name);
   if(record?.logo&&relativePath(record.logo)&&record.logo.startsWith('images/vendor/')){const img=node('img');img.src=record.logo;img.alt=name;img.onerror=()=>{logo.textContent=name.split(/\s+/).map(w=>w[0]).slice(0,3).join('');};logo.append(img);}else logo.textContent=name==='Choose your vendor'?'L':name.split(/\s+/).map(w=>w[0]).slice(0,3).join('');
-  const nav=$('#category-nav');nav.replaceChildren();const tab=(label,dest)=>{const b=btn(label,()=>navigate(dest),page===dest?'active':'');b.setAttribute('aria-current',page===dest?'page':'false');nav.append(b);};tab('Vendor','vendor');
+  const nav=$('#category-nav');nav.replaceChildren();const tab=(label,dest)=>{
+    const b=btn(label,()=>navigate(dest),page===dest?'active':'');b.setAttribute('aria-current',page===dest?'page':'false');
+    if(dest==='vendor'){nav.append(b);return;}
+    const group=node('div',null,`project-category-tab${page===dest?' active':''}`),remove=btn('×',()=>deleteCategory(label,dest),'delete-category');
+    remove.setAttribute('aria-label',`Delete ${label} category from project`);remove.title=`Delete ${label} from this project`;group.append(b,remove);nav.append(group);
+  };tab('Vendor','vendor');
   for(const cat of Object.keys(project.stock.cables))tab(cat,`category:${cat}`);
   if(project.looms.length||project.loomTab)tab(LOOMS,'looms');
   const add=btn('+',addCategory,'add-category');add.setAttribute('aria-label','Add or search category');nav.append(add);
@@ -201,6 +206,17 @@ function metadataForm(scope,title){
   draw();return host;
 }
 function bumpVersion(major){try{const next=incrementVersion(project.vendorVersion,major);confirmAction('Increment vendor version',`${project.vendorVersion||'(unset)'} → ${next}. This updates your generator backup version only.`,()=>change(()=>project.vendorVersion=next),'Increment');}catch(e){notice(e.message,true);}}
+function deleteCategory(category,dest=`category:${category}`){
+  if(grid?.editing&&!grid.commitEditor())return;
+  if(saveBlocked){notice(saveError||'Saving is paused. Download a backup before changing this project.',true);return;}
+  const workspace=project,looms=dest==='looms';
+  const count=looms?project.looms.length:(project.stock.cables[category]?.length||0);
+  confirmAction('Delete project category',`Delete ${category} from this project, including ${count} ${looms?'looms and their components':'cable rows'}? Settings references stay available. You can undo this.`,()=>{
+    if(project!==workspace||saveBlocked){notice('The workspace changed. Select the category again before deleting it.',true);return;}
+    change(()=>{removeProjectCategory(project,category,{looms});if(page===dest)page='vendor';});
+    notice('Category deleted. Press Ctrl/⌘+Z outside a text field to undo.');
+  },'Delete category');
+}
 function addCategory(){let input;openDialog('Add a cable category',body=>{
   body.append(node('p','Choose a category to start with its associated cable types, or type a new name. Lengths start empty.'));
   const label=node('label','Choose a category'),select=node('select');select.setAttribute('aria-label','Choose a category');
@@ -218,7 +234,7 @@ function adaptorAfterPaste(current,i,patches){const patch=patches?.find(p=>p.id=
 const cableColumns=[{key:'name',label:'Cable type / name',list:'cables-list',width:220},{key:'adaptor',label:'Adaptor',type:'boolean',width:105},{key:'direction',label:'Adaptor direction',list:'directions-list',width:165},{key:'start',label:'Start / male',list:'connectors-list',width:185},{key:'end',label:'End / female',list:'connectors-list',width:185},{key:'lengths',label:'Available lengths',type:'lengths',width:380},{key:'connectors',label:'Connectors JSON',type:'json',width:250},{key:'custom',label:'Custom fields JSON',type:'json',width:240}];
 function renderCategory(category){
   const repaired=clone(project.stock.cables[category]);let inherited=false;for(const row of repaired)inherited=inheritCableConnectors(row,refs.cable_types.items)||inherited;if(inherited)change(()=>project.stock.cables[category]=repaired,{renderPage:false});
-  heading(category,`${project.stock.cables[category].length} cable types · lengths in ${lengthUnitLabel(project)} · yellow marks edits since import or this table’s last Save`,[btn('JSON preview',()=>preview(category)),btn('Category Excel',()=>reviewExport('excel',category)),btn('Remove category',()=>confirmAction('Remove category',`Remove ${category} and all its cable rows? You can undo this.`,()=>{change(()=>{delete project.stock.cables[category];delete project.rowIds[category];});navigate('vendor');},'Remove'),'danger')]);
+  heading(category,`${project.stock.cables[category].length} cable types · lengths in ${lengthUnitLabel(project)} · yellow marks edits since import or this table’s last Save`,[btn('JSON preview',()=>preview(category)),btn('Category Excel',()=>reviewExport('excel',category)),btn('Remove category',()=>deleteCategory(category),'danger')]);
   const host=node('div',null,'grid-panel');$('#main').append(host);
   grid=new Grid(host,{current:()=>grid,key:`cables:${category}`,highlightContext:JSON.stringify([project.stock.vendor,project.baseline]),rowKey:(_,i)=>project.rowIds[category][i],label:`${category} cable stock`,highlightColumns:cableColumns,columns:visibleTableColumns(cableColumns,project.stock.cables[category].some((_,i)=>isCableAdaptor(project,category,i))).map(col=>col.key==='name'?{...col,render:(value,cell,editor)=>{cell.append(node('span',value,'cell-text'));const row=project.stock.cables[category][editor.rowId];if(row&&cableNeedsConnectorInputs(row,refs.cable_types.items)){const button=btn('Connectors',e=>{e.stopPropagation();if(grid?.editing&&!grid.commitEditor())return;editCableConnectors(category,editor.rowId);},'cell-action');button.setAttribute('aria-label',`Edit connectors for ${row.name||'unnamed cable'}`);cell.append(button);}}}:col),rows:()=>project.stock.cables[category],get:(r,k)=>k==='adaptor'?isCableAdaptor(project,category,project.stock.cables[category].indexOf(r)):['direction','start','end'].includes(k)&&!isCableAdaptor(project,category,project.stock.cables[category].indexOf(r))?'':getCell(r,k),readOnly:(i,k,patches)=>['direction','start','end'].includes(k)&&!adaptorAfterPaste(isCableAdaptor(project,category,i),i,patches),
     changed:(i,k)=>{const old=baselineRow(project,category,i);return !!old&&(k==='adaptor'?!!project.baseline.adaptors?.[project.rowIds[category][i]]!==isCableAdaptor(project,category,i):!same(getCell(old,k),getCell(project.stock.cables[category][i],k)));},added:i=>!baselineRow(project,category,i),

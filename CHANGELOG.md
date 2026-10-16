@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.39 — 2026-10-16
+
+Previous version: v1.1.38. Local release for manual upload; not deployed.
+
+- Add a separate, keyboard-accessible × delete button to every project category tab, including Stock / Pre-Made Looms. Keep Vendor fixed. Confirm before deleting category contents; return to Vendor only when the deleted tab was active.
+- Share deletion handling with the existing Remove category action. Remove cable row IDs and associated adaptor markers along with the category; preserve the imported baseline for export review and session undo/redo. Loom deletion clears its contents and hides its tab without altering cable categories. Settings references stay intact.
+- Protect invalid active edits, blocked saving and workspace replacement while confirmation is open. Update current README usage and app version.
+- Updated/upload: `js/app.js`, `js/model.js`, `css/app.css`, `js/version.js`, `tests/core.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. No new/deleted project files. User project JSON, backups and original inputs preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 168 automated tests passed. Checks cover confirmation before mutation, inactive/active page behaviour, undo/redo, reference isolation, adaptor cleanup, baseline preservation, invalid-edit/save guards and JSON/project/Excel round trips after cable/loom deletion. All seven app modules passed syntax checks; JSON parsing, local module paths and version consistency passed.
+- Browser testing was not run, as requested. Visual layout and browser interaction remain unverified for this release. No test downloads or temporary project files created; temporary verification data outside the project removed. Existing Paperwork compatibility and user acceptance remain pending.
+
 ## v1.1.38 — 2026-10-16
 
 Previous version: v1.1.37. Local release for manual upload; not deployed.

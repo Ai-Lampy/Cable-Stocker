@@ -7,6 +7,8 @@
 
 ## Completed
 
+- v1.1.39 (local release for manual upload) — 2026-10-16: added confirmed deletion buttons to project category tabs, including Looms, with session undo/redo and Settings references preserved. Upload: `js/app.js`, `js/model.js`, `css/app.css`, `js/version.js`, `tests/core.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. No new/deleted project files. 168 automated tests and non-browser checks passed. Browser testing not run, as requested. Project JSON/backups preserved; Lampy Paperwork untouched; no upload or deployment.
+
 - v1.1.38 (local release for manual upload) — 2026-10-16: applied the shared loom side pane, expanded component rows, available lengths and table saving to Settings → Cable Types → Stock / Pre-Made Looms. Reference data stays in cable_types.json and separate from vendor stock. Upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. No new/deleted project files. 164 automated tests and approved local browser checks passed; details in CHANGELOG.md. Test download removed; project JSON/backups preserved. Lampy Paperwork untouched; no upload or deployment.
 
 - v1.1.37 (local release for manual upload) — 2026-10-15: removed helper text below Length unit and Length display. Upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New files: none. Deleted regenerated root `.DS_Store`; project JSON and backups preserved. 161 automated tests and non-browser checks passed; browser testing not run for this update. Lampy Paperwork untouched; no upload or deployment.

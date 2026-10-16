@@ -300,3 +300,22 @@ test('full workbook replacement and merge use incoming display choices; partial 
 test('unsupported length display choices are rejected before restoring a project',()=>{
  for(const value of [null,[],{m:'Feet'},{ft:'Meter'},{yards:'yd'}]){const p=fresh();p.lengthDisplay=value;assert.throws(()=>M.restoreProject(p),/Invalid length display/);}
 });
+
+test('category deletion removes only its rows, keys and adaptor markers and preserves review baseline',()=>{
+ const p=fresh();M.setCableAdaptor(p,'Data',0,true);M.setCableAdaptor(p,'Multi',0,true);p.baseline=M.snapshot(p);
+ const before=M.clone(p),dataId=p.rowIds.Data[0],multiId=p.rowIds.Multi[0];
+ M.removeProjectCategory(p,'Data');
+ assert.equal(Object.hasOwn(p.stock.cables,'Data'),false);assert.equal(Object.hasOwn(p.rowIds,'Data'),false);assert.equal(p.adaptors[dataId],undefined);assert.equal(p.adaptors[multiId],true);
+ assert.deepEqual(p.stock.cables.Multi,before.stock.cables.Multi);assert.deepEqual(p.baseline,before.baseline);
+ assert(M.changes(p).some(c=>c.category==='Data'&&c.name==='Category'&&c.kind==='removed'));
+ assert.deepEqual(M.restoreProject(M.parseJSON(JSON.stringify(p))),p);
+ assert.deepEqual(M.runtimeJSON(roundtrip(p).project),M.runtimeJSON(p));
+ const after=M.clone(p);M.removeProjectCategory(p,'Missing');assert.deepEqual(p,after);
+});
+test('deleting the project loom tab clears only its looms and preserves explicit empty stock exports',()=>{
+ const p=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[]},looms:[{id:'l',name:'Test loom',lengths:[10],cables:[{cableType:'XLR-5',quantity:2}]}]});p.loomTab=true;
+ const before=M.clone(p);M.removeProjectCategory(p,'Stock / Pre-Made Looms',{looms:true});
+ assert.deepEqual(p.looms,[]);assert.equal(p.loomTab,false);assert.deepEqual(p.stock,before.stock);assert.deepEqual(p.baseline,before.baseline);
+ assert.deepEqual(M.runtimeJSON(p).looms,[]);assert(M.changes(p).some(c=>c.kind==='removed'&&c.name==='Test loom'));
+ assert.deepEqual(M.runtimeJSON(roundtrip(p).project),M.runtimeJSON(p));assert.deepEqual(M.restoreProject(M.clone(p)),p);
+});

@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.38.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.39.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -61,6 +61,8 @@ For manual GitHub Pages upload, retain the complete folder structure and use thi
 Selecting a different vendor looks for its saved project and asks before replacing existing work. Use **New vendor** for an empty document. Imports, category deletion and row deletion have review/confirmation. Undo/redo covers vendor, cable, loom and reference edits for the current session (up to 100 operations).
 
 On the Vendor tab, select **Vendor name** to show all available vendors in alphabetical order. Type to filter, click a vendor, or use the arrow keys and Enter/Tab to choose one. You can also type a new name and press Enter or leave the field. The text box starts at half its field width and grows to fit longer names as you type or select them, up to the available space beside the **❌** clear-search button. The clear button moves with the field, staying directly to its right as it grows or shrinks. Very long names scroll within the input when no more space is available. The clear button empties the search text and shows all vendors. Clearing the search does not delete or replace your loaded project; leaving it blank or pressing Escape restores the current vendor name. Switching vendors keeps the existing project-replacement confirmation.
+
+Each project category tab has a **×** button to delete that category and its contents from the current project. The Looms tab deletes its saved looms and components. Confirm **Delete category** to proceed, or Cancel to keep everything. Deleting the active category returns you to Vendor; deleting another tab keeps your current view. Settings references and other categories remain available. To undo, press **Ctrl/⌘+Z** outside an input, or use a table's Undo button. Undo history lasts for the current session. The Vendor tab cannot be deleted.
 
 **Vendor name** does not show a yellow change highlight. It retains its normal focus outline, and vendor changes still appear in **Review & export**. **Length unit** shows a yellow highlight when it differs from the imported baseline. Table highlights follow the saving rules below.
 

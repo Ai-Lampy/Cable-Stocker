@@ -97,6 +97,13 @@ export function newProject(name = '') {
   const project=projectFromStock({vendor: {name, lengthUnit: 'm'}, cables: {}});
   project.vendorVersion='v1';project.baseline=snapshot(project);return project;
 }
+// Delete only the current project data; preserve the imported baseline for review/undo.
+export function removeProjectCategory(project,category,{looms=false}={}) {
+  if(looms){project.looms=[];project.loomTab=false;return;}
+  if(!Object.hasOwn(project.stock.cables,category))return;
+  for(const id of project.rowIds[category]||[])if(project.adaptors)delete project.adaptors[id];
+  delete project.stock.cables[category];delete project.rowIds[category];
+}
 export function runtimeJSON(project) {
   const stock=clone(project.stock);
   if (project.looms.length || project.stockLooms) stock.looms=project.looms.map(stockLoomJSON);

@@ -150,3 +150,26 @@ test('reference validation checks loom quantities and lengths without requiring 
  row.components[0].count=2;row.lengths=[-1];assert.match(M.validateReferences(refs)[0].message,/positive/);
  row.lengths=[];row.lengthUnit='bad';assert.match(M.validateReferences(refs)[0].message,/metres or feet/);
 });
+
+test('category deletion confirms first, preserves references and inactive page, and supports undo/redo',()=>{
+ const ctx=controller();vm.runInContext(`
+ save=()=>{};renderShell=()=>{};render=()=>{};notice=()=>{};
+ refs={cable_types:{items:[]},manifest:{catalogues:[]},lighting_vendors:{vendors:[]}};referenceExports=clone(refs);
+ project=projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[defaultCable(null,'Test')],Multi:[]}});page='category:Multi';
+ const original=JSON.stringify(project),originalRefs=JSON.stringify(refs);
+ let confirmDelete;confirmAction=(title,message,fn)=>{confirmDelete=fn;};
+ deleteCategory('Data');
+ `,ctx);
+ assert.equal(vm.runInContext('JSON.stringify(project)===original',ctx),true);
+ vm.runInContext('confirmDelete();',ctx);
+ assert.equal(vm.runInContext("Object.hasOwn(project.stock.cables,'Data')",ctx),false);assert.equal(vm.runInContext('page',ctx),'category:Multi');assert.equal(vm.runInContext('JSON.stringify(refs)===originalRefs',ctx),true);
+ vm.runInContext('undo();',ctx);assert.equal(vm.runInContext('JSON.stringify(project)===original',ctx),true);
+ vm.runInContext('redo();',ctx);assert.equal(vm.runInContext("Object.hasOwn(project.stock.cables,'Data')",ctx),false);
+ vm.runInContext("deleteCategory('Multi');confirmDelete();",ctx);assert.equal(vm.runInContext('page',ctx),'vendor');
+});
+test('category deletion protects invalid pending edits, blocked saves and changed workspaces',()=>{
+ const ctx=controller();vm.runInContext(`notice=()=>{};let confirms=0,confirmDelete;confirmAction=(title,message,fn)=>{confirms++;confirmDelete=fn;};grid={editing:true,commitEditor:()=>false};deleteCategory('Data');`,ctx);
+ assert.equal(vm.runInContext('confirms',ctx),0);
+ vm.runInContext("grid=null;saveBlocked=true;deleteCategory('Data');",ctx);assert.equal(vm.runInContext('confirms',ctx),0);
+ vm.runInContext("saveBlocked=false;deleteCategory('Data');project=newProject('Replacement');const replacement=JSON.stringify(project);confirmDelete();",ctx);assert.equal(vm.runInContext('JSON.stringify(project)===replacement',ctx),true);
+});

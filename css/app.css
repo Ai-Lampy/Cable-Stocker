@@ -62,3 +62,11 @@
 .vendor-field{min-width:0}.vendor-field>label{margin-bottom:7px}.vendor-controls{display:flex;gap:8px;align-items:center}.vendor-input-wrap{position:relative;flex:0 1 auto;width:max-content;min-width:50%;max-width:calc(100% - 40px)}.vendor-input-measure{display:block;visibility:hidden;white-space:pre;overflow:hidden;font:inherit;padding:9px 11px;border:1px solid transparent}.vendor-input-wrap>input{position:absolute;inset:0;width:100%;height:100%;min-width:0}.vendor-clear{flex:0 0 32px;width:32px;padding:7px;line-height:1;background:transparent;border:0}.vendor-options{position:absolute;top:calc(100% + 4px);left:0;z-index:20;width:max(100%,220px);max-width:calc(100vw - 80px);max-height:250px;overflow-y:auto;background:white;border:1px solid var(--line);border-radius:5px;padding:4px;box-shadow:0 4px 14px #0003}.vendor-options[hidden]{display:none}.vendor-option{padding:8px 10px;cursor:pointer;overflow-wrap:anywhere}.vendor-option:hover,.vendor-option[aria-selected=true]{background:#e5eedb}.vendor-options p{margin:0;padding:8px;font-size:12px}
 
 .unit-fields{display:grid;grid-template-columns:40% 40%;gap:16px;align-items:start}.unit-fields>label{min-width:0}.unit-fields select{width:100%;min-width:0}
+
+/* Project category labels and their separate, keyboard-accessible delete buttons. */
+.tabs .project-category-tab{display:flex;flex:none;align-items:stretch;border-right:1px solid var(--line)}
+.tabs .project-category-tab.active{background:white;box-shadow:inset 0 -3px #658963}
+.tabs .project-category-tab>button{border-right:0}
+.tabs .project-category-tab>button.active{background:transparent;box-shadow:none}
+.tabs .project-category-tab .delete-category{padding:12px 10px;min-width:36px;font-size:19px;line-height:1;color:#7d4a43}
+.tabs .project-category-tab .delete-category:hover{background:#fff0ec;color:#a12922}
