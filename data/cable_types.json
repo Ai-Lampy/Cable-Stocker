@@ -125,7 +125,8 @@
       "connectors": {
         "male": "CEE 32A 3ø",
         "female": "CEE 32A 3ø"
-      }
+      },
+      "adaptor": false
     },
     {
       "id": "cable-12",
@@ -182,7 +183,8 @@
       "connectors": {
         "male": "Socapex 7-Pin",
         "female": "Socapex 7-Pin"
-      }
+      },
+      "adaptor": false
     },
     {
       "id": "cable-17",
@@ -194,6 +196,39 @@
         "male": "Tajimi",
         "female": "Tajimi"
       }
+    },
+    {
+      "lengths": [
+        304
+      ],
+      "components": [
+        {
+          "id": "2945bfb1-2f8a-4670-9472-aa4fb77f0b48",
+          "type": "Whirlwind 12-Pair",
+          "count": 1,
+          "connectors": {
+            "male": "WW 12-Pin",
+            "female": "WW 12-Pin"
+          },
+          "lengths": []
+        },
+        {
+          "id": "9ef3a517-7585-48fe-9d36-bd261a4a38be",
+          "type": "32A 3ø",
+          "count": 1,
+          "connectors": {
+            "male": "CEE 32A 3ø",
+            "female": "CEE 32A 3ø"
+          },
+          "lengths": []
+        }
+      ],
+      "description": "",
+      "lengthUnit": "ft",
+      "id": "d27f0e85-3f5a-48c2-8f64-c795159e4204",
+      "name": "Snake W-1 CEE 32A 3Ph 304'",
+      "category": "Stock / Pre-Made Looms",
+      "aliases": []
     }
   ]
 }
