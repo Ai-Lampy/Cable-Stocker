@@ -194,8 +194,26 @@ export function syncVendorManifest(refs) {
 }
 export function categoryCables(name, refs) {
   const category=referenceMatch(refs.categories.items,name);
-  if(!category)return [];
-  return refs.cable_types.items.filter(c=>referenceMatch(refs.categories.items,c.category)?.id===category.id).map(c=>({row:defaultCable(c),adaptor:c.adaptor===true}));
+  return refs.cable_types.items.filter(c=>c.category===name||(category&&referenceMatch(refs.categories.items,c.category)?.id===category.id)).map(c=>({row:defaultCable(c),adaptor:c.adaptor===true}));
+}
+// Prepare independent stock copies. Adding a category never overwrites existing vendor looms.
+export function referenceLoomsForProject(project,refs){
+  const looms=[],mismatches=[],unit=project.stock.vendor.lengthUnit;
+  const nameKey=value=>String(value||'').trim().toLocaleLowerCase();
+  for(const row of refs.cable_types.items.filter(r=>isLoomCategory(r.category,refs))){
+    const terms=[row.name,...(row.aliases||[])].map(nameKey);
+    if([...project.looms,...looms].some(l=>(row.id&&l.referenceId===row.id)||terms.includes(nameKey(l.name))))continue;
+    const {id,category,aliases,lengthUnit,direction,connectors,adaptor,...source}=clone(referenceLoom(row));
+    const loom={...source,id:uid(),...(id?{referenceId:id}:{}),components:source.components.map(c=>({...c,id:uid()}))};
+    if(lengthUnit!==unit&&(loom.lengths.length||loom.components.some(c=>c.lengths?.length)))mismatches.push({id:loom.id,name:loom.name,unit:lengthUnit});
+    looms.push(loom);
+  }
+  return {looms,mismatches};
+}
+export function addReferenceLooms(project,plan,{keepMismatchedLengths=false}={}){
+  const copies=clone(plan.looms),mismatches=new Set(plan.mismatches.map(m=>m.id));
+  for(const loom of copies)if(mismatches.has(loom.id)&&!keepMismatchedLengths){loom.lengths=[];for(const c of loom.components)c.lengths=[];}
+  project.looms.push(...copies);project.loomTab=true;
 }
 export function isCableAdaptor(project, category, index) {
   return project.adaptors?.[project.rowIds[category]?.[index]]===true;
@@ -431,6 +449,32 @@ export function mergeProjects(current, incoming, partial = false) {
     if (i < 0) result.looms.push(clone(loom)); else result.looms[i] = clone(loom);
   }
   return result;
+}
+
+// Reconcile published additions/updates without overwriting local reference edits or deletions.
+const publishedMatch=(rows,row)=>rows.find(r=>row.id&&r.id===row.id)||referenceMatch(rows,String(row.name||''));
+export function mergePublishedReference(local,published,previous){
+  if(!local)return clone(published);
+  const prior=previous?.items||[],remote=published.items||[],result=clone(local);
+  result.items=(local.items||[]).map(row=>{const old=publishedMatch(prior,row),next=publishedMatch(remote,row);return clone(old&&next&&same(row,old)?next:row);});
+  for(const row of remote)if(!publishedMatch(result.items,row)&&!publishedMatch(prior,row))result.items.push(clone(row));
+  return result;
+}
+export function newPublishedCableTypes(published,previous){return (published?.items||[]).filter(row=>!publishedMatch(previous?.items||[],row));}
+export function syncNewReferenceStock(project,refs,newTypes){
+  let cables=0;const eligible=newTypes.map(row=>publishedMatch(refs.cable_types.items,row)).filter(Boolean);
+  for(const [category,rows]of Object.entries(project.stock.cables)){
+    const categoryRef=referenceMatch(refs.categories.items,category);
+    for(const type of eligible){
+      if(isLoomCategory(type.category,refs))continue;
+      const matches=type.category===category||(categoryRef&&referenceMatch(refs.categories.items,type.category)?.id===categoryRef.id);
+      if(!matches||rows.some(row=>referenceMatch([type],row.name)))continue;
+      rows.push(defaultCable(type));project.rowIds[category].push(uid());setCableAdaptor(project,category,rows.length-1,type.adaptor===true);cables++;
+    }
+  }
+  const plan=project.loomTab||project.looms.length?referenceLoomsForProject(project,{...refs,cable_types:{items:eligible}}):{looms:[],mismatches:[]};
+  if(plan.looms.length)addReferenceLooms(project,plan);
+  return {cables,looms:plan.looms.length,mismatches:plan.mismatches};
 }
 
 // Category sheets preserve original reference objects and category wording.

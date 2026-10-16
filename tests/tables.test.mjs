@@ -173,3 +173,37 @@ test('category deletion protects invalid pending edits, blocked saves and change
  vm.runInContext("grid=null;saveBlocked=true;deleteCategory('Data');",ctx);assert.equal(vm.runInContext('confirms',ctx),0);
  vm.runInContext("saveBlocked=false;deleteCategory('Data');project=newProject('Replacement');const replacement=JSON.stringify(project);confirmDelete();",ctx);assert.equal(vm.runInContext('JSON.stringify(project)===replacement',ctx),true);
 });
+
+test('adding Looms uses reference entries; mismatched-unit cancellation keeps project untouched',()=>{
+ const ctx=controller();vm.runInContext(`
+ notice=()=>{};change=fn=>fn();navigate=next=>page=next;
+ refs={categories:{items:[]},cable_types:{items:[{id:'ref',name:'Loom',category:'Stock / Pre-Made Looms',lengthUnit:'ft',lengths:[304],components:[]}]}};
+ project=newProject('Test');const before=JSON.stringify(project);let actions;openDialog=(title,body,buttons)=>actions=buttons;
+ addLoomCategory();
+ `,ctx);
+ assert.equal(vm.runInContext('JSON.stringify(project)===before',ctx),true);
+ vm.runInContext('actions[0].run({close(){}});',ctx);assert.equal(vm.runInContext('JSON.stringify(project)===before',ctx),true);
+ vm.runInContext('actions[2].run({close(){}});',ctx);assert.equal(vm.runInContext('project.looms.length',ctx),1);assert.equal(vm.runInContext('project.looms[0].lengths.length',ctx),0);assert.equal(vm.runInContext('page',ctx),'looms');
+ vm.runInContext("project=newProject('Other');project.stock.vendor.lengthUnit='ft';addLoomCategory();",ctx);assert.equal(vm.runInContext('project.looms[0].lengths[0]',ctx),304);
+});
+
+test('startup refresh merges published cable files through saved references and does not re-add seen rows',async()=>{
+ const ctx=controller();vm.runInContext(`
+ const old={categories:{items:[{id:'data',name:'Data',aliases:[]}]},cable_types:{items:[{id:'old',name:'Old',category:'Data',direction:'male-female',connectors:{male:'A',female:'B'}}]},connector_types:{items:[]},lighting_vendors:{vendors:[]},manifest:{catalogues:[]},length_colours:{items:[]}};
+ const local=clone(old);local.cable_types.items[0].aliases=['My wording'];
+ const remote=clone(old);remote.cable_types.items.push({id:'new',name:'New',category:'Data',direction:'male-female',connectors:{male:'A',female:'B'}});
+ const draft=projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[{name:'Old',direction:'male-female',connectors:{male:'A',female:'B'},lengths:[20]}]}});
+ localStorage.setItem(KEYS.prefs,JSON.stringify({refs:local,referenceExports:old}));localStorage.setItem(KEYS.draft,JSON.stringify({project:draft,dirty:false}));
+ read=async path=>clone(path.endsWith('colour_options.json')?{}:remote[path.split('/').pop().replace('.json','')]);
+ const nodes=new Map();document.querySelector=selector=>{if(!nodes.has(selector))nodes.set(selector,{replaceChildren(){}});return nodes.get(selector);};document.querySelectorAll=()=>[];document.addEventListener=()=>{};
+ window={addEventListener(){}};watchUpdates=()=>{};renderAll=()=>{};status=()=>{};notice=()=>{};
+ `,ctx);
+ await vm.runInContext('start()',ctx);
+ assert.equal(vm.runInContext('loaded',ctx),true);assert.equal(vm.runInContext('project.stock.cables.Data.length',ctx),2);
+ assert.equal(vm.runInContext('refs.cable_types.items[0].aliases[0]',ctx),'My wording');
+ assert.equal(vm.runInContext('JSON.parse(localStorage.getItem(KEYS.prefs)).publishedReferences.cable_types.items.length',ctx),2);
+ assert.equal(vm.runInContext('project.stock.cables.Data[0].lengths[0]',ctx),20);
+ vm.runInContext('project.stock.cables.Data.pop();project.rowIds.Data.pop();save();',ctx);
+ await vm.runInContext('start()',ctx);
+ assert.equal(vm.runInContext('project.stock.cables.Data.length',ctx),1);
+});

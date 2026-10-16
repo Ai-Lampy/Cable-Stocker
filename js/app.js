@@ -1,7 +1,7 @@
 import {vendorProjectFilename,loadVendorProject} from './vendor-projects.js';
 import {watchUpdates, safeRefresh, freshDocumentURL} from './updates.js';
 import {APP_VERSION} from './version.js';
-import {removeProjectCategory,isLoomCategory,referenceLoom,replaceLoomReferences,LENGTH_DISPLAYS,lengthUnitLabel,formatLength,loomRows,loomOrder,prepareLoomDraft,clone,same,uid,cableTypeSheets,cableTypeRows,connectorTypeSheets,connectorTypeRows,connectorTypeCategories,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,stockLoomJSON,parseLengths,combineLengths,referenceMatch,defaultCable,inheritCableConnectors,fillCableConnectors,connectorReviews,approveConnector,cableNeedsConnectorInputs,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,colourSuggestions,resolveColour,validateLengthColours,changes,validate,normaliseVendorVersion,incrementVersion,mergeProjects,relativePath} from './model.js';
+import {mergePublishedReference,newPublishedCableTypes,syncNewReferenceStock,referenceLoomsForProject,addReferenceLooms,removeProjectCategory,isLoomCategory,referenceLoom,replaceLoomReferences,LENGTH_DISPLAYS,lengthUnitLabel,formatLength,loomRows,loomOrder,prepareLoomDraft,clone,same,uid,cableTypeSheets,cableTypeRows,connectorTypeSheets,connectorTypeRows,connectorTypeCategories,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,stockLoomJSON,parseLengths,combineLengths,referenceMatch,defaultCable,inheritCableConnectors,fillCableConnectors,connectorReviews,approveConnector,cableNeedsConnectorInputs,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,colourSuggestions,resolveColour,validateLengthColours,changes,validate,normaliseVendorVersion,incrementVersion,mergeProjects,relativePath} from './model.js';
 import {Grid,display,sortedLengths} from './grid.js';
 import {toWorkbook,fromWorkbook,replaceWorkbook} from './excel.js';
 
@@ -15,7 +15,7 @@ const field=(label,value,onchange,{type='text',list,help}={})=>{
 const KEYS={draft:'lampy-cable:draft:1',prefs:'lampy-cable:references:1'};
 const LOOMS='Stock / Pre-Made Looms';
 const REF_NAMES={categories:'Categories',cable_types:'Cable Types',connector_types:'Connectors',lighting_vendors:'Lighting Vendors',manifest:'Vendor Manifest',length_colours:'Length colour'};
-let colourPalette={},project=newProject(),refs={},referenceBaseline={},referenceExports={},dirty=false,refDirty=false,page='vendor',settingsTab='categories',cableTypesSheet=null,connectorTypesSheet=null,grid=null,history=[],future=[],copiedLengths=null,toastTimer,loaded=false,saveError='',saveBlocked=false,sessionIssues=[];
+let colourPalette={},project=newProject(),refs={},referenceBaseline={},referenceExports={},publishedReferences={},dirty=false,refDirty=false,page='vendor',settingsTab='categories',cableTypesSheet=null,connectorTypesSheet=null,grid=null,history=[],future=[],copiedLengths=null,toastTimer,loaded=false,saveError='',saveBlocked=false,sessionIssues=[];
 let lastSavedDraft='',lastSavedRefs='',updateReload=false,importPending=false,vendorLoadSequence=0;
 const issueTimes=new Map();let issueSequence=0;
 function notice(message,error=false){const t=$('#toast');t.textContent=message;t.className=`show${error?' error':''}`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='',error?11000:5000);}
@@ -32,7 +32,7 @@ function save(){try{
   const existing=localStorage.getItem(KEYS.draft);
   if((lastSavedDraft&&existing!==lastSavedDraft)||(lastSavedRefs&&localStorage.getItem(KEYS.prefs)!==lastSavedRefs)){saveBlocked=true;saveError='Another tab changed this workspace. Download your backups, then reload.';notice(saveError,true);status();return;}
   refDirty=!same(refs,referenceExports);
-  localStorage.setItem(KEYS.draft,JSON.stringify({project,dirty}));localStorage.setItem(KEYS.prefs,JSON.stringify({refs,refDirty,referenceExports}));lastSavedDraft=localStorage.getItem(KEYS.draft);lastSavedRefs=localStorage.getItem(KEYS.prefs);saveError='';
+  localStorage.setItem(KEYS.draft,JSON.stringify({project,dirty}));localStorage.setItem(KEYS.prefs,JSON.stringify({refs,refDirty,referenceExports,publishedReferences}));lastSavedDraft=localStorage.getItem(KEYS.draft);lastSavedRefs=localStorage.getItem(KEYS.prefs);saveError='';
 }catch(e){saveError='Autosave failed. Download a project backup now.';notice(saveError,true);}status();}
 function status(){$('#save-status').textContent=saveError||(!loaded?'Loading references…':dirty||refDirty?'Draft saved · unexported edits':'Draft saved locally');}
 function saveTable(){save();if(saveError||saveBlocked)notice(saveError||'Saving is paused. Download a backup.',true);else notice('Table saved locally. Download a backup to keep a separate copy.');return !saveError&&!saveBlocked;}
@@ -218,18 +218,33 @@ function deleteCategory(category,dest=`category:${category}`){
   },'Delete category');
 }
 function addCategory(){let input;openDialog('Add a cable category',body=>{
-  body.append(node('p','Choose a category to start with its associated cable types, or type a new name. Lengths start empty.'));
+  body.append(node('p','Choose a category to start with its associated cable types or pre-made looms, or type a new name. Cable lengths start empty; looms retain reference lengths when units match.'));
   const label=node('label','Choose a category'),select=node('select');select.setAttribute('aria-label','Choose a category');
   const empty=node('option','Type a new category or choose below');empty.value='';select.append(empty);
-  for(const ref of refs.categories.items)for(const name of new Set([ref.name,...(ref.aliases||[])])){const option=node('option',name);option.value=name;select.append(option);}
+  for(const name of new Set([...cableTypeSheets(refs),...refs.categories.items.flatMap(ref=>ref.aliases||[])].filter(Boolean))){const option=node('option',name);option.value=name;select.append(option);}
   label.append(select);body.append(label);
   const l=field('Category name','',()=>{},{list:'categories-list'});input=l.querySelector('input');body.append(l);select.onchange=()=>input.value=select.value;
 },[{label:'Cancel',run:d=>d.close()},{label:'Add category',cls:'primary',run:d=>{
   const name=input.value.trim();if(!name||!safeKey(name)){notice('Enter a valid category name.',true);return;}d.close();
-  if(name===LOOMS||referenceMatch(refs.categories.items,name)?.id==='cat-looms'){change(()=>project.loomTab=true);navigate('looms');return;}
+  if(isLoomCategory(name,refs)){addLoomCategory();return;}
   if(!Object.hasOwn(project.stock.cables,name))change(()=>{const entries=categoryCables(name,refs);project.stock.cables[name]=entries.map(e=>e.row);project.rowIds[name]=entries.map(()=>uid());entries.forEach((e,i)=>setCableAdaptor(project,name,i,e.adaptor));});
   navigate(`category:${name}`);
 }}]);}
+function addLoomCategory(){
+  if(saveBlocked){notice(saveError||'Saving is paused. Download a backup first.',true);return;}
+  const workspace=project,referenceWorkspace=refs,plan=referenceLoomsForProject(project,refs);
+  const apply=keepMismatchedLengths=>{
+    if(project!==workspace||refs!==referenceWorkspace||saveBlocked){notice('The workspace changed. Add the category again.',true);return;}
+    change(()=>addReferenceLooms(project,plan,{keepMismatchedLengths}));navigate('looms');
+    if(plan.looms.length)notice(`${plan.looms.length} reference loom(s) added.${plan.mismatches.length&&!keepMismatchedLengths?' Lengths with a different unit were left empty.':''}`);
+  };
+  if(!plan.mismatches.length){apply(false);return;}
+  openDialog('Loom length units differ',body=>{
+    body.append(node('p',`This project uses ${project.stock.vendor.lengthUnit}. These reference looms use a different unit:`));
+    const list=node('ul');for(const item of plan.mismatches)list.append(node('li',`${item.name} · ${item.unit}`));body.append(list);
+    body.append(node('p',`Add these looms with their cable types and quantities but leave their lengths empty, or explicitly keep the same numbers labelled as ${project.stock.vendor.lengthUnit}. Numbers are never converted. You can Cancel and change the vendor unit first to retain the original units.`));
+  },[{label:'Cancel',run:d=>d.close()},{label:`Keep numbers as ${project.stock.vendor.lengthUnit}`,run:d=>{d.close();apply(true);}},{label:'Add without mismatched lengths',cls:'primary',run:d=>{d.close();apply(false);}}]);
+}
 function adaptorAfterPaste(current,i,patches){const patch=patches?.find(p=>p.id===i&&p.col.key==='adaptor');return patch?['true','yes'].includes(String(patch.text).trim().toLowerCase()):!!current;}
 const cableColumns=[{key:'name',label:'Cable type / name',list:'cables-list',width:220},{key:'adaptor',label:'Adaptor',type:'boolean',width:105},{key:'direction',label:'Adaptor direction',list:'directions-list',width:165},{key:'start',label:'Start / male',list:'connectors-list',width:185},{key:'end',label:'End / female',list:'connectors-list',width:185},{key:'lengths',label:'Available lengths',type:'lengths',width:380},{key:'connectors',label:'Connectors JSON',type:'json',width:250},{key:'custom',label:'Custom fields JSON',type:'json',width:240}];
 function renderCategory(category){
@@ -489,11 +504,23 @@ async function importFile(file){
 async function read(path){const response=await fetch(path,{cache:'no-cache'});if(!response.ok)throw new Error(`Could not load ${path} (${response.status}).`);return parseJSON(await response.text());}
 async function start(){
   try{
-    const entries=await Promise.all(Object.keys(REF_NAMES).map(async key=>[key,await read(`${['manifest','lighting_vendors'].includes(key)?'reference':'data'}/${key}.json`)]));refs=Object.fromEntries(entries);colourPalette=await read('reference/colour_options.json');referenceBaseline=clone(refs);referenceExports=clone(refs);
+    const entries=await Promise.all(Object.keys(REF_NAMES).map(async key=>[key,await read(`${['manifest','lighting_vendors'].includes(key)?'reference':'data'}/${key}.json`)]));refs=Object.fromEntries(entries);colourPalette=await read('reference/colour_options.json');referenceBaseline=clone(refs);referenceExports=clone(refs);publishedReferences=clone(refs);let newCableTypes=[];
     const stored=key=>{try{return localStorage.getItem(key);}catch{saveError='Browser storage is unavailable. Download backups to keep your work.';return null;}};
-    const savedRefs=stored(KEYS.prefs);if(savedRefs){lastSavedRefs=savedRefs;try{const saved=parseJSON(savedRefs);if(saved.refs){for(const key of Object.keys(REF_NAMES))if(saved.refs[key])refs[key]=saved.refs[key];referenceExports={...referenceExports,...(saved.referenceExports||{})};refDirty=!same(refs,referenceExports);}}catch{notice('Saved references could not be read. Original files loaded.',true);}}
+    const savedRefs=stored(KEYS.prefs);if(savedRefs){lastSavedRefs=savedRefs;try{const saved=parseJSON(savedRefs);if(saved.refs){
+      const previous=saved.publishedReferences||saved.referenceExports||saved.refs;
+      newCableTypes=newPublishedCableTypes(publishedReferences.cable_types,previous.cable_types);
+      for(const key of Object.keys(REF_NAMES))if(saved.refs[key]){
+        if(['categories','cable_types','connector_types'].includes(key)){
+          refs[key]=mergePublishedReference(saved.refs[key],publishedReferences[key],previous[key]);
+          referenceExports[key]=mergePublishedReference(saved.referenceExports?.[key]||saved.refs[key],publishedReferences[key],previous[key]);
+        }else{refs[key]=saved.refs[key];referenceExports[key]=saved.referenceExports?.[key]||referenceExports[key];}
+      }
+      refDirty=!same(refs,referenceExports);
+    }}catch{notice('Saved references could not be read. Original files loaded.',true);}}
     const raw=stored(KEYS.draft);if(raw){try{const saved=parseJSON(raw);project=restoreProject(saved.project);dirty=!!saved.dirty;lastSavedDraft=raw;}catch{notice('Saved draft could not be read. It has not been overwritten. Download backups for new work; clear the damaged site storage only after recovery.',true);saveError='Saved draft needs recovery. Autosave paused.';saveBlocked=true;}}
-    syncVendorManifest(refs);loaded=true;if(fillCableConnectors(project,refs)){dirty=true;save();}renderAll();
+    syncVendorManifest(refs);loaded=true;
+    if(!saveBlocked&&newCableTypes.length){const before=capture(),added=syncNewReferenceStock(project,refs,newCableTypes);if(added.cables||added.looms){history.push(before);dirty=true;notice(`Loaded ${added.cables} new cable type(s) and ${added.looms} new loom(s) into existing project categories.${added.mismatches.length?' Some loom lengths were left empty because their reference unit differs from this vendor.':''}`,!!added.mismatches.length);}}
+    if(fillCableConnectors(project,refs)){dirty=true;save();}renderAll();
     $('#settings-button').onclick=()=>navigate('settings');$('#errors-button').onclick=()=>navigate('errors');$('#import-button').onclick=()=>$('#file-input').click();$('#export-button').onclick=()=>reviewExport('json');$('#backup-button').onclick=downloadBackup;
     $('#file-input').onchange=async e=>{const file=e.target.files[0];e.target.value='';importPending=true;try{await importFile(file);}finally{importPending=false;}};document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>navigate(b.dataset.page));$('.brand').onclick=e=>{e.preventDefault();navigate('vendor');};
     window.addEventListener('beforeunload',e=>{if(!updateReload&&(dirty||refDirty||$('#loom-pane')?.open||[...document.querySelectorAll('[data-lampy-grid]')].some(el=>el.lampyGrid.editing&&el.lampyGrid.editor.value!==el.lampyGrid.editorOriginal))){e.preventDefault();e.returnValue='';}});
@@ -515,7 +542,7 @@ async function start(){
             if(pending){pending.focus();return 'Finish this field before updating. Your entry has been kept.';}return '';},
           editors:()=>[...document.querySelectorAll('[data-lampy-grid]')].map(el=>el.lampyGrid),
           persist:()=>{save();if(saveError||saveBlocked)throw new Error(saveError||'Saving is paused.');
-            if(localStorage.getItem(KEYS.draft)!==JSON.stringify({project,dirty})||localStorage.getItem(KEYS.prefs)!==JSON.stringify({refs,refDirty,referenceExports}))throw new Error('Could not verify your saved work. Refresh cancelled.');},
+            if(localStorage.getItem(KEYS.draft)!==JSON.stringify({project,dirty})||localStorage.getItem(KEYS.prefs)!==JSON.stringify({refs,refDirty,referenceExports,publishedReferences}))throw new Error('Could not verify your saved work. Refresh cancelled.');},
           reload:()=>{updateReload=true;window.location.replace(freshDocumentURL(window.location.href));}
         });
       }catch(e){updateReload=false;notice(e.message,true);}

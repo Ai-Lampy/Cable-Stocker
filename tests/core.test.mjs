@@ -319,3 +319,52 @@ test('deleting the project loom tab clears only its looms and preserves explicit
  assert.deepEqual(M.runtimeJSON(p).looms,[]);assert(M.changes(p).some(c=>c.kind==='removed'&&c.name==='Test loom'));
  assert.deepEqual(M.runtimeJSON(roundtrip(p).project),M.runtimeJSON(p));assert.deepEqual(M.restoreProject(M.clone(p)),p);
 });
+
+test('supplied reference looms load into stock with independent IDs, quantities and matching lengths',()=>{
+ const p=newProjectFixture('ft'),before=M.clone(refs),plan=M.referenceLoomsForProject(p,refs);
+ assert(plan.looms.length>0);assert.equal(plan.mismatches.length,0);M.addReferenceLooms(p,plan);
+ const supplied=refs.cable_types.items.filter(r=>M.isLoomCategory(r.category,refs));
+ assert.equal(p.looms.length,supplied.length);p.looms.forEach((l,i)=>{assert.notEqual(l.id,supplied[i].id);assert.equal(l.referenceId,supplied[i].id);assert.deepEqual(l.lengths,supplied[i].lengths);assert.deepEqual(l.components.map(c=>[c.type,c.count]),supplied[i].components.map(c=>[c.type,c.count]));});
+ assert.deepEqual(refs,before);assert.deepEqual(M.restoreProject(M.clone(p)),p);assert.deepEqual(roundtrip(p).project.looms,p.looms);
+ p.looms[0].name='Vendor wording';p.looms[0].components[0].count=9;
+ assert.equal(M.referenceLoomsForProject(p,refs).looms.length,0);assert.deepEqual(refs,before);
+});
+function newProjectFixture(unit='m'){const p=M.newProject('Generated test vendor');p.stock.vendor.lengthUnit=unit;return p;}
+function loomReferenceFixture(){return {categories:{items:[{id:'cat-looms',name:'Stock / Pre-Made Looms',aliases:['Looms']}]},cable_types:{items:[{id:'ref-loom',name:'Loom',aliases:['Alias loom'],category:'Looms',lengthUnit:'ft',lengths:[304],components:[{id:'part',type:'XLR-5',count:2,connectors:{male:'Keep'},lengths:[304]}]}]}};}
+test('different-unit loom lengths require explicit retention and never mutate reference values',()=>{
+ const r=loomReferenceFixture(),before=M.clone(r),p=newProjectFixture(),plan=M.referenceLoomsForProject(p,r);
+ assert.equal(plan.mismatches[0].unit,'ft');assert.equal(p.looms.length,0);M.addReferenceLooms(p,plan);assert.deepEqual(p.looms[0].lengths,[]);assert.deepEqual(p.looms[0].components[0].lengths,[]);assert.equal(p.looms[0].components[0].count,2);
+ const q=newProjectFixture();M.addReferenceLooms(q,plan,{keepMismatchedLengths:true});assert.deepEqual(q.looms[0].lengths,[304]);assert.deepEqual(q.looms[0].components[0].lengths,[304]);assert.equal(q.stock.vendor.lengthUnit,'m');assert.deepEqual(r,before);
+});
+test('existing loom names and aliases prevent duplication without overwriting vendor values',()=>{
+ const r=loomReferenceFixture(),p=newProjectFixture();p.looms=[{id:'vendor-id',name:'Alias loom',lengths:[1],components:[]}];const before=M.clone(p);
+ assert.equal(M.referenceLoomsForProject(p,r).looms.length,0);assert.deepEqual(p,before);
+});
+test('published reference refresh brings in new records and untouched updates while retaining local edits/deletions',()=>{
+ const prior={items:[{id:'a',name:'A',x:1},{id:'b',name:'B',x:1},{id:'c',name:'C',x:1}]};
+ const local={items:[{id:'a',name:'A',x:9},{id:'b',name:'B',x:1},{id:'local',name:'Local'}]};
+ const published={items:[{id:'a',name:'A',x:2},{id:'b',name:'B',x:2},{id:'c',name:'C',x:2},{id:'new',name:'New'}]};const before=M.clone([prior,local,published]);
+ const merged=M.mergePublishedReference(local,published,prior);
+ assert.deepEqual(merged.items,[{id:'a',name:'A',x:9},{id:'b',name:'B',x:2},{id:'local',name:'Local'},{id:'new',name:'New'}]);
+ assert.deepEqual(M.newPublishedCableTypes(published,prior),[{id:'new',name:'New'}]);assert.deepEqual([prior,local,published],before);
+ assert.deepEqual(M.mergePublishedReference(merged,published,published),merged);
+});
+test('new published cables of every selected category and looms populate without duplicates or overwrites',()=>{
+ const r=loomReferenceFixture();r.categories.items.push({id:'data',name:'Data',aliases:['Signal']});
+ r.cable_types.items.push(...['Data','Multi','Mains','TRS','Custom'].map((category,i)=>({id:'c'+i,name:'New '+category,category,aliases:['Alias '+category],direction:'male-female',connectors:{male:'Plug',female:'Socket'},adaptor:category==='Mains'})));
+ const p=newProjectFixture('ft');for(const category of ['Signal','Multi','Mains','TRS']){p.stock.cables[category]=[];p.rowIds[category]=[];}p.loomTab=true;
+ const baseline=M.clone(p.baseline),rBefore=M.clone(r),added=M.syncNewReferenceStock(p,r,r.cable_types.items);
+ assert.equal(added.cables,4);assert.equal(added.looms,1);assert.equal(added.mismatches.length,0);assert.equal(p.stock.cables.Custom,undefined);assert.equal(M.isCableAdaptor(p,'Mains',0),true);
+ p.stock.cables.Signal[0].lengths=[10];p.stock.cables.Signal[0].name='Alias Data';const before=M.clone(p);
+ assert.equal(M.syncNewReferenceStock(p,r,r.cable_types.items).cables,0);assert.deepEqual(p,before);assert.deepEqual(p.baseline,baseline);assert.deepEqual(r,rBefore);
+ assert.deepEqual(M.runtimeJSON(roundtrip(p).project),M.runtimeJSON(p));
+});
+test('published refresh does not resurrect already-seen project rows or deleted categories',()=>{
+ const r=loomReferenceFixture(),p=newProjectFixture('ft');p.loomTab=true;M.syncNewReferenceStock(p,r,r.cable_types.items);p.looms=[];
+ const current=M.clone(r.cable_types),newTypes=M.newPublishedCableTypes(current,current);assert.deepEqual(newTypes,[]);M.syncNewReferenceStock(p,r,newTypes);assert.deepEqual(p.looms,[]);
+ p.loomTab=false;M.syncNewReferenceStock(p,r,r.cable_types.items);assert.deepEqual(p.looms,[]);
+});
+test('new custom categories can seed from cable file without a separate category record',()=>{
+ const r={categories:{items:[]},cable_types:{items:[{name:'Custom cable',category:'New type',connectors:{male:'A',female:'B'},direction:'male-female'}]}};
+ assert(M.cableTypeSheets(r).includes('New type'));assert.equal(M.categoryCables('New type',r)[0].row.name,'Custom cable');
+});

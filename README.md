@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.39.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.40.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -100,7 +100,11 @@ Every cable table, Settings table and the main loom table has **Save table** but
 
 ## Composite looms
 
-Add **Stock / Pre-Made Looms** from the category selector, then choose **Add loom**. A side pane opens with **Loom name** and a two-column **Cable Type / Quantity** table. Use **+ Cable type** to add components, or press Enter on its last row. Tab moves between input cells. **Save loom** requires a name, at least one cable type and a positive whole-number quantity for each component. It saves the finished loom locally and adds its parent row to the main table. **Cancel**, Close or Escape asks before discarding changed pane entries; these entries do not become a saved loom until you choose Save loom.
+Add **Stock / Pre-Made Looms** from the category selector to copy the pre-made looms in your Cable Types reference into this vendor project. Copies retain names, component quantities, connectors and matching-unit available lengths. Existing vendor looms are kept; adding the category again adds missing reference looms without duplicating or overwriting existing ones. Reference and component IDs are replaced with independent project IDs. If the tab was previously empty, add the category again to load its references.
+
+If a reference loom uses a different unit, the app asks you to Cancel, add without those lengths, or explicitly keep the same numbers in the vendor's unit. It never converts numbers. For example, choose feet on the Vendor tab before adding a 304 ft reference loom if you want its original length and unit retained.
+
+To create another loom, choose **Add loom**. A side pane opens with **Loom name** and a two-column **Cable Type / Quantity** table. Use **+ Cable type** to add components, or press Enter on its last row. Tab moves between input cells. **Save loom** requires a name, at least one cable type and a positive whole-number quantity for each component. It saves the finished loom locally and adds its parent row to the main table. **Cancel**, Close or Escape asks before discarding changed pane entries; these entries do not become a saved loom until you choose Save loom.
 
 Saved looms appear as parent rows sorted by Name. Set available lengths on the parent row. Expand the arrow beside a name to show components as ordinary 35 px rows in the same table at 100% zoom, under the same column headings. Edit their cable types and quantities directly, or use **Edit loom** to change the name and add/remove components in the side pane. Filtering matches complete loom groups, keeping child rows with their parent. Child rows sort by cable type within each loom by default. Saved looms and quantities remain when you reopen the app in the same browser and origin; expanded/collapsed state resets.
 
@@ -162,6 +166,10 @@ Settings → **Cable Types** has a separate sheet for each category, including c
 The **Stock / Pre-Made Looms** reference sheet uses the same loom editor and expandable table as vendor stock. **Add loom** opens a side pane with Loom name, aliases, length unit and a two-column Cable Type / Quantity table. Save loom adds a parent row; expand it to edit component types and quantities as normal 35 px rows. Edit available lengths on the parent, including Copy Lengths and Replace/Merge. Length chips sort lowest to highest. Top and bottom **Save table**, sorting, search, column widths, undo/redo and protected deletion work on this sheet.
 
 Each reference loom retains its own `lengthUnit` (`m` or `ft`); changing it requires confirmation and never converts numbers. Older loom reference rows without units are treated as metres and keep their original fields; use Edit loom to add any missing components. Aliases and custom fields are preserved. These entries stay in the existing `items` array in **data/cable_types.json**, with lengths and structured components. Download **cable_types.json** to retain your reference edits and upload it to that destination yourself. Settings reference looms remain separate from vendor stock and its project/Excel backups; editing one does not change the other.
+
+After you upload updated `data/cable_types.json`, **refresh or reopen the app** to load new published cable types across every category, including looms. The app reconciles Categories, Cable Types and Connectors files with saved Settings: new records become available, unchanged records receive published updates, and your local reference edits/deletions are retained. Categories present only in the cable file are also offered by the category selector.
+
+Newly published types automatically copy into matching categories already selected in the current project. Cable lengths start empty; loom lengths copy when units match. For automatic additions with different units, the app leaves those loom lengths empty and shows a notice; the reference keeps the original values. Existing vendor rows, quantities and lengths are not overwritten. Categories you deleted stay deleted, and already-seen deleted rows are not recreated on each refresh. You can undo automatic project additions during the session. Reference files are checked at startup, not continuously; data-only uploads do not trigger the app-version update banner.
 
 All tables hide raw JSON columns, including cable custom fields, reference connector objects and loom connector overrides. The underlying data stays intact in backups and exports. Use Excel/project files when you need to edit those hidden structured fields. Use Import on the Vendor tab for existing files.
 

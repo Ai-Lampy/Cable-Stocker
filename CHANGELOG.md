@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.40 — 2026-10-16
+
+Previous version: v1.1.39. Local release for manual upload; not deployed.
+
+- Fix adding Stock / Pre-Made Looms opening an empty tab: copy reference looms from cable_types.json into vendor stock, preserving components, quantities, connectors and matching-unit lengths. Use independent IDs and retain reference provenance in backups only. Re-adding the category adds missing looms without overwriting existing vendor entries or creating duplicates.
+- Ask how to handle different reference/vendor length units during category addition. Cancel leaves the project unchanged; the safe option omits mismatched lengths, while keeping the same numbers under the vendor unit requires an explicit choice. Never silently convert values.
+- Reconcile published Categories, Cable Types and Connectors with cached Settings at startup. Load new published entries and untouched updates while retaining local edits/deletions. Persist the last published snapshot separately from reference downloads and include it in Save & refresh verification.
+- Copy newly published cable types into matching selected project categories on refresh, including looms. Preserve existing vendor edits and intentionally deleted categories/previously seen rows. Automatic mismatched-unit loom additions omit lengths and show a notice. Offer custom categories found only in the cable file.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/core.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Upload any reference JSON files you updated separately to their existing data/ destinations. No new/deleted project files. User's updated cable_types.json, other references, project JSON and backups preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 177 automated tests passed, including the supplied 304 ft reference loom, quantity/length and Excel/project preservation, duplicate prevention, unit mismatch choices, cache reconciliation, all-category additions, local edit/deletion protection, startup persistence and repeat refresh. JavaScript syntax, JSON parsing, local module paths and version consistency passed.
+- Browser testing was not run, as requested. Visual behaviour and live deployment remain unverified. Reference updates require refresh/reopen; data-only uploads do not trigger the app-version banner. Existing Excel behaviour adds an empty Data sheet for a loom-only full workbook; loom content still round-trips. No test downloads; temporary verification data removed. Separate Paperwork compatibility remains pending.
+
 ## v1.1.39 — 2026-10-16
 
 Previous version: v1.1.38. Local release for manual upload; not deployed.
