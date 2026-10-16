@@ -111,3 +111,42 @@ test('loom child display sorts by cable type and quantity without moving compone
  const looms=[{id:'a',name:'Alpha',lengths:[],components:[{type:'Zulu',count:1},{type:'Beta',count:4}]}],rows=M.loomRows(looms),expanded=new Set(['a']);
  assert.deepEqual(M.loomOrder(rows,expanded),[0,2,1]);assert.deepEqual(M.loomOrder(rows,expanded,'',{key:'count',dir:1}),[0,1,2]);assert.equal(looms[0].components[0].type,'Zulu');
 });
+
+
+test('Settings looms edit, add and delete references without touching stock or other categories',()=>{
+ const ctx=loomController();
+ vm.runInContext(`
+ const category='Stock / Pre-Made Looms';
+ refs.cable_types.items.push({id:'reference',category,name:'Reference loom',aliases:['Alias'],lengthUnit:'ft',custom:{keep:true},lengths:[20,10],components:[{id:'part',type:'DMX',count:2,connectors:{male:'Override'},lengths:[]}]});
+ referenceBaseline=clone(refs);
+ const stockBefore=JSON.stringify(project),otherBefore=JSON.stringify(refs.cable_types.items[0]);
+ const context=loomContext(true,category);renderLooms(context);
+ captured[1].apply([{id:0,col:{key:'name'},value:'Renamed'},{id:1,col:{key:'count'},value:4},{id:0,col:{key:'lengths'},value:[30,15]}]);
+ `,ctx);
+ const saved=JSON.parse(vm.runInContext('JSON.stringify(refs.cable_types.items[1])',ctx));
+ assert.equal(saved.name,'Renamed');assert.equal(saved.components[0].count,4);assert.deepEqual(saved.lengths,[30,15]);assert.equal(saved.lengthUnit,'ft');assert.deepEqual(saved.aliases,['Alias']);assert.deepEqual(saved.custom,{keep:true});
+ assert.equal(vm.runInContext('JSON.stringify(project)===stockBefore&&JSON.stringify(refs.cable_types.items[0])===otherBefore',ctx),true);
+ vm.runInContext(`context.mutate(looms=>looms.push({...newLoom(),category,name:'Added'}));confirmAction=(title,text,fn)=>fn();captured[1].remove([1]);`,ctx);
+ assert.equal(vm.runInContext('refs.cable_types.items[1].components.length',ctx),0);
+ vm.runInContext('captured[1].remove([0]);',ctx);
+ assert.equal(vm.runInContext('refs.cable_types.items.length',ctx),2);
+ assert.equal(vm.runInContext('refs.cable_types.items[1].name',ctx),'Added');
+ assert.equal(vm.runInContext('JSON.stringify(project)===stockBefore',ctx),true);
+});
+
+test('legacy loom references retain aliases and unknown fields without mutation on read',()=>{
+ const row={id:'legacy',name:'Existing',category:'Stock / Pre-Made Looms',aliases:['Alias'],connectors:{male:'Preserve'},custom:7},before=structuredClone(row),loom=M.referenceLoom(row);
+ assert.deepEqual(row,before);assert.deepEqual(loom.components,[]);assert.deepEqual(loom.lengths,[]);assert.equal(loom.lengthUnit,'m');assert.deepEqual(loom.connectors,row.connectors);
+ const refs={categories:{items:[{id:'cat-looms',name:'Stock / Pre-Made Looms',aliases:['Looms']}]}},normal={id:'normal',name:'Cable',category:'Data'};
+ assert.equal(M.isLoomCategory('Looms',refs),true);assert.equal(M.isLoomCategory('Data',refs),false);
+ assert.deepEqual(M.replaceLoomReferences([normal,row],row.category,[{...loom,name:'Changed'}])[0],normal);
+ assert.deepEqual(M.parseJSON(JSON.stringify(loom)),loom);
+});
+
+test('reference validation checks loom quantities and lengths without requiring cable endpoints',()=>{
+ const row={id:'ref',category:'Stock / Pre-Made Looms',name:'Loom',aliases:[],lengthUnit:'m',lengths:[10],components:[{id:'c',type:'DMX',count:2,connectors:{},lengths:[]}]},refs={cable_types:{items:[row]}};
+ assert.deepEqual(M.validateReferences(refs),[]);
+ row.components[0].count=0;assert.match(M.validateReferences(refs)[0].message,/Quantity/);
+ row.components[0].count=2;row.lengths=[-1];assert.match(M.validateReferences(refs)[0].message,/positive/);
+ row.lengths=[];row.lengthUnit='bad';assert.match(M.validateReferences(refs)[0].message,/metres or feet/);
+});

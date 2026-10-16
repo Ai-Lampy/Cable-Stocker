@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.38 — 2026-10-16
+
+Previous version: v1.1.37. Local release for manual upload; not deployed.
+
+- Apply the shared Add/Edit loom side pane and expandable parent/child table to Settings → Cable Types → Stock / Pre-Made Looms. Include component types/quantities, available-length chips and copy/merge controls, sorting, selection, column widths, top/bottom Save, undo/redo and protected deletion.
+- Save Settings looms in the existing cable_types.json items array, independently from vendor stock. Preserve aliases and unknown fields; retain a per-reference length unit with explicit confirmation before unit changes. Legacy rows receive non-mutating editor defaults and validation for missing components. Keep the vendor stock JSON and Excel schemas unchanged.
+- Add regression coverage for reference/stock isolation, scoped additions/deletions, legacy references, JSON preservation and loom validation. Correct Settings error navigation to select the corresponding loom parent.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted project files: none. Original references, user project JSON and backups preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 164 automated tests passed, including JSON/Excel round trips. JavaScript syntax, local imports, JSON validity and version consistency passed. Approved local browser checks passed Add/Edit, missing-component validation, Enter adding a component row, alias preservation, expanded 35 px rows, numeric length-chip sorting, bottom Save committing a quantity edit, discard protection, reload persistence, reference JSON preview/download, deletion and undo/redo. The downloaded file preserved quantities, lengths, aliases and every other reference entry. Vendor stock Add/Save/length editing/JSON preview and undo/redo also passed. No console warnings/errors in checked flows.
+- Cleanup: removed test rows and the downloaded cable_types.json; cleared the isolated test origin's storage, closed test tabs and stopped the local server. Screenshot retained outside the project. Other browsers, narrow screens and live deployment were not tested. Separate Lampy Paperwork loom consumption remains pending.
+
 ## v1.1.37 — 2026-10-15
 
 Previous version: v1.1.36. Local release for manual upload; not deployed.

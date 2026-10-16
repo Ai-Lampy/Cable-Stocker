@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.37.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.38.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -155,7 +155,11 @@ Excel's 32,767-character limit applies to each cell. Oversized row metadata requ
 
 ## Cable type category sheets
 
-Settings → **Cable Types** has a separate sheet for each category, including custom categories and **Uncategorised**. New and pasted rows inherit the active category. Editing Default category moves that row to its destination sheet. Search, selection, deletion and Save operate on the active sheet; downloading cable_types.json still includes every category.
+Settings → **Cable Types** has a separate sheet for each category, including custom categories and **Uncategorised**. Ordinary cable sheets let new and pasted rows inherit the active category; editing Default category moves the row to that sheet. Search, selection, deletion and Save operate on the active sheet; downloading cable_types.json includes every category.
+
+The **Stock / Pre-Made Looms** reference sheet uses the same loom editor and expandable table as vendor stock. **Add loom** opens a side pane with Loom name, aliases, length unit and a two-column Cable Type / Quantity table. Save loom adds a parent row; expand it to edit component types and quantities as normal 35 px rows. Edit available lengths on the parent, including Copy Lengths and Replace/Merge. Length chips sort lowest to highest. Top and bottom **Save table**, sorting, search, column widths, undo/redo and protected deletion work on this sheet.
+
+Each reference loom retains its own `lengthUnit` (`m` or `ft`); changing it requires confirmation and never converts numbers. Older loom reference rows without units are treated as metres and keep their original fields; use Edit loom to add any missing components. Aliases and custom fields are preserved. These entries stay in the existing `items` array in **data/cable_types.json**, with lengths and structured components. Download **cable_types.json** to retain your reference edits and upload it to that destination yourself. Settings reference looms remain separate from vendor stock and its project/Excel backups; editing one does not change the other.
 
 All tables hide raw JSON columns, including cable custom fields, reference connector objects and loom connector overrides. The underlying data stays intact in backups and exports. Use Excel/project files when you need to edit those hidden structured fields. Use Import on the Vendor tab for existing files.
 

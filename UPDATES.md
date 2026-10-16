@@ -7,6 +7,8 @@
 
 ## Completed
 
+- v1.1.38 (local release for manual upload) — 2026-10-16: applied the shared loom side pane, expanded component rows, available lengths and table saving to Settings → Cable Types → Stock / Pre-Made Looms. Reference data stays in cable_types.json and separate from vendor stock. Upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. No new/deleted project files. 164 automated tests and approved local browser checks passed; details in CHANGELOG.md. Test download removed; project JSON/backups preserved. Lampy Paperwork untouched; no upload or deployment.
+
 - v1.1.37 (local release for manual upload) — 2026-10-15: removed helper text below Length unit and Length display. Upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New files: none. Deleted regenerated root `.DS_Store`; project JSON and backups preserved. 161 automated tests and non-browser checks passed; browser testing not run for this update. Lampy Paperwork untouched; no upload or deployment.
 
 - v1.1.36 (local release for manual upload) — 2026-10-15: corrected the layout so Vendor name, Length unit and Length display share the same desktop row. Unit/display each occupy 40% of the right-hand area, rather than a separate full-width row. Shortened dropdown labels to fit. Updated/upload: `js/app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; also include `css/app.css` from v1.1.35 if not already uploaded. New/deleted files: none. 161 automated tests and approved local browser checks passed. Lampy Paperwork untouched; no upload or deployment.

@@ -372,7 +372,12 @@ export function validateReferences(refs) {
         if (Object.keys(row).some(k => !['vendor','file'].includes(k))) add(key,i,'file','Manifest entries may contain vendor and file only.');
       }
       if (key === 'lighting_vendors' && row.logo && (!relativePath(row.logo) || !row.logo.startsWith('images/vendor/'))) add(key,i,'logo','Logo must be under images/vendor/ using its original filename.');
-      if (key === 'cable_types') {
+      if (key === 'cable_types' && isLoomCategory(row.category,refs)) {
+        const loom=referenceLoom(row);
+        if(!['m','ft'].includes(loom.lengthUnit))add(key,i,'lengthUnit','Choose metres or feet for this loom.');
+        if(!Array.isArray(loom.lengths)||loom.lengths.some(n=>typeof n!=='number'||!Number.isFinite(n)||n<=0))add(key,i,'lengths','Loom lengths must be positive numbers.');
+        try{prepareLoomDraft(loom,refs.cable_types.items);}catch(e){add(key,i,'name',e.message);}
+      } else if (key === 'cable_types') {
         if (!object(row.connectors)) add(key,i,'connectors','Default connectors must be a JSON object.');
         if (!row.category?.trim()) add(key,i,'category','A default category is required.');
         if (!['male-female','bidirectional'].includes(row.direction)) add(key,i,'direction','Default direction must match the supplied schema.');
@@ -423,6 +428,14 @@ export function mergeProjects(current, incoming, partial = false) {
 
 // Category sheets preserve original reference objects and category wording.
 export function cableTypeSheets(refs){return [...new Set([...(refs.categories?.items||[]).map(r=>r.name),...(refs.cable_types?.items||[]).map(r=>r.category||''),''])];}
+export function isLoomCategory(category,refs){return category==='Stock / Pre-Made Looms'||referenceMatch(refs.categories?.items||[],category)?.id==='cat-looms';}
+// Legacy reference rows gain editor defaults in memory only, without changing source data.
+export function referenceLoom(row){return {lengths:[],components:[],description:'',lengthUnit:'m',...row};}
+export function replaceLoomReferences(items,category,looms){
+  const remaining=new Map(looms.map(l=>[l.id,l]));
+  const result=items.flatMap(row=>{if((row.category||'')!==category)return [row];const next=remaining.get(row.id);remaining.delete(row.id);return next?[next]:[];});
+  return result.concat([...remaining.values()]);
+}
 export function cableTypeRows(rows,category){return rows.filter(r=>(r.category||'')===category);}
 export function visibleTableColumns(columns,adaptors=true){return columns.filter(c=>c.type!=='json'&&(adaptors||!['direction','start','end'].includes(c.key)));}
 
