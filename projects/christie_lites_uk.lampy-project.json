@@ -159,6 +159,9 @@
             144,
             96,
             24
+          ],
+          "loomOnlyLengths": [
+            504
           ]
         }
       ],
@@ -358,7 +361,7 @@
     }
   },
   "filename": "christie_lites_cable.json",
-  "vendorVersion": "v1.1",
+  "vendorVersion": "v2",
   "looms": [
     {
       "lengths": [
@@ -377,7 +380,7 @@
         },
         {
           "id": "ed0a8b5a-efa0-415c-8881-0693150fdf68",
-          "type": "32A 3Ph",
+          "type": "32A 3ø",
           "count": 1,
           "connectors": {
             "male": "CEE 32A 3ø",
@@ -387,7 +390,7 @@
         },
         {
           "id": "ed75780e-1021-4bda-804a-771c93e353a1",
-          "type": "EtherCON",
+          "type": "Ethercon",
           "count": 3,
           "connectors": {
             "end": "etherCON"
@@ -428,7 +431,7 @@
         },
         {
           "id": "dd2ab4eb-4a0f-4198-bb92-35f0474f1e4a",
-          "type": "EtherCON",
+          "type": "Ethercon",
           "count": 3,
           "connectors": {
             "end": "etherCON"
@@ -461,7 +464,7 @@
         },
         {
           "id": "57f6a473-7658-428f-b469-00bee87ef59e",
-          "type": "32A 3Ph",
+          "type": "32A 3ø",
           "count": 1,
           "connectors": {
             "male": "CEE 32A 3ø",
@@ -541,7 +544,7 @@
         },
         {
           "id": "e2bf7911-fc9f-4fd5-a373-e7cd3dab36fb",
-          "type": "32A 3Ph",
+          "type": "32A 3ø",
           "count": 1,
           "connectors": {
             "male": "CEE 32A 3ø",
