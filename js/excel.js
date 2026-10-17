@@ -113,7 +113,7 @@ export function fromWorkbook(book,X,current) {
         if(start!==originalStart||end!==originalEnd){
           if(!object(connectors))throw new Error('Repair connectors_json before editing connector endpoints.');
           if(base&&jsonChanged&&(start!==getCell({direction:row.direction,connectors},'start')||end!==getCell({direction:row.direction,connectors},'end')))throw new Error(`${row.name}: endpoint cells conflict with edited connectors_json. Make the two representations agree.`);
-          if(cableDirection(row.direction)==='bidirectional'){
+          if(cableDirection(row.direction)==='bidirectional'&&!Object.hasOwn(connectors,'start')){
             if(start!==end)throw new Error(`${row.name}: bidirectional end connectors must match. Change direction or use connectors_json explicitly.`);
             connectors.end=start;
           }else{const edited={direction:row.direction,connectors};setCell(edited,'start',start);setCell(edited,'end',end);}

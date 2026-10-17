@@ -23,7 +23,7 @@ test('invalid rectangular input leaves entry slots and existing data intact',()=
 test('invalid in-cell commit preserves text and editing focus',()=>{const g=editable([]);Object.assign(g,{ids:[0],selection:{r:0,c:0},editorOriginal:'',editing:true,editor:{value:'bad',focus(){this.focused=true;}}});g.o.columns=[{key:'length',type:'positive'}];assert.equal(g.commitEditor(),false);assert.equal(g.editor.value,'bad');assert.equal(g.editing,true);assert.equal(g.editor.focused,true);});
 function controller(){const values=new Map();const element=()=>({children:[],append(...nodes){this.children.push(...nodes);},remove(){this.removed=true;}});const context=vm.createContext({...M,APP_VERSION:'test',document:{createElement:element},localStorage:{getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v)}});const app=fs.readFileSync(new URL('../js/app.js',import.meta.url),'utf8').replace(/^import .*;$/gm,'').replace(/start\(\);\s*$/,'');vm.runInContext(app,context);return context;}
 test('Settings acknowledgements persist by note content; changed notes appear again',()=>{const ctx=controller();const first=vm.runInContext("settingsNote('New hint')",ctx);first.children[1].onclick();assert.equal(first.removed,true);vm.runInContext('readSettingsNotes.clear()',ctx);assert.equal(vm.runInContext("settingsNote('New hint').hidden",ctx),true);assert.notEqual(vm.runInContext("settingsNote('Changed hint').hidden",ctx),true);});
-test('length colour suffix follows vendor units but editing/export stays numeric',()=>{const ctx=controller();for(const unit of ['m','ft']){vm.runInContext(`project.stock.vendor.lengthUnit='${unit}'`,ctx);const col=vm.runInContext("refColumns('length_colours')[0]",ctx);assert.equal(col.format(12.5),`12.5 ${unit}`);assert.equal(col.format(''),'');assert.equal(parseCell('12.5',col),12.5);}});
+test('length colour suffix follows vendor units but editing/export stays numeric',()=>{const ctx=controller();for(const unit of ['m','ft']){vm.runInContext(`project.stock.vendor.lengthUnit='${unit}'`,ctx);const col=vm.runInContext("refColumns('length_colours')[0]",ctx);assert.equal(col.format(12.5),unit==='ft'?"12.5'":'12.5m');assert.equal(col.format(''),'');assert.equal(parseCell('12.5',col),12.5);}});
 
 test('sorting keeps unused entry rows after populated rows in either direction',()=>{const g=grid([{name:'B'},{name:'A'}]);g.sort={key:'name',dir:1};assert.deepEqual(g.indices(),[1,0,2,3,4]);g.sort.dir=-1;assert.deepEqual(g.indices(),[0,1,2,3,4]);});
 
@@ -96,7 +96,7 @@ test('loom display keeps children with their parent through sorting, collapse an
 });
 test('loom pane validates a separate draft and preserves IDs, lengths, custom data and overrides',()=>{
  const draft={id:'loom',name:'  Test loom  ',lengths:[20,10],description:'Keep',custom:{yes:true},components:[{id:'a',type:'DMX',count:'4',connectors:{male:'Override',female:'Override'},lengths:[10],custom:7},{id:'b',type:'Custom',count:'2',connectors:{},lengths:[]}]},before=structuredClone(draft);
- const saved=M.prepareLoomDraft(draft,[]);assert.deepEqual(draft,before);assert.equal(saved.name,'Test loom');assert.equal(saved.components[0].count,4);assert.equal(saved.components[0].connectors.male,'Override');assert.deepEqual(saved.lengths,[20,10]);assert.deepEqual(saved.custom,{yes:true});assert.equal(saved.components[0].custom,7);assert.deepEqual(saved.components[1].connectors,{male:'Custom',female:'Custom'});
+ const saved=M.prepareLoomDraft(draft,[]);assert.deepEqual(draft,before);assert.equal(saved.name,'Test loom');assert.equal(saved.components[0].count,4);assert.equal(saved.components[0].connectors.male,'Override');assert.deepEqual(saved.lengths,[20,10]);assert.deepEqual(saved.custom,{yes:true});assert.equal(saved.components[0].custom,7);assert.deepEqual(saved.components[1].connectors,{});
  const refs=[{name:'DMX',aliases:['DMX5'],connectors:{male:'XLR5',female:'XLR5'}}];draft.components[1].type='DMX5';assert.equal(M.prepareLoomDraft(draft,refs).components[1].connectors.male,'XLR5');
  for(const count of ['',0,-1,1.5,'bad']){draft.components[0].count=count;assert.throws(()=>M.prepareLoomDraft(draft,refs),/Quantity/);}
  draft.components=[];assert.throws(()=>M.prepareLoomDraft(draft,refs),/at least one/);draft.name=' ';assert.throws(()=>M.prepareLoomDraft(draft,refs),/loom name/);
@@ -187,7 +187,7 @@ test('adding Looms uses reference entries; mismatched-unit cancellation keeps pr
  vm.runInContext("project=newProject('Other');project.stock.vendor.lengthUnit='ft';addLoomCategory();",ctx);assert.equal(vm.runInContext('project.looms[0].lengths[0]',ctx),304);
 });
 
-test('startup refresh merges published cable files through saved references and does not re-add seen rows',async()=>{
+test('startup refresh updates Settings references but never adds stock or resurrects deleted rows',async()=>{
  const ctx=controller();vm.runInContext(`
  const old={categories:{items:[{id:'data',name:'Data',aliases:[]}]},cable_types:{items:[{id:'old',name:'Old',category:'Data',direction:'male-female',connectors:{male:'A',female:'B'}}]},connector_types:{items:[]},lighting_vendors:{vendors:[]},manifest:{catalogues:[]},length_colours:{items:[]}};
  const local=clone(old);local.cable_types.items[0].aliases=['My wording'];
@@ -199,13 +199,13 @@ test('startup refresh merges published cable files through saved references and 
  window={addEventListener(){}};watchUpdates=()=>{};renderAll=()=>{};status=()=>{};notice=()=>{};
  `,ctx);
  await vm.runInContext('start()',ctx);
- assert.equal(vm.runInContext('loaded',ctx),true);assert.equal(vm.runInContext('project.stock.cables.Data.length',ctx),2);
+ assert.equal(vm.runInContext('loaded',ctx),true);assert.equal(vm.runInContext('project.stock.cables.Data.length',ctx),1);
  assert.equal(vm.runInContext('refs.cable_types.items[0].aliases[0]',ctx),'My wording');
  assert.equal(vm.runInContext('JSON.parse(localStorage.getItem(KEYS.prefs)).publishedReferences.cable_types.items.length',ctx),2);
  assert.equal(vm.runInContext('project.stock.cables.Data[0].lengths[0]',ctx),20);
  vm.runInContext('project.stock.cables.Data.pop();project.rowIds.Data.pop();save();',ctx);
  await vm.runInContext('start()',ctx);
- assert.equal(vm.runInContext('project.stock.cables.Data.length',ctx),1);
+ assert.equal(vm.runInContext('project.stock.cables.Data.length',ctx),0);
 });
 
 test('FOH stock uses a separate loom context for edits, deletion, saving and layout keys',()=>{
@@ -411,4 +411,31 @@ test('Shift+Space and Shift+arrows select and extend whole rows without opening 
 });
 test('whole-row selection follows stable identity when expanded rows change displayed indices',()=>{
  const g=rowSelectionGrid();g.selectRow(1);g.o.rows().unshift({id:'new',name:'A new row',value:'New'});g.renderBody();assert.equal(g.selectionText(),'Bravo\tB');g.remove();assert.deepEqual(g.removed,[3]);
+});
+test('stock tables expose normal alias and loom-only length editors without raw JSON columns',()=>{
+ const ctx=controller();const cols=vm.runInContext('visibleTableColumns(cableColumns,false)',ctx);assert.equal(cols.find(c=>c.key==='aliases').type,'aliases');assert.equal(cols.find(c=>c.key==='loomOnlyLengths').type,'lengths');assert(!cols.some(c=>c.type==='json'));
+ assert.deepEqual(parseCell('One, Two',cols.find(c=>c.key==='aliases')),['One','Two']);assert.deepEqual(parseCell('504, 600',cols.find(c=>c.key==='loomOnlyLengths')),[504,600]);
+});
+test('loom-only length dialog commits only that availability field and cancel preserves both arrays',()=>{
+ const ctx=controller();vm.runInContext(`
+ document.createElement=tag=>({tag,children:[],value:'',append(...nodes){this.children.push(...nodes);},replaceChildren(){this.children=[];},setAttribute(){},get lastChild(){return this.children.at(-1);}});
+ display=String;openDialog=(title,build,actions)=>{const body=node('div');build(body);globalThis.dialog={title,body,actions};};makeLengthChip=value=>node('span',value);notice=()=>{};
+ const target={name:'Whirlwind',lengths:[24],loomOnlyLengths:[504]};const before=JSON.stringify(target);
+ lengthEditor(target,()=>{globalThis.finished=true;},{key:'loomOnlyLengths',commit:fn=>fn()});
+ `,ctx);
+ assert.match(ctx.dialog.title,/Loom-only/);ctx.dialog.actions.find(a=>a.label==='Cancel').run({close(){}});assert.equal(vm.runInContext('JSON.stringify(target)===before',ctx),true);
+ vm.runInContext("lengthEditor(target,()=>{globalThis.finished=true;},{key:'loomOnlyLengths',commit:fn=>fn()})",ctx);
+ const line=ctx.dialog.body.children.find(n=>n.className==='length-input'),input=line.children[0];input.value='600';ctx.dialog.actions.find(a=>a.label==='Save lengths').run({close(){}});
+ assert.equal(vm.runInContext('JSON.stringify(target.lengths)',ctx),'[24]');assert.equal(vm.runInContext('JSON.stringify(target.loomOnlyLengths)',ctx),'[504,600]');assert.equal(ctx.finished,true);
+});
+test('connector form edits two explicit bidirectional ends and cancellation keeps the source',()=>{
+ const ctx=controller();vm.runInContext(`
+ document.createElement=tag=>({tag,children:[],dataset:{},value:'',append(...nodes){this.children.push(...nodes);},setAttribute(){},querySelector(selector){return this.children.find(n=>n.tag===selector);},get firstChild(){return this.caption||=( {textContent:this.textContent} );}});
+ openDialog=(title,build,actions)=>{const body=node('div');build(body);globalThis.dialog={title,body,actions};};notice=message=>globalThis.lastNotice=message;change=fn=>fn();
+ project=projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[{name:'Explicit',direction:'bidirectional',connectors:{start:'A',end:'B',custom:'Keep'},lengths:[5]}]}});
+ const before=JSON.stringify(project);editCableConnectors('Data',0);
+ `,ctx);
+ assert.equal(ctx.dialog.body.children[2].hidden,false);ctx.dialog.body.children[1].querySelector('input').value='Cancelled';ctx.dialog.actions.find(a=>a.label==='Cancel').run({close(){}});assert.equal(vm.runInContext('JSON.stringify(project)===before',ctx),true);
+ vm.runInContext("editCableConnectors('Data',0)",ctx);ctx.dialog.body.children[1].querySelector('input').value='New A';ctx.dialog.body.children[2].querySelector('input').value='';ctx.dialog.actions.find(a=>a.label==='Save connectors').run({close(){}});assert.match(ctx.lastNotice,/each required end/);assert.equal(vm.runInContext('JSON.stringify(project)===before',ctx),true);
+ ctx.dialog.body.children[2].querySelector('input').value='New B';ctx.dialog.actions.find(a=>a.label==='Save connectors').run({close(){}});assert.deepEqual(JSON.parse(vm.runInContext('JSON.stringify(project.stock.cables.Data[0].connectors)',ctx)),{start:'New A',end:'New B',custom:'Keep'});
 });

@@ -6,7 +6,7 @@ import vm from 'node:vm';
 import * as M from '../js/model.js';
 import {toWorkbook,fromWorkbook,replaceWorkbook} from '../js/excel.js';
 const read=p=>JSON.parse(fs.readFileSync(new URL(p,import.meta.url),'utf8'));
-const fixture=()=>({vendor:{name:'Generated test vendor',lengthUnit:'m'},cables:{Data:[]},looms:[{id:'stock-loom-1',name:'2-Way Socapex',lengths:[30,10,20.5],cables:[{cableType:'Socapex 19-Pin',quantity:2},{cableType:'XLR-5',quantity:4}]}]});
+const fixture=()=>({vendor:{name:'Generated test vendor',lengthUnit:'m'},cables:{Data:[]},looms:[{id:'stock-loom-1',name:'2-Way Socapex',lengths:[10,20.5,30],cables:[{cableType:'Socapex 19-Pin',quantity:2},{cableType:'XLR-5',quantity:4}]}]});
 const grouped=stock=>{const result=M.clone(stock);result.cables[M.LOOM_CATEGORY]=result.looms;delete result.looms;return result;};
 const project=()=>M.projectFromStock(fixture(),'test_cable.json');
 const excelContext=vm.createContext({console,ArrayBuffer,Uint8Array,Date,TextEncoder,TextDecoder});
@@ -14,12 +14,12 @@ vm.runInContext(fs.readFileSync(new URL('../vendor/xlsx.full.min.js',import.meta
 const X=excelContext.XLSX;
 function roundtrip(p,options){const bytes=X.write(toWorkbook(p,X,options),{type:'array',bookType:'xlsx'});return fromWorkbook(X.read(bytes,{type:'array'}),X,p);}
 
-test('stock loom import/export preserves approved names, quantities, IDs, length order and unit',()=>{
+test('stock loom import/export preserves approved names, quantities, IDs, lengths and unit',()=>{
  const input=fixture(),before=M.clone(input),p=M.projectFromStock(input,'test_cable.json');
  assert.deepEqual(input,before);assert.deepEqual(M.runtimeJSON(p),grouped(input));assert.deepEqual(M.changes(p),[]);
  assert.equal(p.looms[0].components[1].count,4);assert.equal(p.looms[0].components[0].type,'Socapex 19-Pin');
- p.stock.vendor.lengthUnit='ft';assert.deepEqual(M.runtimeJSON(p).cables[M.LOOM_CATEGORY][0].lengths,[30,10,20.5]);
- assert.deepEqual(M.validate(p).filter(i=>i.level==='error'),[]);
+ p.stock.vendor.lengthUnit='ft';assert.deepEqual(M.runtimeJSON(p).cables[M.LOOM_CATEGORY][0].lengths,[10,20.5,30]);
+ assert(M.validate(p).some(i=>i.message.includes('missing individual cable reference')));
 });
 test('stock JSON excludes editor component IDs and backup fields but includes edited quantities and loom lengths',()=>{
  const p=project(),l=p.looms[0];l.description='Keep in backup';l.components[0].connectors={male:'Override'};l.components[0].lengths=[31];l.components[0].count=3;l.lengths=[12,24];
@@ -100,7 +100,7 @@ test('loom preview, clipboard and fragment download all use the approved stock s
 });
 test('complete stock preview and download include looms and retain the chosen vendor filename',()=>{
  const ctx=appContext();vm.runInContext('preview()',ctx);assert.deepEqual(JSON.parse(ctx.dialog.body.children.find(n=>n.tag==='pre').textContent),grouped(fixture()));
- vm.runInContext('reviewExport()',ctx);ctx.dialog.actions.find(a=>a.label==='Download').run({close(){}});
+ vm.runInContext('reviewExport()',ctx);ctx.dialog.actions.find(a=>a.label==='Download anyway').run({close(){}});
  assert.equal(ctx.downloads[0].filename,'test_cable.json');assert.deepEqual(JSON.parse(ctx.downloads[0].text),grouped(fixture()));
 });
 
@@ -128,7 +128,7 @@ test('separate stock loom categories round trip with ordinary cables, lengths, q
  input.cables['FOH Snake']=[{...M.clone(input.cables[M.LOOM_CATEGORY][0]),id:'foh-1',name:'FOH assembly',lengths:[10,40],extra:{keep:true},cables:[{cableType:'XLR-3',quantity:12,custom:'keep'}]}];
  const before=M.clone(input),p=M.projectFromStock(input,'category_cable.json');
  assert.deepEqual(input,before);assert.equal(p.looms.length,2);assert.deepEqual(Object.keys(p.stock.cables),['Data']);assert.deepEqual(Object.keys(p.rowIds),['Data']);
- assert.equal(M.projectLoomRows(p,'FOH Snake')[0].components[0].count,12);assert.deepEqual(M.changes(p),[]);assert.deepEqual(M.validate(p).filter(i=>i.level==='error'),[]);
+ assert.equal(M.projectLoomRows(p,'FOH Snake')[0].components[0].count,12);assert.deepEqual(M.changes(p),[]);assert(M.validate(p).some(i=>i.message.includes('missing individual cable reference')));
  for(const restored of [p,M.restoreProject(M.clone(p)),roundtrip(p).project])assert.deepEqual(M.runtimeJSON(restored),input);
  assert.equal(Object.hasOwn(M.runtimeJSON(p),'looms'),false);
 });

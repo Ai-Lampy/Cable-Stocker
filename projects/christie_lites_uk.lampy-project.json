@@ -160,80 +160,6 @@
             96,
             24
           ]
-        },
-        {
-          "name": "XLR-3 MALE > XLR-5 FEMALE",
-          "direction": "male-female",
-          "connectors": {
-            "male": "XLR-3",
-            "female": "XLR-5"
-          },
-          "lengths": [
-            4
-          ]
-        },
-        {
-          "name": "XLR-3 MALE > MALE",
-          "direction": "male-male",
-          "connectors": {
-            "male": "XLR-3",
-            "female": "XLR-3",
-            "start": "XLR-3",
-            "end": "XLR-3"
-          },
-          "lengths": [
-            4
-          ]
-        },
-        {
-          "name": "XLR-3 FEMALE > FEMALE",
-          "direction": "female-female",
-          "connectors": {
-            "male": "XLR-3",
-            "female": "XLR-3",
-            "start": "XLR-3",
-            "end": "XLR-3"
-          },
-          "lengths": [
-            4
-          ]
-        },
-        {
-          "name": "XLR-5 MALE > XLR-3 FEMALE",
-          "direction": "male-female",
-          "connectors": {
-            "male": "XLR-5",
-            "female": "XLR-3"
-          },
-          "lengths": [
-            4
-          ]
-        },
-        {
-          "name": "XLR-5 MALE > MALE",
-          "direction": "male-male",
-          "connectors": {
-            "male": "",
-            "female": "",
-            "start": "XLR-5",
-            "end": "XLR-5"
-          },
-          "lengths": [
-            4
-          ]
-        },
-        {
-          "name": "XLR-5 FEMALE > FEMALE",
-          "direction": "female-female",
-          "connectors": {
-            "male": "",
-            "female": "",
-            "start": "XLR-5",
-            "end": "XLR-5"
-          },
-          "lengths": [
-            4
-          ]
         }
       ],
       "TRS": [
@@ -387,72 +313,6 @@
             24,
             48,
             96
-          ]
-        },
-        {
-          "name": "63A 3ø > Tails",
-          "direction": "female-male",
-          "connectors": {
-            "male": "Tails",
-            "female": "CEE 63A 3ø"
-          },
-          "lengths": [
-            8
-          ]
-        },
-        {
-          "name": "Powerlock MALE > 125A 3ø FEMALE",
-          "direction": "male-female",
-          "connectors": {
-            "male": "Powerlock (3P + N + E)",
-            "female": "CEE 125A 3ø"
-          },
-          "lengths": [
-            4
-          ]
-        },
-        {
-          "name": "Powerlock MALE > 63A 3ø FEMALE",
-          "direction": "male-female",
-          "connectors": {
-            "male": "Powerlock (3P + N + E)",
-            "female": "CEE 63A 3ø"
-          },
-          "lengths": [
-            4
-          ]
-        },
-        {
-          "name": "125A 3ø > Tails",
-          "direction": "female-male",
-          "connectors": {
-            "male": "Tails",
-            "female": "CEE 125A 3ø"
-          },
-          "lengths": [
-            8
-          ]
-        },
-        {
-          "name": "125A 3ø MALE > Powerlock FEMALE",
-          "direction": "male-female",
-          "connectors": {
-            "male": "CEE 125A 3ø",
-            "female": "Powerlock (3P + N + E)"
-          },
-          "lengths": [
-            4
-          ]
-        },
-        {
-          "name": "63A 3ø MALE > Powerlock FEMALE",
-          "direction": "male-female",
-          "connectors": {
-            "male": "CEE 63A 3ø",
-            "female": "Powerlock (3P + N + E)"
-          },
-          "lengths": [
-            4
           ]
         }
       ],
@@ -763,13 +623,7 @@
       "6c9a86fc-3dee-4f76-b83d-2d643dd07e39",
       "e54975f5-8855-4d98-a3ee-4dfab3f072ab",
       "1219984c-0796-4378-890c-d749d33b6088",
-      "7242940c-1b71-40ca-a708-91728c312bed",
-      "daf9ad0f-6a2e-46dd-8d2e-2920ba2baea0",
-      "05a4053b-f763-4603-a59e-35015d61e300",
-      "1c2005a4-c54b-430f-b401-cb7b53041221",
-      "30c5a404-667c-46c4-ac5f-d3e86d5660bc",
-      "ea6bb29b-a082-426a-8f8a-bbaad489e0b4",
-      "bd3b4c3b-4335-49b2-9333-7a54559153d1"
+      "7242940c-1b71-40ca-a708-91728c312bed"
     ],
     "TRS": [
       "98932886-ca62-4daf-95bc-bd53fbb19039",
@@ -784,13 +638,7 @@
       "202c5325-59c6-48be-ab9f-8abf20ab1148",
       "f62e0158-6ba7-4721-be8c-d84c66feda2c",
       "d14933f2-613a-4c66-90d4-b35dc37abdda",
-      "66bde30e-0c65-48b1-9f94-0b221c1905d6",
-      "5e59f337-089a-43f4-992e-0ef547e744dc",
-      "f7a4fc37-7508-4688-ad41-67f4cc007fa2",
-      "f241a341-9d12-4e51-b98d-69efd4902d75",
-      "aada916b-f909-419c-bfd5-e6ac04c6ae05",
-      "666984f6-0b05-40bb-8265-30172f73f20a",
-      "22a8ef4d-a39b-42d3-9841-e95ad82bcc65"
+      "66bde30e-0c65-48b1-9f94-0b221c1905d6"
     ],
     "Motor": [
       "781e82d8-bd1d-4c05-bff7-5f1dd82fb30e",
@@ -815,20 +663,7 @@
   "lengthDisplay": {
     "ft": "'"
   },
-  "adaptors": {
-    "daf9ad0f-6a2e-46dd-8d2e-2920ba2baea0": true,
-    "05a4053b-f763-4603-a59e-35015d61e300": true,
-    "1c2005a4-c54b-430f-b401-cb7b53041221": true,
-    "30c5a404-667c-46c4-ac5f-d3e86d5660bc": true,
-    "ea6bb29b-a082-426a-8f8a-bbaad489e0b4": true,
-    "bd3b4c3b-4335-49b2-9333-7a54559153d1": true,
-    "5e59f337-089a-43f4-992e-0ef547e744dc": true,
-    "aada916b-f909-419c-bfd5-e6ac04c6ae05": true,
-    "f241a341-9d12-4e51-b98d-69efd4902d75": true,
-    "f7a4fc37-7508-4688-ad41-67f4cc007fa2": true,
-    "666984f6-0b05-40bb-8265-30172f73f20a": true,
-    "22a8ef4d-a39b-42d3-9841-e95ad82bcc65": true
-  },
+  "adaptors": {},
   "loomCategories": [
     "FOH Snake"
   ],

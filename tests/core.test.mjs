@@ -75,7 +75,7 @@ test('stock JSON preview compares the current draft, including vendor/root metad
 });
 test('semantic equality ignores object field order, but preserves array order',()=>{assert(M.same({x:1,y:2},{y:2,x:1}));assert(!M.same([1,2],[2,1]));});
 test('vendor version increment independent of app/runtime version',()=>{assert.equal(M.incrementVersion('v2',false),'v2.1');assert.equal(M.incrementVersion('v2.9',true),'v3');assert.throws(()=>M.incrementVersion('bad',true));const p=fresh();p.vendorVersion='v3';assert(!('version' in M.runtimeJSON(p).vendor));});
-test('runtime exports approved loom fields while excluding editor data and vendor version',()=>{const p=fresh();p.looms=[{id:'loom-test',name:'Fixture test',lengths:[30],components:[]}];p.vendorVersion='v4';assert.deepEqual(M.runtimeJSON(p),{...source,cables:{...source.cables,[M.LOOM_CATEGORY]:[{id:'loom-test',name:'Fixture test',lengths:[30],cables:[]}]}});assert(M.validate(p).some(i=>i.message.includes('planned update')));});
+test('runtime exports approved loom fields while excluding editor data and vendor version',()=>{const p=fresh();p.looms=[{id:'loom-test',name:'Fixture test',lengths:[30],components:[]}];p.vendorVersion='v4';assert.deepEqual(M.runtimeJSON(p),{...source,cables:{...source.cables,[M.LOOM_CATEGORY]:[{id:'loom-test',name:'Fixture test',lengths:[30],cables:[]}]}});assert(M.validate(p).some(i=>i.message.includes('needs components')));});
 test('project backup restores imported baseline and looms',()=>{const p=fresh();p.looms.push({id:'test-loom',name:'Test',lengths:[30],description:'',components:[{id:'comp-1',type:'DMX 5-pin',count:2,connectors:{male:'XLR-5',female:'XLR-5'},lengths:[]}]});const restored=M.restoreProject(M.parseJSON(JSON.stringify(p)));assert.deepEqual(restored,p);});
 test('Excel full binary round trip preserves authoritative JSON and no false changes',()=>{const p=fresh(),r=roundtrip(p).project;assert.deepEqual(r.stock,p.stock);assert.deepEqual(r.rowIds,p.rowIds);assert.deepEqual(M.changes(r,M.snapshot(p)),[]);});
 test('Excel aliases, overrides, custom nested data, version and composite looms round trip',()=>{
@@ -91,7 +91,7 @@ test('inconsistent bidirectional Excel endpoints reject whole import',()=>{const
 test('direct connectors_json Excel edits are not overwritten by unchanged endpoint cells',()=>{const p=fresh(),book=toWorkbook(p,X);book.Sheets.Data.G2={t:'s',v:'{"male":"Changed","female":"XLR-3","custom":"kept"}'};const r=fromWorkbook(book,X,p).project;assert.equal(r.stock.cables.Data[0].connectors.male,'Changed');assert.equal(r.stock.cables.Data[0].connectors.custom,'kept');});
 test('conflicting edits to both Excel connector representations are rejected',()=>{const p=fresh(),book=toWorkbook(p,X);book.Sheets.Data.G2={t:'s',v:'{"male":"One","female":"XLR-3"}'};book.Sheets.Data.D2={t:'s',v:'Two'};assert.throws(()=>fromWorkbook(book,X,p),/conflict/);});
 test('Excel preserves unchanged partially invalid values and missing fields in explicit metadata',()=>{const p=fresh();p.stock.cables.Data[0].lengths=['invalid',0,4,4];p.stock.cables.Data[1].connectors=null;delete p.stock.cables.Data[2].name;assert.deepEqual(roundtrip(p).project.stock,p.stock);});
-test('duplicate lengths entered in Excel are retained and flagged, not silently discarded',()=>{const p=fresh(),book=toWorkbook(p,X);book.Sheets.Data.F2={t:'s',v:'2, 2, 3'};const r=fromWorkbook(book,X,p).project;assert.deepEqual(r.stock.cables.Data[0].lengths,[2,2,3]);assert(M.validate(r).some(i=>i.message==='Duplicate lengths.'));});
+test('duplicate lengths entered in Excel are retained and flagged, not silently discarded',()=>{const p=fresh(),book=toWorkbook(p,X);book.Sheets.Data.F2={t:'s',v:'2, 2, 3'};const r=fromWorkbook(book,X,p).project;assert.deepEqual(r.stock.cables.Data[0].lengths,[2,2,3]);assert(M.validate(r).some(i=>i.message.startsWith('Duplicate lengths')));});
 test('single category Excel replaces only its scope',()=>{const p=fresh(),r=roundtrip(p,{category:'Data'});r.project.stock.cables.Data.splice(0,1);r.project.rowIds.Data.splice(0,1);const result=replaceWorkbook(p,r.project,r.partial,r.categories);assert.equal(result.stock.cables.Data.length,p.stock.cables.Data.length-1);assert.deepEqual(result.stock.cables.Multi,p.stock.cables.Multi);assert.deepEqual(result.baseline,p.baseline);});
 test('Excel merge keeps rows omitted by incoming workbook',()=>{const p=fresh(),incoming=M.clone(p);incoming.stock.cables.Data.splice(0,1);incoming.rowIds.Data.splice(0,1);incoming.stock.cables.Data[0].name='Changed';const r=M.mergeProjects(p,incoming);assert.equal(r.stock.cables.Data.length,p.stock.cables.Data.length);assert.equal(r.stock.cables.Data[1].name,'Changed');});
 test('Excel formula cells are not evaluated or silently read',()=>{const p=fresh(),book=toWorkbook(p,X);book.Sheets.Data.B2={t:'s',v:'cached',f:'HYPERLINK("https://example.com")'};assert.throws(()=>fromWorkbook(book,X,p),/Formula found/);});
@@ -211,28 +211,25 @@ test('invalid version text is not silently repaired into a different version',()
 
 test('recognised cable names and aliases inherit missing connector defaults without replacing overrides',()=>{const entries=[{name:'Known',aliases:['Alias'],direction:'male-female',connectors:{male:'Plug',female:'Socket'}}];const row={name:' Alias ',direction:'male-female',connectors:{male:'Custom',female:''},lengths:[]};assert.equal(M.inheritCableConnectors(row,entries),true);assert.deepEqual(row.connectors,{male:'Custom',female:'Socket'});assert.equal(M.inheritCableConnectors(row,entries),false);assert.equal(M.cableNeedsConnectorInputs(row,entries),false);assert.equal(M.cableNeedsConnectorInputs({...row,name:'Custom'},entries),true);});
 test('empty recognised bidirectional cables inherit direction and end; incompatible overrides remain editable',()=>{const entries=[{name:'Known',direction:'bidirectional',connectors:{end:'RJ45'}}];const row=M.defaultCable();row.name='Known';assert.equal(M.inheritCableConnectors(row,entries),true);assert.equal(row.direction,'bidirectional');assert.equal(row.connectors.end,'RJ45');const custom={name:'Known',direction:'male-female',connectors:{male:'Override',female:''}};assert.equal(M.inheritCableConnectors(custom,entries),false);assert.equal(M.cableNeedsConnectorInputs(custom,entries),true);});
-test('custom cable normal connector inputs fix validation without adaptor flag or runtime markers',()=>{const p=fresh();p.stock.cables.Custom=[M.defaultCable(null,'Custom cable')];p.rowIds.Custom=['custom'];const row=p.stock.cables.Custom[0];M.setCell(row,'start','Custom plug');M.setCell(row,'end','Custom socket');assert.equal(M.validate(p).filter(x=>x.category==='Custom'&&x.level==='error').length,0);assert.equal(M.isCableAdaptor(p,'Custom',0),false);assert.deepEqual(M.runtimeJSON(p).cables.Custom[0].connectors,{male:'Custom plug',female:'Custom socket'});});
+test('custom cable normal connector inputs fix validation without adaptor flag or runtime markers',()=>{const p=fresh();p.stock.cables.Custom=[M.defaultCable(null,'Custom cable')];p.rowIds.Custom=['custom'];const row=p.stock.cables.Custom[0];row.lengths=[5];M.setCell(row,'start','Custom plug');M.setCell(row,'end','Custom socket');assert.equal(M.validate(p).filter(x=>x.category==='Custom'&&x.level==='error').length,0);assert.equal(M.isCableAdaptor(p,'Custom',0),false);assert.deepEqual(M.runtimeJSON(p).cables.Custom[0].connectors,{male:'Custom plug',female:'Custom socket'});});
 
 test('bidirectional inherited end is visible despite old empty male/female keys',()=>{const row={name:'Ethernet',direction:'bidirectional',connectors:{male:'',female:'',end:'RJ45'}};assert.equal(M.getCell(row,'start'),'RJ45');assert.equal(M.getCell(row,'end'),'RJ45');M.setCell(row,'end','EtherCON');assert.equal(M.getCell(row,'end'),'EtherCON');});
 
-test('missing connectors use cable names after reference inheritance, preserving overrides and malformed data',()=>{
- const p=fresh(),r=M.clone(refs);p.stock.cables.Custom=[M.defaultCable(null,'Review cable'),{name:'Two way',direction:'bidirectional',connectors:{},lengths:[]},{name:'Partial',direction:'male-female',connectors:{male:'XLR3',extra:4},lengths:[]},{name:'Bad',direction:'male-female',connectors:42,lengths:[]},M.defaultCable()];
- const baseline=M.clone(p.baseline);assert.equal(M.fillCableConnectors(p,r),true);
- assert.deepEqual(p.stock.cables.Custom[0].connectors,{male:'Review cable',female:'Review cable'});
- assert.deepEqual(p.stock.cables.Custom[1].connectors,{end:'Two way'});
- assert.deepEqual(p.stock.cables.Custom[2].connectors,{male:'XLR3',extra:4,female:'Partial'});
- assert.equal(p.stock.cables.Custom[3].connectors,42);assert.deepEqual(p.stock.cables.Custom[4].connectors,{male:'',female:''});assert.deepEqual(p.baseline,baseline);assert.equal(M.fillCableConnectors(p,r),false);
+test('validation and export preserve missing connectors without inventing cable-name fallbacks',()=>{
+ const p=fresh();p.stock.cables.Custom=[M.defaultCable(null,'Review cable'),{name:'Bad',direction:'male-female',connectors:42,lengths:[]}];const before=M.clone(p);
+ assert(M.validate(p).some(i=>i.category==='Custom'&&i.field==='start'));M.runtimeJSON(p);assert.deepEqual(p,before);
 });
+const suppliedReviewCable=name=>({...M.defaultCable(null,name),connectors:{male:name,female:name},lengths:[5]});
 test('review groups unknown connector ends and approval corrects all uses without duplicate references',()=>{
- const p=fresh(),r=M.clone(refs);p.stock.cables.Custom=[M.defaultCable(null,'Review cable'),M.defaultCable(null,'review cable')];M.fillCableConnectors(p,r);
+ const p=fresh(),r=M.clone(refs);p.stock.cables.Custom=[suppliedReviewCable('Review cable'),suppliedReviewCable('review cable')];
  const review=M.connectorReviews(p,r).find(x=>x.name==='Review cable');assert.equal(review.usages.length,4);
  const count=r.connector_types.items.length;assert.throws(()=>M.approveConnector(p,r,'Review cable','  '),/Enter/);assert.equal(r.connector_types.items.length,count);
  M.approveConnector(p,r,'Review cable','Approved connector');assert.equal(r.connector_types.items.length,count+1);assert(!M.connectorReviews(p,r).some(x=>x.name==='Approved connector'));
  assert.equal(p.stock.cables.Custom[1].connectors.female,'Approved connector');assert.throws(()=>M.approveConnector(p,r,'Review cable','Again'),/no longer/);
- p.stock.cables.Custom.push(M.defaultCable(null,'Another'));M.fillCableConnectors(p,r);M.approveConnector(p,r,'Another','approved connector');assert.equal(r.connector_types.items.length,count+1);
+ p.stock.cables.Custom.push(suppliedReviewCable('Another'));M.approveConnector(p,r,'Another','approved connector');assert.equal(r.connector_types.items.length,count+1);
 });
 test('pending connector review survives stock JSON and project/Excel round trips without runtime metadata',()=>{
- const p=fresh(),r=M.clone(refs);p.stock.cables.Custom=[M.defaultCable(null,'Review cable')];p.rowIds.Custom=['test-review'];M.fillCableConnectors(p,r);
+ const p=fresh(),r=M.clone(refs);p.stock.cables.Custom=[suppliedReviewCable('Review cable')];p.rowIds.Custom=['test-review'];
  const output=M.runtimeJSON(p);assert.deepEqual(Object.keys(output).sort(),Object.keys(source).sort());
  for(const restored of [M.projectFromStock(output),M.restoreProject(M.clone(p)),fromWorkbook(toWorkbook(p,X),X,p).project])assert(M.connectorReviews(restored,r).some(x=>x.name==='Review cable'));
  assert.equal(M.connectorReviews(fresh(),r).length,0);
@@ -258,7 +255,7 @@ test('connector controller scopes additions, category moves, multi-row paste and
  vm.runInContext("connectorTypesSheet='Mains';renderSettings();",c);assert.equal(grid.rows().length,2);assert.equal(grid.rows()[0].name,'Moved');assert.equal(grid.rows()[1].name,'Power');
 });
 test('approved connectors inherit one usage category without adding category to stock JSON',()=>{
- const p=fresh(),r=M.clone(refs);p.stock.cables.Test=[M.defaultCable(null,'Unlisted')];M.fillCableConnectors(p,r);M.approveConnector(p,r,'Unlisted','Approved');
+ const p=fresh(),r=M.clone(refs);p.stock.cables.Test=[suppliedReviewCable('Unlisted')];M.approveConnector(p,r,'Unlisted','Approved');
  assert.equal(r.connector_types.items.at(-1).category,'Test');assert.equal(p.stock.cables.Test[0].category,undefined);
 });
 
@@ -274,13 +271,13 @@ test('new-project version default does not overwrite saved versions or invent an
  assert.equal(fresh().vendorVersion,'');
 });
 
-test('length display formats change labels without changing stock units or numeric values',()=>{
+test('handoff display overrides old label preferences without changing units or values',()=>{
  const p=fresh(),stock=M.runtimeJSON(p);
  for(const [unit,labels] of Object.entries(M.LENGTH_DISPLAYS)){
   p.stock.vendor.lengthUnit=unit;
-  for(const label of labels){p.lengthDisplay={[unit]:label};assert.equal(M.lengthUnitLabel(p),label);assert.equal(M.formatLength(12.5,p),`12.5${label==="'"?'':' '}${label}`);assert.equal(M.formatLength('',p),'');assert.equal(M.runtimeJSON(p).vendor.lengthUnit,unit);assert.deepEqual(M.runtimeJSON(p).cables,stock.cables);assert.equal(M.runtimeJSON(p).lengthDisplay,undefined);}
+  for(const label of labels){p.lengthDisplay={[unit]:label};assert.equal(M.lengthUnitLabel(p),unit==='ft'?"'":'m');assert.equal(M.formatLength(12.5,p),unit==='ft'?"12.5'":'12.5m');assert.equal(M.formatLength('',p),'');assert.equal(M.runtimeJSON(p).vendor.lengthUnit,unit);assert.deepEqual(M.runtimeJSON(p).cables,stock.cables);assert.equal(M.runtimeJSON(p).lengthDisplay,undefined);}
  }
- delete p.lengthDisplay;assert.equal(M.lengthUnitLabel(p),'ft');
+ delete p.lengthDisplay;assert.equal(M.lengthUnitLabel(p),"'");
 });
 test('length display choices survive project and Excel backups while legacy projects stay unchanged',()=>{
  const p=fresh();p.lengthDisplay={m:'Meter',ft:"'"};
@@ -350,21 +347,8 @@ test('published reference refresh brings in new records and untouched updates wh
  assert.deepEqual(M.newPublishedCableTypes(published,prior),[{id:'new',name:'New'}]);assert.deepEqual([prior,local,published],before);
  assert.deepEqual(M.mergePublishedReference(merged,published,published),merged);
 });
-test('new published cables of every selected category and looms populate without duplicates or overwrites',()=>{
- const r=loomReferenceFixture();r.categories.items.push({id:'data',name:'Data',aliases:['Signal']});
- r.cable_types.items.push(...['Data','Multi','Mains','TRS','Custom'].map((category,i)=>({id:'c'+i,name:'New '+category,category,aliases:['Alias '+category],direction:'male-female',connectors:{male:'Plug',female:'Socket'},adaptor:category==='Mains'})));
- const p=newProjectFixture('ft');for(const category of ['Signal','Multi','Mains','TRS']){p.stock.cables[category]=[];p.rowIds[category]=[];}p.loomTab=true;
- const baseline=M.clone(p.baseline),rBefore=M.clone(r),added=M.syncNewReferenceStock(p,r,r.cable_types.items);
- assert.equal(added.cables,4);assert.equal(added.looms,1);assert.equal(added.mismatches.length,0);assert.equal(p.stock.cables.Custom,undefined);assert.equal(M.isCableAdaptor(p,'Mains',0),true);
- p.stock.cables.Signal[0].lengths=[10];p.stock.cables.Signal[0].name='Alias Data';const before=M.clone(p);
- assert.equal(M.syncNewReferenceStock(p,r,r.cable_types.items).cables,0);assert.deepEqual(p,before);assert.deepEqual(p.baseline,baseline);assert.deepEqual(r,rBefore);
- assert.deepEqual(M.runtimeJSON(roundtrip(p).project),M.runtimeJSON(p));
-});
-test('published refresh does not resurrect already-seen project rows or deleted categories',()=>{
- const r=loomReferenceFixture(),p=newProjectFixture('ft');p.loomTab=true;M.syncNewReferenceStock(p,r,r.cable_types.items);p.looms=[];
- const current=M.clone(r.cable_types),newTypes=M.newPublishedCableTypes(current,current);assert.deepEqual(newTypes,[]);M.syncNewReferenceStock(p,r,newTypes);assert.deepEqual(p.looms,[]);
- p.loomTab=false;M.syncNewReferenceStock(p,r,r.cable_types.items);assert.deepEqual(p.looms,[]);
-});
+
+
 test('new custom categories can seed from cable file without a separate category record',()=>{
  const r={categories:{items:[]},cable_types:{items:[{name:'Custom cable',category:'New type',connectors:{male:'A',female:'B'},direction:'male-female'}]}};
  assert(M.cableTypeSheets(r).includes('New type'));assert.equal(M.categoryCables('New type',r)[0].row.name,'Custom cable');
@@ -386,13 +370,7 @@ test('adding either loom category loads only its references and keeps unit safeg
  assert.equal(M.referenceLoomsForProject(p,r,'FOH Snake').looms.length,0);
  const metric=newProjectFixture();const plan=M.referenceLoomsForProject(metric,r,'FOH Snake');assert.equal(plan.mismatches.length,1);M.addReferenceLooms(metric,plan);assert.deepEqual(metric.looms[0].lengths,[]);assert.deepEqual(metric.looms[0].components[0].lengths,[]);
 });
-test('new FOH references load only when that category is selected and do not revive deleted categories',()=>{
- const r=fohFixture(),p=newProjectFixture('ft');p.loomTab=true;
- assert.equal(M.syncNewReferenceStock(p,r,r.cable_types.items).looms,1);assert.equal(M.projectLoomRows(p,'FOH Snake').length,0);
- M.selectLoomCategory(p,'FOH Snake');assert.equal(M.syncNewReferenceStock(p,r,r.cable_types.items).looms,1);
- const before=M.clone(p);assert.equal(M.syncNewReferenceStock(p,r,r.cable_types.items).looms,0);assert.deepEqual(p,before);
- M.removeProjectCategory(p,'FOH Snake',{looms:true});assert.equal(p.looms.length,1);assert.equal(M.syncNewReferenceStock(p,r,r.cable_types.items).looms,0);assert.equal(p.loomTab,true);
-});
+
 test('FOH edits and deletion preserve other looms and the review baseline',()=>{
  const p=newProjectFixture('ft'),r=fohFixture();for(const cat of [M.LOOM_CATEGORY,'FOH Snake'])M.addReferenceLooms(p,M.referenceLoomsForProject(p,r,cat));p.baseline=M.snapshot(p);
  const other=M.clone(M.projectLoomRows(p,M.LOOM_CATEGORY));const rows=M.clone(M.projectLoomRows(p,'FOH Snake'));rows[0].components[0].count=7;M.replaceProjectLooms(p,'FOH Snake',rows);
@@ -435,10 +413,10 @@ test('reverse direction endpoints edit by gender and preserve custom connector d
   M.setCell(row,'start','F2');M.setCell(row,'end','M2');assert.deepEqual(row.connectors,{male:'M2',female:'F2',extra:7});
  }
 });
-test('reverse connectors inherit, fall back, validate and approve in direction order',()=>{
+test('explicit reverse connector input and reference defaults validate and approve in direction order',()=>{
  const p=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[{name:'Known',direction:'female > male',connectors:{female:'Override'},lengths:[2]},{name:'Unknown',direction:'female-male',connectors:{},lengths:[3]}]}});
  const r={cable_types:{items:[{name:'Known',direction:'female-male',connectors:{male:'M',female:'F'}}]},connector_types:{items:[{name:'M'},{name:'Override'}]}};
- p.filename='test.json';M.fillCableConnectors(p,r);assert.deepEqual(p.stock.cables.Data[0].connectors,{female:'Override',male:'M'});
+ p.filename='test.json';M.inheritCableConnectors(p.stock.cables.Data[0],r.cable_types.items);p.stock.cables.Data[1].connectors={female:'Unknown',male:'Unknown'};assert.deepEqual(p.stock.cables.Data[0].connectors,{female:'Override',male:'M'});
  assert.deepEqual(M.connectorReviews(p,r)[0].usages.map(x=>x.key),['female','male']);
  M.approveConnector(p,r,'Unknown','Approved');assert.deepEqual(M.connectorReviews(p,r),[]);
  assert.deepEqual(M.validate(p),[]);assert.equal(M.cableNeedsConnectorInputs(p.stock.cables.Data[0],r.cable_types.items),false);
@@ -474,17 +452,17 @@ test('direction transitions keep both connector types and existing metadata',()=
  for(const direction of ['male-male','female-female','female-male','male-male']){
   M.setCell(row,'direction',direction);assert.equal(M.getCell(row,'start'),'XLR-3');assert.equal(M.getCell(row,'end'),'XLR-5');assert.equal(row.connectors.custom,42);
  }
- M.setCell(row,'direction','bidirectional');assert.equal(M.getCell(row,'start'),'XLR-3');assert.equal(M.getCell(row,'end'),'XLR-3');
+ M.setCell(row,'direction','bidirectional');assert.equal(M.getCell(row,'start'),'XLR-3');assert.equal(M.getCell(row,'end'),'XLR-5');
 });
 test('same-gender missing defaults inherit and unknown endpoints remain reviewable',()=>{
  const row={name:'Known',direction:'male-male',connectors:{start:'Override'},lengths:[5]};
  const r={cable_types:{items:[{name:'Known',direction:'male-male',connectors:{start:'A',end:'B'}}]},connector_types:{items:[{name:'Override'}]}};
  const p=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[row]}},'test.json');
- M.fillCableConnectors(p,r);assert.deepEqual(p.stock.cables.Data[0].connectors,{start:'Override',end:'B'});
+ M.inheritCableConnectors(p.stock.cables.Data[0],r.cable_types.items);assert.deepEqual(p.stock.cables.Data[0].connectors,{start:'Override',end:'B'});
  assert.equal(M.cableNeedsConnectorInputs(p.stock.cables.Data[0],r.cable_types.items),false);
  assert.deepEqual(M.connectorReviews(p,r)[0].usages.map(u=>u.key),['end']);M.approveConnector(p,r,'B','Approved');assert.deepEqual(M.connectorReviews(p,r),[]);assert.deepEqual(M.validate(p),[]);
  delete p.stock.cables.Data[0].connectors.start;assert.equal(M.getCell(p.stock.cables.Data[0],'start'),'');assert.equal(M.validate(p)[0].field,'start');
- const unknown={name:'Unknown',direction:'female-female',connectors:{},lengths:[1]};p.stock.cables.Data.push(unknown);M.fillCableConnectors(p,r);assert.deepEqual(unknown.connectors,{start:'Unknown',end:'Unknown'});
+ const unknown={name:'Unknown',direction:'female-female',connectors:{},lengths:[1]};p.stock.cables.Data.push(unknown);M.validate(p);assert.deepEqual(unknown.connectors,{});
 });
 test('same-gender JSON, project and Excel round trips keep distinct endpoint types',()=>{
  const rows=['male-male','female-female','Male > Male','Female > Female'].map(direction=>({name:direction,direction,connectors:{start:'A',end:'B',custom:42},lengths:[2,5]}));

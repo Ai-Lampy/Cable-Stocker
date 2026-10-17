@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.47.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.48.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -31,7 +31,7 @@ Both Save table buttons perform the same action: accept a valid pending edit, sa
 
 ## Connector review
 
-Missing connectors inherit recognised cable defaults first. Any required end still missing uses the cable name. Existing connector values stay unchanged. Unknown names show a yellow notification icon and count on **Errors**; names and aliases already in Connectors do not need repeat approval.
+Existing stock is not repaired automatically on load, refresh or unrelated edits. Explicitly choosing a recognised cable when entering its name can copy declared reference defaults; missing ends remain errors rather than using guessed cable-name connectors. Enter confirmed details in the Connectors form. Unknown names show a yellow notification icon and count on **Errors**; names and aliases already in Connectors do not need repeat approval.
 
 Open **Errors**, expand a connector warning and choose **Review connector**. Confirm or correct its name, then choose **Approve & add to Connectors**. Approval updates the listed cable ends and saves the connector in your local reference list. Cancel keeps it pending. Custom cables still use the **Connectors** form in their name cell; adaptor columns stay hidden for normal cables.
 
@@ -51,7 +51,7 @@ For manual GitHub Pages upload, retain the complete folder structure and use thi
 
 ## Work with cable stock
 
-1. Select a vendor, or enter a new vendor name. New vendors start in metres. Imported feet remain feet. **Vendor name**, **Length unit** and **Length display** share the same row on wider screens. The two unit fields each use 40% of the area beside Vendor name. On narrow screens, that pair moves below Vendor name. After choosing **Length unit**, choose **Length display**: metric offers `m` or `Meter`; imperial offers `ft`, `'` or `Feet`. For example, 10 displays as `10 m`, `10 Meter`, `10 ft`, `10'` or `10 Feet`. The choice applies to length chips, headings and length-colour cells. It remembers a separate format for each unit in your vendor project/Excel backups. Cable-stock JSON keeps `m` or `ft` and numeric lengths; changing the display never converts values.
+1. Select a vendor, or enter a new vendor name. New vendors start in metres; imported feet remain feet. **Vendor name**, **Length unit** and **Length display** share the same row on wider screens. The two unit fields each use 40% of the area beside Vendor name. On narrow screens, that pair moves below Vendor name. Length display is read-only: metric uses `24m`, imperial uses `24'`. Cable-stock JSON stores `m` or `ft` with numeric lengths. Changing the unit never converts values. Older display preferences remain in project/Excel backups for preservation but do not override this format.
 2. Confirm the output filename. The supplied manifest confirms `christie_lites_cable.json` for Christie Lites UK. Its Lampy Paperwork destination is `json/cable/christie_lites_cable.json`.
 3. Add categories with **+**. Choose a name/alias from the dropdown or type a category. Recognised categories start with their associated cable types and connector defaults, with empty lengths. Custom categories start empty. The selected category wording remains in vendor data; adding an existing category does not replace its rows.
 4. Ordinary cables hide direction and Start / male / End / female columns. When a category contains adaptors, those columns appear for adaptor rows; ordinary rows stay blank and read-only in those columns. Mark a row **Adaptor** to edit its direction and endpoints. Existing direction fields remain in Lampy JSON for compatibility. Add a row. Select a cell and type to replace its contents directly in that cell; double-click or press F2 to edit existing text. Press Enter to accept and move down, or Tab to accept and move right (Shift+Tab moves left). Escape cancels the pending cell edit. Invalid entries remain in the cell for correction. Selecting a cable reference on a new row prefills connectors. Adaptor endpoint overrides remain editable. Hidden connector and custom data remain in JSON and Excel exports.
@@ -72,13 +72,13 @@ Plain cable-stock JSON import previews compare against your current draft by mat
 
 | Output | Purpose | Contents |
 | --- | --- | --- |
-| Lampy cable-stock JSON | Vendor cable and pre-made loom catalogue | `vendor`, `cables` containing separate ordinary cable and loom category arrays, and retained imported custom fields. Loom IDs are exported; editor component IDs and preferences are not. Lampy Paperwork requires its planned update to use stock looms. |
+| Lampy cable-stock JSON | Vendor cable and pre-made loom catalogue | `vendor`, `cables` containing separate ordinary cable and loom category arrays, and retained imported custom fields. Loom IDs are exported; editor component IDs and preferences are not. The supplied handoff specifies categorized loom support in Lampy Paperwork V51.19; aliases still need its loader update. |
 | `*.lampy-project.json` | Reopen vendor work | Cable stock, composite looms, adaptor markers, generator vendor version, filename, row identities and imported baseline. **Not** a Lampy Paperwork input. |
 | `.xlsx` | Spreadsheet editing and backup | Cable categories, adaptor markers, looms/components, vendor metadata, custom fields and stable row keys. |
 
 Cable-stock JSON stores pre-made looms in `cables["Stock / Pre-Made Looms"]` and FOH snakes in `cables["FOH Snake"]`, alongside the other category arrays. Each loom keeps `id`, `name`, available `lengths` and a `cables` array of `cableType` / `quantity` entries. Import restores each group to its own tab, including empty selected categories. Ordinary cable rows retain their existing structure. Older files with a root `looms` array still import into Stock / Pre-Made Looms; their next export uses the category structure. Old combined files cannot identify which entries were FOH snakes; reopen your project/Excel backup to retain that distinction.
 
-Generator vendor version, adaptor markers, descriptions, connector overrides and component-specific lengths remain in project/Excel backups. Imported custom fields stay preserved. Lampy Paperwork needs its planned update before it can use these stock-loom categories; exporting them does not update Paperwork.
+Generator vendor version, adaptor markers, descriptions, connector overrides and component-specific lengths remain in project/Excel backups. Imported custom fields stay preserved. The supplied handoff specifies categorized looms and loom-only lengths for Lampy Paperwork V51.19. Alias support and cables with no individually available lengths still need loader updates. Exporting files does not update Paperwork.
 
 New projects start at vendor version **v1**, including an empty project started when no saved vendor project exists. Saved and imported project versions remain unchanged. Vendor versions such as `v2` and `v2.1` are independent of the app version. Major/minor buttons require confirmation. A category JSON preview/download is a labelled fragment, not a complete vendor file.
 
@@ -104,6 +104,20 @@ Every cable table, Settings table and the main loom table has **Save table** but
 - Click a heading to sort ascending/descending. **Clear sort** restores the default ascending order. Search filters displayed rows. Clear the search filter before extending the table with pasted rows; sorting can remain active.
 - Zoom, widths, alignment and wrapping persist per table. Zoom changes the table only. Preferences never enter Lampy JSON.
 - In tables, yellow marks values changed from the imported baseline, or from that table’s last successful **Save table**. Export reviews continue to use the original import baseline and show added and removed rows. Excel imports retain the original baseline; importing another stock JSON establishes a new one.
+
+## Catalogue validation and availability
+
+The **Aliases** column accepts supplied alternative names separated by commas. They identify the same cable, not extra stock items. Names and aliases must resolve to exactly one cable across all individual categories, ignoring case and surrounding whitespace. Ambiguous names are errors and are never guessed. Loom member suggestions use the vendor's individual cable catalogue. New loom drafts and JSON exports use a canonical name when its reference resolves uniquely; the saved import baseline and supplied aliases stay intact.
+
+**Available lengths** edits individual cable availability. **Loom-only lengths** edits the separate optional `loomOnlyLengths` array using the same chip editor. Individual lengths never include values from that second array. A length must not appear in both. Whirlwind 12-Pair at 504 feet must be loom-only. Do not invent this availability if it is absent from your source; the app flags missing declarations for review.
+
+Every advertised loom length must appear in each member cable's `lengths` or `loomOnlyLengths`. Members must reference individual cables, not other looms. Loom IDs and names must be unique; quantities must be positive integers. Every member uses the complete loom's selected length. Component-specific lengths and connector overrides are backup-only and do not change the exported member definition.
+
+Individual cables require supported direction tokens and both endpoints. Explicit `connectors.start` and `connectors.end` override gender lookup for every direction, including bidirectional cables. Otherwise male-female uses male then female, female-male uses female then male, and bidirectional uses end for both. Same-gender directions use explicit start/end. Conflicting definitions are errors; editing an explicit endpoint also updates its existing corresponding gender field to agree.
+
+Export sorts and deduplicates valid numeric length arrays on copies and converts supported direction labels to their JSON tokens. It never adds availability, guesses missing references or moves ambiguous stock. Project/Excel backups preserve original ordering, custom data and invalid entries for recovery. JSON imports reject duplicate keys, including escaped or nested duplicates. Errors remain visible in review; **Download anyway** remains available for inspection and does not make an invalid catalogue valid.
+
+Cables with only `loomOnlyLengths` and an empty individual `lengths` array are reported for a Lampy Paperwork loader update. Keep their real availability instead of inventing individual stock. Declared aliases are preserved with a compatibility warning until Paperwork implements alias lookup; exports use canonical member names where resolution is unambiguous.
 
 ## Composite looms
 
@@ -178,9 +192,9 @@ Previously saved reference lengths and units are preserved, although their contr
 
 After you upload updated `data/cable_types.json`, **refresh or reopen the app** to load new published cable types across every category, including looms. The app reconciles Categories, Cable Types and Connectors files with saved Settings: new records become available, unchanged records receive published updates, and your local reference edits/deletions are retained. Categories present only in the cable file are also offered by the category selector.
 
-Newly published types automatically copy into matching categories already selected in the current project. Cable lengths start empty; loom lengths copy when units match. For automatic additions with different units, the app leaves those loom lengths empty and shows a notice; the reference keeps the original values. Existing vendor rows, quantities and lengths are not overwritten. Categories you deleted stay deleted, and already-seen deleted rows are not recreated on each refresh. You can undo automatic project additions during the session. Reference files are checked at startup, not continuously; data-only uploads do not trigger the app-version update banner.
+Published reference changes update Settings only. Saved vendor stock is never expanded automatically on refresh, so removed cables and adaptors stay removed. Add confirmed stock explicitly through the category selector or table; adding a category can copy its supplied references. Existing project quantities and availability remain authoritative. Reference files are checked at startup, not continuously; data-only uploads do not trigger the app-version update banner.
 
-All tables hide raw JSON columns, including cable custom fields, reference connector objects and loom connector overrides. The underlying data stays intact in backups and exports. Use Excel/project files when you need to edit those hidden structured fields. Use Import on the Vendor tab for existing files.
+All tables hide raw JSON columns, including cable custom fields, reference connector objects and loom connector overrides. The underlying data stays intact in backups and exports. Stock aliases and loom-only availability have normal table editors; Excel retains these optional fields in `custom_json` and its backup metadata. Use Excel/project files when you need to edit those hidden structured fields. Use Import on the Vendor tab for existing files.
 
 ## Vendor manifest and length colours
 

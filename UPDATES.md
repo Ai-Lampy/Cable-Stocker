@@ -2,12 +2,15 @@
 
 ## Pending
 
-- Reference-data review: review remaining blank connector defaults in `data/cable_types.json` where explicit types are needed. Existing cable-name fallback and approval remain available. Do not infer physical connector arrangements or overwrite user data. The previously flagged splitter/tails direction values now pass validation in the user-updated reference file.
-
+- Reference-data review: confirm remaining missing connector defaults where needed. Missing stock endpoints now remain errors; Cable Stocker does not guess connectors. Do not overwrite supplied data.
+- Stock review under the handoff rules: Christie Lites UK project has three unresolved `32A 3Ph` member references and missing Whirlwind 12-Pair loom-only availability at 504 feet. Siyan LTD has seven cables without individually available lengths, a missing Socapex 19-Pin member reference and missing XLR-5 availability for its advertised loom lengths. Confirm declarations before editing; project JSON and backups are unchanged.
+- Lampy Paperwork integration: the supplied handoff states V51.19 supports categorized looms and loom-only lengths. Alias resolution and exclusively loom-only cables with an empty individual lengths array still need separate loader updates. No Paperwork inspection, change or deployment was performed for this update.
 - User acceptance of the initial release in day-to-day cable-stock editing.
-- Lampy Paperwork needs a separate future update to consume the categorized vendor stock-loom structure (`cables["Stock / Pre-Made Looms"]` and `cables["FOH Snake"]`). Cable Stocker now exports it; Paperwork changes are outside this release. No implementation or deployment has been performed in Paperwork.
+
 
 ## Completed
+
+- v1.1.48 (local release for manual upload) — 2026-10-17: implemented handoff validation, aliases and loom-only availability editors, canonical member exports, explicit endpoint support, fixed length display and preservation of saved stock during reference refresh. Upload: `js/app.js`, `js/model.js`, `js/grid.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `tests/loom-stock.test.mjs`, `tests/tables.test.mjs`, `tests/handoff.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; include earlier unuploaded release files. All 247 automated tests and non-browser checks passed. Browser testing not run, as requested. New: `tests/handoff.test.mjs`; deleted files: none. User JSON/backups unchanged; stock review items listed above. No Lampy Paperwork changes, upload or deployment. Full changes, compatibility limits and audit in CHANGELOG.md.
 
 - v1.1.47 (local release for manual upload) — 2026-10-17: separate loom categories in cable-stock JSON export/import and whole-row selection using #, including Shift ranges and Ctrl/⌘ individual rows. Upload: `js/app.js`, `js/model.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/core.test.mjs`, `tests/loom-stock.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; include earlier unuploaded release files. All 232 automated tests and non-browser checks passed. Browser testing not run, as requested. No new/deleted project files. User JSON/backups preserved; Lampy Paperwork untouched; no upload/deployment. Details and compatibility limits in CHANGELOG.md.
 

@@ -131,7 +131,7 @@ export class Grid {
           const chips=el('div',null,'cell-chips');
           if(Array.isArray(value))sortedLengths(value).forEach(v=>chips.append(this.o.lengthChip?.(v)||el('span',String(v),'chip mini')));else chips.append(el('span',display(value),'invalid'));
           td.append(chips);
-          const edit=el('button','Edit lengths','cell-action');edit.onclick=e=>{e.stopPropagation();if(this.editing&&!this.commitEditor())return;if(row)this.o.lengths(id);else this.edit(r,c);};td.append(edit);
+          const edit=el('button','Edit lengths','cell-action');edit.onclick=e=>{e.stopPropagation();if(this.editing&&!this.commitEditor())return;if(row)this.o.lengths(id,col.key);else this.edit(r,c);};td.append(edit);
         }else td.append(el('span',col.format?col.format(value):display(value),'cell-text'));
         td.onclick=e=>{if(this.filled){this.filled=false;return;}this.select(r,c,e.shiftKey);};
         td.ondblclick=()=>this.edit(r,c);
