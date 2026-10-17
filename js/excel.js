@@ -1,4 +1,4 @@
-import {LOOM_CATEGORY,projectLoomCategories,projectLoomRows,selectLoomCategory,replaceProjectLooms,checkLengthDisplay,clone, parseJSON, parseLengths, projectFromStock, snapshot, uid, object, safeKey, isCableAdaptor, setCableAdaptor} from './model.js';
+import {getCell,setCell,cableDirection,LOOM_CATEGORY,projectLoomCategories,projectLoomRows,selectLoomCategory,replaceProjectLooms,checkLengthDisplay,clone, parseJSON, parseLengths, projectFromStock, snapshot, uid, object, safeKey, isCableAdaptor, setCableAdaptor} from './model.js';
 
 export const CABLE_COLUMNS = ['key','name','direction','start_connector','end_connector','lengths','connectors_json','custom_json','adaptor'];
 const LOOM_COLUMNS = ['key','name','lengths','description','custom_json'];
@@ -30,7 +30,7 @@ export function toWorkbook(project,X,{category=null,blank=false}={}) {
     const rows=[CABLE_COLUMNS];
     sourceRows[cat]={};
     if(!blank)(project.stock.cables[cat]||[]).forEach((r,i)=>{sourceRows[cat][project.rowIds[cat][i]]=clone(r);rows.push([
-      project.rowIds[cat][i],r.name??'',r.direction??'',r.connectors?.male??r.connectors?.end??'',r.connectors?.female??r.connectors?.end??'',
+      project.rowIds[cat][i],r.name??'',r.direction??'',getCell(r,'start'),getCell(r,'end'),
       Array.isArray(r.lengths)?r.lengths.join(', '):json(r.lengths),json(r.connectors ?? {}),json(omit(r,['name','direction','connectors','lengths'])),isCableAdaptor(project,cat,i)?'yes':'no'
     ]);});
     addSheet(X,book,name,rows,[39,25,19,23,23,45,48,48,12]);
@@ -105,15 +105,16 @@ export function fromWorkbook(book,X,current) {
         const jsonChanged=!base||String(row.connectors_json)!==json(base.connectors??{});
         const connectors=jsonChanged?jsonObject(row.connectors_json,'Connectors'):clone(base.connectors);
         const start=String(row.start_connector),end=String(row.end_connector);
-        const originalStart=base?(base.connectors?.male??base.connectors?.end??''):(connectors?.male??connectors?.end??''),originalEnd=base?(base.connectors?.female??base.connectors?.end??''):(connectors?.female??connectors?.end??'');
+        const original=base||{direction:row.direction,connectors};
+        const originalStart=getCell(original,'start'),originalEnd=getCell(original,'end');
         // Preserve unknown connector fields and exact shape unless the endpoint cells changed.
         if(start!==originalStart||end!==originalEnd){
           if(!object(connectors))throw new Error('Repair connectors_json before editing connector endpoints.');
-          if(base&&jsonChanged&&(start!==(connectors.male??connectors.end??'')||end!==(connectors.female??connectors.end??'')))throw new Error(`${row.name}: endpoint cells conflict with edited connectors_json. Make the two representations agree.`);
-          if(row.direction==='bidirectional'&&!Object.hasOwn(connectors,'male')&&!Object.hasOwn(connectors,'female')){
+          if(base&&jsonChanged&&(start!==getCell({direction:row.direction,connectors},'start')||end!==getCell({direction:row.direction,connectors},'end')))throw new Error(`${row.name}: endpoint cells conflict with edited connectors_json. Make the two representations agree.`);
+          if(cableDirection(row.direction)==='bidirectional'){
             if(start!==end)throw new Error(`${row.name}: bidirectional end connectors must match. Change direction or use connectors_json explicitly.`);
             connectors.end=start;
-          }else{connectors.male=start;connectors.female=end;}
+          }else{const edited={direction:row.direction,connectors};setCell(edited,'start',start);setCell(edited,'end',end);}
         }
         if(!base||String(row.name)!==String(base.name??''))result.name=String(row.name);
         if(!base||String(row.direction)!==String(base.direction??''))result.direction=String(row.direction);

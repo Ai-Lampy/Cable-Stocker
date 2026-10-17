@@ -2,10 +2,14 @@
 
 ## Pending
 
+- Reference-data review: choose supported directions and appropriate connector defaults for Socapex Splitter, 63A 3ø > Tails and 125A 3ø > Tails in `data/cable_types.json`. Their custom splitter/tails direction text is outside the three supported choices; the reference-data validation test remains failing. Existing blank connector defaults also remain for review. Do not infer physical connector arrangements or overwrite user data.
+
 - User acceptance of the initial release in day-to-day cable-stock editing.
 - Lampy Paperwork needs a separate future update to consume the agreed vendor stock-loom structure. Cable Stocker now exports it; Paperwork changes are outside this release. No implementation or deployment has been performed in Paperwork.
 
 ## Completed
+
+- v1.1.43 (local release for manual upload) — 2026-10-17: added all three direction choices with visible dropdowns, reverse connector order and JSON/Excel preservation. Upload: `js/app.js`, `js/model.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. No new/deleted project files. Approved local browser checks passed; 195/196 automated tests passed, with the outstanding reference-data audit listed above. Full results in CHANGELOG.md. User JSON/backups preserved; Lampy Paperwork untouched; no upload/deployment.
 
 - v1.1.42 (local release for manual upload) — 2026-10-17: added editable Aliases and Default category columns to Settings pre-made loom and FOH Snake tables, with parent-only metadata, safe category moves and alias/category searching and sorting. Upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. No new/deleted project files. 190 automated tests, non-browser checks and approved local browser checks passed; details in CHANGELOG.md. Test storage removed and server stopped; no downloads. User JSON/backups preserved; Lampy Paperwork untouched; no upload or deployment.
 

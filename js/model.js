@@ -129,6 +129,30 @@ export function referenceMatch(entries, text) {
   const needle = String(text).toLocaleLowerCase();
   return entries.find(r => [r.name, ...(r.aliases || [])].some(n => String(n).toLocaleLowerCase() === needle));
 }
+// Keep legacy JSON tokens; arrow labels are accepted when importing or pasting.
+export const DIRECTION_OPTIONS = [
+  {value:'bidirectional',label:'bidirectional'},
+  {value:'male-female',label:'male > female'},
+  {value:'female-male',label:'female > male'}
+];
+export function cableDirection(value){
+  const text=String(value??'').trim().toLowerCase();
+  return DIRECTION_OPTIONS.find(option=>option.value===text||option.label===text)?.value||'';
+}
+export function parseDirection(value){
+  const direction=cableDirection(value);
+  if(!direction)throw new Error('Choose bidirectional, male > female or female > male.');
+  return direction;
+}
+export function directionLabel(value){return DIRECTION_OPTIONS.find(option=>option.value===cableDirection(value))?.label??value;}
+export function connectorKeys(direction){
+  switch(cableDirection(direction)){
+    case 'male-female':return ['male','female'];
+    case 'female-male':return ['female','male'];
+    case 'bidirectional':return ['end'];
+    default:return [];
+  }
+}
 export function defaultCable(ref, wording) {
   return {name: wording || ref?.name || '', direction: ref?.direction || 'male-female', connectors: clone(ref?.connectors || {male: '', female: ''}), lengths: []};
 }
@@ -136,9 +160,9 @@ export function inheritCableConnectors(row,entries){
   const ref=referenceMatch(entries,String(row.name||'').trim());if(!ref||!object(ref.connectors))return false;
   const before=clone(row);if(row.connectors==null)row.connectors={};if(!object(row.connectors))return false;
   const populated=Object.values(row.connectors).some(v=>typeof v==='string'&&v.trim());
-  if(!populated&&['male-female','bidirectional'].includes(ref.direction))row.direction=ref.direction;
-  if(row.direction===ref.direction){
-    const keys=row.direction==='male-female'?['male','female']:['end'];
+  if(!populated&&cableDirection(ref.direction))row.direction=ref.direction;
+  if(cableDirection(row.direction)&&cableDirection(row.direction)===cableDirection(ref.direction)){
+    const keys=connectorKeys(row.direction);
     for(const key of keys)if((row.connectors[key]==null||(typeof row.connectors[key]==='string'&&!row.connectors[key].trim()))&&typeof ref.connectors[key]==='string'&&ref.connectors[key].trim())row.connectors[key]=ref.connectors[key];
   }
   return !same(before,row);
@@ -150,7 +174,7 @@ export function fillCableConnectors(project,refs){
   for(const rows of Object.values(project.stock.cables))for(const row of rows){
     changed=inheritCableConnectors(row,refs.cable_types.items)||changed;
     const name=String(row.name||'').trim();if(!name)continue;
-    const keys=row.direction==='male-female'?['male','female']:row.direction==='bidirectional'?['end']:[];
+    const keys=connectorKeys(row.direction);
     if(!keys.length)continue;
     if(row.connectors==null){row.connectors={};changed=true;}
     if(!object(row.connectors))continue;
@@ -162,7 +186,7 @@ export function connectorReviews(project,refs){
   const reviews=new Map();
   for(const [category,rows]of Object.entries(project.stock.cables))rows.forEach((row,index)=>{
     if(!object(row.connectors))return;
-    const keys=row.direction==='male-female'?['male','female']:row.direction==='bidirectional'?['end']:[];
+    const keys=connectorKeys(row.direction);
     for(const key of keys){const value=row.connectors[key];if(typeof value!=='string'||!value.trim()||referenceMatch(refs.connector_types.items,value.trim()))continue;
       const name=value.trim(),id=name.toLocaleLowerCase();
       if(!reviews.has(id))reviews.set(id,{name,usages:[]});
@@ -179,7 +203,7 @@ export function approveConnector(project,refs,pendingName,approvedName){
 }
 export function cableNeedsConnectorInputs(row,entries){
   if(!referenceMatch(entries,String(row.name||'').trim())||!object(row.connectors))return true;
-  const keys=row.direction==='male-female'?['male','female']:row.direction==='bidirectional'?['end']:[];
+  const keys=connectorKeys(row.direction);
   return !keys.length||keys.some(key=>typeof row.connectors[key]!=='string'||!row.connectors[key].trim());
 }
 export function syncVendorManifest(refs) {
@@ -249,17 +273,15 @@ export function validateLengthColours(data,palette) {
   });return issues;
 }
 export function getCell(row, key) {
-  if(['start','end'].includes(key)&&row.direction==='bidirectional')return row.connectors?.end??'';
-  if (key === 'start') return row.connectors?.male ?? row.connectors?.end ?? '';
-  if (key === 'end') return row.connectors?.female ?? row.connectors?.end ?? '';
+  if(['start','end'].includes(key)){const keys=connectorKeys(row.direction);return row.connectors?.[key==='start'?keys[0]:keys.at(-1)]??row.connectors?.end??'';}
   if (key === 'custom') return Object.fromEntries(Object.entries(row).filter(([k]) => !['name','direction','connectors','lengths'].includes(k)));
   return row[key];
 }
 export function setCell(row, key, value) {
   if (key === 'start' || key === 'end') {
     if (!object(row.connectors)) row.connectors = {};
-    if (row.direction === 'bidirectional') row.connectors.end = value;
-    else row.connectors[key === 'start' ? 'male' : 'female'] = value;
+    const keys=connectorKeys(row.direction);if(!keys.length)throw new Error('Choose a valid direction before editing connectors.');
+    row.connectors[key==='start'?keys[0]:keys.at(-1)] = value;
   } else if (key === 'custom') {
     if (!object(value)) throw new Error('Custom fields must be a JSON object.');
     for (const k of ['name','direction','connectors','lengths']) if (Object.hasOwn(value, k)) throw new Error(`Edit ${k} in its own column.`);
@@ -353,11 +375,11 @@ export function validate(project, refs) {
       else if (names.has(row.name.toLowerCase())) add('warning',category,i,'name',`Duplicate cable name: ${row.name}.`,'Check whether this is a deliberate variant.');
       names.add(String(row.name).toLowerCase());
       lengths(row.lengths,category,i);
-      if (!['male-female','bidirectional'].includes(row.direction)) add('warning',category,i,'direction','Direction is not demonstrated by the source schema.','Use male-female or bidirectional, or verify compatibility.');
+      if (!cableDirection(row.direction)) add('warning',category,i,'direction','Unsupported cable direction.','Choose bidirectional, male > female or female > male.');
       if (!object(row.connectors)) add('error',category,i,'start','Connectors are invalid.','Enter the connectors using the connector columns.');
       else {
-        const keys = row.direction === 'male-female' ? ['male','female'] : row.direction === 'bidirectional' ? ['end'] : [];
-        for (const key of keys) if (typeof row.connectors[key] !== 'string' || !row.connectors[key].trim()) add('error',category,i,key==='male'?'start':'end',`Missing ${key} connector.`,'Enter the connector in the cable table; recognised cable types inherit reference defaults.');
+        const keys = connectorKeys(row.direction);
+        for (const key of keys) if (typeof row.connectors[key] !== 'string' || !row.connectors[key].trim()) add('error',category,i,key===keys[0]?'start':'end',`Missing ${key} connector.`,'Enter the connector in the cable table; recognised cable types inherit reference defaults.');
       }
     });
   }
@@ -407,7 +429,7 @@ export function validateReferences(refs) {
       } else if (key === 'cable_types') {
         if (!object(row.connectors)) add(key,i,'connectors','Default connectors must be a JSON object.');
         if (!row.category?.trim()) add(key,i,'category','A default category is required.');
-        if (!['male-female','bidirectional'].includes(row.direction)) add(key,i,'direction','Default direction must match the supplied schema.');
+        if (!cableDirection(row.direction)) add(key,i,'direction','Choose bidirectional, male > female or female > male.');
       }
     });
   }

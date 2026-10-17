@@ -214,6 +214,26 @@
         "Low Voltage"
       ],
       "category": "Motor"
+    },
+    {
+      "id": "f24e2fb6-9c7e-4695-8eb4-b3e83d961a47",
+      "name": "Bare Tails",
+      "aliases": [
+        "Tails"
+      ],
+      "category": "Mains"
+    },
+    {
+      "id": "57a9d50b-bd88-40f0-9fdf-5a2d557e4cba",
+      "name": "IEC",
+      "aliases": [],
+      "category": "TRS"
+    },
+    {
+      "id": "71c06729-9915-48b1-bc4c-e6da23cbc6a6",
+      "name": "Schuko",
+      "aliases": [],
+      "category": "TRS"
     }
   ]
 }

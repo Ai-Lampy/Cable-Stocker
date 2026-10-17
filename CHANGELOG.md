@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.43 — 2026-10-17
+
+Previous version: v1.1.42. Local release for manual upload; not deployed.
+
+- Support bidirectional, male > female and female > male directions. Show all three choices when editing Direction cells in vendor adaptor and Settings cable-type tables, with keyboard selection/Tab commit and rejection of other typed values. Keep existing column visibility rules.
+- Display readable arrow labels while retaining compatible `male-female`, `female-male` and `bidirectional` JSON tokens. Accept imported arrow wording without rewriting it on import/export. Map reversed start/end cells to female/male connector keys; preserve connector identities, custom fields and existing forward/bidirectional data.
+- Apply direction handling to connector forms, default inheritance, fallback/review/approval, validation and Excel endpoint columns. Preserve direction-only Excel edits without swapping stored gendered connector identities.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted project files: none. Reference JSON, original examples, user project JSON and backups preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 195 of 196 automated tests passed, including six new direction tests and JSON/Excel round trips. Updated the existing supplied-loom regression to check each actual category, including FOH Snake. The remaining reference-data audit fails on three pre-existing unsupported directions: Socapex Splitter (`male > 2 x Female`), 63A 3ø > Tails and 125A 3ø > Tails (both `male > Tails`). These records were not silently changed. The previously flagged `female-male` record now validates. Blank connector defaults remain subject to existing fallback/review behaviour.
+- Approved local browser checks passed: three visible options in stock and Settings tables; selecting female > male reverses displayed endpoints while preserving identities; connector form labels follow direction; bidirectional saves one shared endpoint; invalid input is rejected; valid typed input commits with Tab; top/bottom Save and reload persistence work. No console warnings/errors in checked flows. JavaScript syntax, JSON parsing, local paths and version consistency passed. Live deployment, other browsers and downstream Lampy Paperwork support for reversed directions remain unverified.
+- Cleanup: restored isolated browser storage, closed test tab and stopped local server. No downloads or temporary project files retained; screenshot kept outside the project.
+
 ## v1.1.42 — 2026-10-17
 
 Previous version: v1.1.41. Local release for manual upload; not deployed.

@@ -321,13 +321,14 @@ test('deleting the project loom tab clears only its looms and preserves explicit
 });
 
 test('supplied reference looms load into stock with independent IDs, quantities and matching lengths',()=>{
- const p=newProjectFixture('ft'),before=M.clone(refs),plan=M.referenceLoomsForProject(p,refs);
- assert(plan.looms.length>0);assert.equal(plan.mismatches.length,0);M.addReferenceLooms(p,plan);
- const supplied=refs.cable_types.items.filter(r=>M.isLoomCategory(r.category,refs));
+ const p=newProjectFixture('ft'),before=M.clone(refs);
+ const supplied=refs.cable_types.items.filter(r=>M.isLoomCategory(r.category,refs));assert(supplied.length>0);
+ const categories=[...new Set(supplied.map(r=>r.category))];
+ for(const category of categories){const plan=M.referenceLoomsForProject(p,refs,category);assert(plan.looms.length>0);assert.equal(plan.mismatches.length,0);M.addReferenceLooms(p,plan);}
  assert.equal(p.looms.length,supplied.length);p.looms.forEach((l,i)=>{assert.notEqual(l.id,supplied[i].id);assert.equal(l.referenceId,supplied[i].id);assert.deepEqual(l.lengths,supplied[i].lengths);assert.deepEqual(l.components.map(c=>[c.type,c.count]),supplied[i].components.map(c=>[c.type,c.count]));});
  assert.deepEqual(refs,before);assert.deepEqual(M.restoreProject(M.clone(p)),p);assert.deepEqual(roundtrip(p).project.looms,p.looms);
  p.looms[0].name='Vendor wording';p.looms[0].components[0].count=9;
- assert.equal(M.referenceLoomsForProject(p,refs).looms.length,0);assert.deepEqual(refs,before);
+ for(const category of categories)assert.equal(M.referenceLoomsForProject(p,refs,category).looms.length,0);assert.deepEqual(refs,before);
 });
 function newProjectFixture(unit='m'){const p=M.newProject('Generated test vendor');p.stock.vendor.lengthUnit=unit;return p;}
 function loomReferenceFixture(){return {categories:{items:[{id:'cat-looms',name:'Stock / Pre-Made Looms',aliases:['Looms']}]},cable_types:{items:[{id:'ref-loom',name:'Loom',aliases:['Alias loom'],category:'Looms',lengthUnit:'ft',lengths:[304],components:[{id:'part',type:'XLR-5',count:2,connectors:{male:'Keep'},lengths:[304]}]}]}};}
@@ -417,4 +418,43 @@ test('cached duplicate category IDs reconcile by name without merging FOH into p
  const published=M.clone(old);published.items[1].id='cat-foh-snake';published.items[1].type='loom';
  assert.deepEqual(M.mergePublishedReference(old,published,old),published);
  const local=M.clone(old);local.items[1].aliases.push('My alias');const result=M.mergePublishedReference(local,published,old);assert.deepEqual(result.items[1],local.items[1]);assert.equal(result.items[0].name,M.LOOM_CATEGORY);assert(M.isLoomCategory('My alias',{categories:result}));
+});
+
+test('direction choices accept arrows and legacy tokens, reject unrelated direction text',()=>{
+ for(const [label,token] of [['male > female','male-female'],['female > male','female-male'],['bidirectional','bidirectional']]){
+  assert.equal(M.parseDirection(label),token);assert.equal(M.parseDirection(token),token);assert.equal(M.directionLabel(token),label);
+  const row={name:'Test',category:'Test',direction:label,connectors:{male:'M',female:'F',end:'E'}};
+  assert.deepEqual(M.validateReferences({cable_types:{items:[row]}}),[]);
+ }
+ for(const value of ['male > Tails','male > 2 x Female','',null])assert.throws(()=>M.parseDirection(value),/Choose/);
+});
+test('reverse direction endpoints edit by gender and preserve custom connector data',()=>{
+ for(const direction of ['female-male','female > male']){
+  const row={direction,connectors:{male:'M',female:'F',extra:7}};
+  assert.equal(M.getCell(row,'start'),'F');assert.equal(M.getCell(row,'end'),'M');
+  M.setCell(row,'start','F2');M.setCell(row,'end','M2');assert.deepEqual(row.connectors,{male:'M2',female:'F2',extra:7});
+ }
+});
+test('reverse connectors inherit, fall back, validate and approve in direction order',()=>{
+ const p=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[{name:'Known',direction:'female > male',connectors:{female:'Override'},lengths:[2]},{name:'Unknown',direction:'female-male',connectors:{},lengths:[3]}]}});
+ const r={cable_types:{items:[{name:'Known',direction:'female-male',connectors:{male:'M',female:'F'}}]},connector_types:{items:[{name:'M'},{name:'Override'}]}};
+ p.filename='test.json';M.fillCableConnectors(p,r);assert.deepEqual(p.stock.cables.Data[0].connectors,{female:'Override',male:'M'});
+ assert.deepEqual(M.connectorReviews(p,r)[0].usages.map(x=>x.key),['female','male']);
+ M.approveConnector(p,r,'Unknown','Approved');assert.deepEqual(M.connectorReviews(p,r),[]);
+ assert.deepEqual(M.validate(p),[]);assert.equal(M.cableNeedsConnectorInputs(p.stock.cables.Data[0],r.cable_types.items),false);
+ delete p.stock.cables.Data[0].connectors.female;assert.equal(M.validate(p)[0].field,'start');
+});
+test('all direction forms preserve JSON and Excel round trips and export endpoints in order',()=>{
+ const rows=['male-female','male > female','female-male','female > male','bidirectional'].map(direction=>({name:direction,direction,connectors:direction==='bidirectional'?{end:'E'}:{male:'M',female:'F',extra:'keep'},lengths:[1,5]}));
+ const p=M.projectFromStock({vendor:{name:'Directions',lengthUnit:'m'},cables:{Data:rows}});
+ assert.deepEqual(M.runtimeJSON(M.projectFromStock(M.runtimeJSON(p))),M.runtimeJSON(p));
+ assert.deepEqual(M.runtimeJSON(roundtrip(p).project),M.runtimeJSON(p));
+ const book=toWorkbook(p,X);assert.equal(book.Sheets.Data.D4.v,'F');assert.equal(book.Sheets.Data.E4.v,'M');
+ book.Sheets.Data.D4.v='New F';book.Sheets.Data.E4.v='New M';
+ assert.deepEqual(fromWorkbook(book,X,p).project.stock.cables.Data[2].connectors,{male:'New M',female:'New F',extra:'keep'});
+});
+test('Excel direction-only reversal retains gendered connector identities',()=>{
+ const p=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[{name:'Test',direction:'male-female',connectors:{male:'M',female:'F'},lengths:[2]}]}});
+ const book=toWorkbook(p,X);book.Sheets.Data.C2.v='female-male';const row=fromWorkbook(book,X,p).project.stock.cables.Data[0];
+ assert.deepEqual(row.connectors,{male:'M',female:'F'});assert.equal(M.getCell(row,'start'),'F');
 });

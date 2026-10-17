@@ -232,39 +232,6 @@
       }
     },
     {
-      "lengths": [
-        304
-      ],
-      "components": [
-        {
-          "id": "2945bfb1-2f8a-4670-9472-aa4fb77f0b48",
-          "type": "Whirlwind 12-Pair",
-          "count": 1,
-          "connectors": {
-            "male": "WW 12-Pin",
-            "female": "WW 12-Pin"
-          },
-          "lengths": []
-        },
-        {
-          "id": "9ef3a517-7585-48fe-9d36-bd261a4a38be",
-          "type": "32A 3ø",
-          "count": 1,
-          "connectors": {
-            "male": "CEE 32A 3ø",
-            "female": "CEE 32A 3ø"
-          },
-          "lengths": []
-        }
-      ],
-      "description": "",
-      "lengthUnit": "ft",
-      "id": "d27f0e85-3f5a-48c2-8f64-c795159e4204",
-      "name": "Snake W-1 CEE 32A 3Ph 304'",
-      "category": "Stock / Pre-Made Looms",
-      "aliases": []
-    },
-    {
       "id": "e6781e8e-da93-43c5-b6ba-81f8ac50971e",
       "name": "32A 1ø",
       "aliases": [
@@ -363,6 +330,211 @@
         "male": "",
         "female": ""
       }
+    },
+    {
+      "lengths": [],
+      "components": [
+        {
+          "id": "b4feca03-dc62-4f87-b572-7606af25b1cf",
+          "type": "Whirlwind 12-Pair",
+          "count": 1,
+          "connectors": {
+            "male": "WW 12-Pin",
+            "female": "WW 12-Pin"
+          },
+          "lengths": []
+        },
+        {
+          "id": "6a633bc1-2fba-4959-b8d7-45814d2e88b1",
+          "type": "32A 3ø",
+          "count": 1,
+          "connectors": {
+            "male": "CEE 32A 3ø",
+            "female": "CEE 32A 3ø"
+          },
+          "lengths": []
+        }
+      ],
+      "description": "",
+      "lengthUnit": "m",
+      "id": "9eebd736-dcd3-4770-a5fb-b8d9f230980f",
+      "name": "Snake W-1 CEE 32A 3Ph 304'",
+      "category": "FOH Snake",
+      "aliases": [
+        "32A 3Ph Snake",
+        "32/3 Snake",
+        "32A 3Ph FOH Snake",
+        "32/3 FOH Snake",
+        "32A 3ø Snake",
+        "32A 3ø FOH Snake"
+      ]
+    },
+    {
+      "lengths": [],
+      "components": [
+        {
+          "id": "a25fc0bc-a121-4bc6-910a-f3ee93907000",
+          "type": "Whirlwind 12-Pair",
+          "count": 1,
+          "connectors": {
+            "male": "WW 12-Pin",
+            "female": "WW 12-Pin"
+          },
+          "lengths": []
+        },
+        {
+          "id": "2417d27a-084b-4791-87cd-7a04e4e79326",
+          "type": "TRUE 1",
+          "count": 1,
+          "connectors": {
+            "male": "powerCON TRUE1",
+            "female": "powerCON TRUE1"
+          },
+          "lengths": []
+        }
+      ],
+      "description": "",
+      "lengthUnit": "m",
+      "id": "5f8d0407-da6c-451b-85af-284246c5abce",
+      "name": "Snake W-1 TRUE1 304'",
+      "category": "FOH Snake",
+      "aliases": [
+        "True1 Snake",
+        "T1 Snake",
+        "True1 FOH Snake"
+      ]
+    },
+    {
+      "id": "5303c298-2306-4a6e-9a49-425b30e266f3",
+      "name": "Socapex Splitter",
+      "aliases": [
+        "Twofer Socapex",
+        "Soca Y-Split"
+      ],
+      "category": "Multi",
+      "direction": "male > 2 x Female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      },
+      "adaptor": true
+    },
+    {
+      "id": "68d6e2e6-7d94-4232-910b-3a03c6ce24c6",
+      "name": "63A 3ø > Tails",
+      "aliases": [
+        "63A 3Ph to Bare Tails",
+        "63/3 > Tails"
+      ],
+      "category": "Mains",
+      "direction": "male > Tails",
+      "connectors": {
+        "male": "",
+        "female": ""
+      },
+      "adaptor": true
+    },
+    {
+      "id": "3e57b66d-a4d8-42d2-9d98-4fcb020bb84c",
+      "name": "Powerlock MALE > 125A 3ø FEMALE",
+      "aliases": [
+        "P/Lock > 125/3 Adaptor"
+      ],
+      "category": "Mains",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      },
+      "adaptor": true
+    },
+    {
+      "id": "c1a464f3-3089-4af4-bf4f-f6064d433ad5",
+      "name": "Powerlock MALE > 63A 3ø FEMALE",
+      "aliases": [
+        "P/Lock > 63/3 Adaptor"
+      ],
+      "category": "Mains",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      },
+      "adaptor": true
+    },
+    {
+      "id": "f9b53273-59b8-41d6-93a0-23ee30948ecf",
+      "name": "125A 3ø > Tails",
+      "aliases": [
+        "125A 3Ph to Bare Tails",
+        "125/3 > Tails"
+      ],
+      "category": "Mains",
+      "direction": "male > Tails",
+      "connectors": {
+        "male": "",
+        "female": ""
+      },
+      "adaptor": true
+    },
+    {
+      "id": "acc3cbd0-3e8c-428f-8972-773bf549e1cb",
+      "name": "Schuko",
+      "aliases": [],
+      "category": "TRS",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      }
+    },
+    {
+      "id": "16af6cf7-57d1-4880-9467-10bb84681d0c",
+      "name": "IEC",
+      "aliases": [],
+      "category": "TRS",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      }
+    },
+    {
+      "id": "64c34c5f-687c-421c-9e4f-4ff244c70302",
+      "name": "16A 3ø",
+      "aliases": [
+        "Red Motor"
+      ],
+      "category": "Motor",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      }
+    },
+    {
+      "id": "26a4cce3-876f-4269-b138-dca4760b1851",
+      "name": "Socapex 7-Pin MALE > Red+Yellow FEMALE",
+      "aliases": [],
+      "category": "Motor",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      },
+      "adaptor": true
+    },
+    {
+      "id": "ff91b83e-f083-465c-9505-4bee2a2e6332",
+      "name": "Socapex 7-Pin FEMALE > Red+Yellow MALE",
+      "aliases": [],
+      "category": "Motor",
+      "direction": "female-male",
+      "connectors": {
+        "male": "",
+        "female": ""
+      },
+      "adaptor": true
     }
   ]
 }
