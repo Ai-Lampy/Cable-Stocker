@@ -65,6 +65,7 @@ export function restoreProject(value) {
   const p = clone(value);
   checkLengthDisplay(p.lengthDisplay);checkLengthDisplay(p.baseline?.lengthDisplay);
   if (p.adaptors !== undefined && (!object(p.adaptors) || Object.values(p.adaptors).some(v=>v!==true))) throw new Error('Invalid adaptor markers.');
+  for(const state of [p,p.baseline].filter(Boolean))if(state.loomCategories!==undefined&&(!Array.isArray(state.loomCategories)||state.loomCategories.some(c=>typeof c!=='string'||!c.trim()||!safeKey(c))))throw new Error('Invalid loom categories.');
   if (!Array.isArray(p.looms) || !object(p.rowIds)) throw new Error('Incomplete generator project.');
   importStockLooms(p);
   for (const [cat, rows] of Object.entries(p.stock.cables)) {
@@ -77,6 +78,7 @@ export function restoreProject(value) {
   if (typeof p.filename !== 'string' || typeof p.vendorVersion !== 'string') throw new Error('Invalid project filename or version.');
   for (const loom of [...p.looms, ...p.baseline.looms]) {
     if (!object(loom) || typeof loom.id !== 'string' || typeof loom.name !== 'string' || !Array.isArray(loom.lengths) || !Array.isArray(loom.components)) throw new Error('Invalid generator loom structure.');
+    if(loom.category!==undefined&&(typeof loom.category!=='string'||!loom.category.trim()||!safeKey(loom.category)))throw new Error('Invalid loom category.');
     for (const c of loom.components) if (!object(c) || typeof c.id !== 'string' || typeof c.type !== 'string' || !object(c.connectors) || !Array.isArray(c.lengths)) throw new Error('Invalid generator component structure.');
   }
   return p;
@@ -99,7 +101,7 @@ export function newProject(name = '') {
 }
 // Delete only the current project data; preserve the imported baseline for review/undo.
 export function removeProjectCategory(project,category,{looms=false}={}) {
-  if(looms){project.looms=[];project.loomTab=false;return;}
+  if(looms){project.looms=project.looms.filter(l=>loomCategory(l)!==category);if(category===LOOM_CATEGORY)project.loomTab=false;if(project.loomCategories)project.loomCategories=project.loomCategories.filter(c=>c!==category);return;}
   if(!Object.hasOwn(project.stock.cables,category))return;
   for(const id of project.rowIds[category]||[])if(project.adaptors)delete project.adaptors[id];
   delete project.stock.cables[category];delete project.rowIds[category];
@@ -197,23 +199,23 @@ export function categoryCables(name, refs) {
   return refs.cable_types.items.filter(c=>c.category===name||(category&&referenceMatch(refs.categories.items,c.category)?.id===category.id)).map(c=>({row:defaultCable(c),adaptor:c.adaptor===true}));
 }
 // Prepare independent stock copies. Adding a category never overwrites existing vendor looms.
-export function referenceLoomsForProject(project,refs){
+export function referenceLoomsForProject(project,refs,selected=LOOM_CATEGORY){
   const looms=[],mismatches=[],unit=project.stock.vendor.lengthUnit;
   const nameKey=value=>String(value||'').trim().toLocaleLowerCase();
-  for(const row of refs.cable_types.items.filter(r=>isLoomCategory(r.category,refs))){
+  for(const row of refs.cable_types.items.filter(r=>isLoomCategory(r.category,refs)&&loomCategoryName(r.category,refs)===loomCategoryName(selected,refs))){
     const terms=[row.name,...(row.aliases||[])].map(nameKey);
-    if([...project.looms,...looms].some(l=>(row.id&&l.referenceId===row.id)||terms.includes(nameKey(l.name))))continue;
+    if([...project.looms,...looms].some(l=>(row.id&&l.referenceId===row.id)||(loomCategoryName(loomCategory(l),refs)===loomCategoryName(selected,refs)&&terms.includes(nameKey(l.name)))))continue;
     const {id,category,aliases,lengthUnit,direction,connectors,adaptor,...source}=clone(referenceLoom(row));
-    const loom={...source,id:uid(),...(id?{referenceId:id}:{}),components:source.components.map(c=>({...c,id:uid()}))};
+    const loom={...source,id:uid(),...(selected!==LOOM_CATEGORY?{category:selected}:{}),...(id?{referenceId:id}:{}),components:source.components.map(c=>({...c,id:uid()}))};
     if(lengthUnit!==unit&&(loom.lengths.length||loom.components.some(c=>c.lengths?.length)))mismatches.push({id:loom.id,name:loom.name,unit:lengthUnit});
     looms.push(loom);
   }
-  return {looms,mismatches};
+  return {looms,mismatches,category:selected};
 }
 export function addReferenceLooms(project,plan,{keepMismatchedLengths=false}={}){
   const copies=clone(plan.looms),mismatches=new Set(plan.mismatches.map(m=>m.id));
   for(const loom of copies)if(mismatches.has(loom.id)&&!keepMismatchedLengths){loom.lengths=[];for(const c of loom.components)c.lengths=[];}
-  project.looms.push(...copies);project.loomTab=true;
+  project.looms.push(...copies);selectLoomCategory(project,plan.category||LOOM_CATEGORY);
 }
 export function isCableAdaptor(project, category, index) {
   return project.adaptors?.[project.rowIds[category]?.[index]]===true;
@@ -323,9 +325,9 @@ export function changes(project, baseline = project.baseline) {
   }
   for (const loom of project.looms) {
     const old = baseline.looms?.find(x => x.id === loom.id);
-    if (!old || !same(old, loom)) result.push({category:'Stock / Pre-Made Looms',kind:old ? 'modified':'added',name:loom.name});
+    if (!old || !same(old, loom)) result.push({category:loomCategory(loom),kind:old ? 'modified':'added',name:loom.name});
   }
-  for (const loom of baseline.looms || []) if (!project.looms.some(x => x.id === loom.id)) result.push({category:'Stock / Pre-Made Looms',kind:'removed',name:loom.name});
+  for (const loom of baseline.looms || []) if (!project.looms.some(x => x.id === loom.id)) result.push({category:loomCategory(loom),kind:'removed',name:loom.name});
   return result;
 }
 export function validate(project, refs) {
@@ -359,17 +361,17 @@ export function validate(project, refs) {
       }
     });
   }
-  if (project.looms.length) add('warning','Stock / Pre-Made Looms',null,'name','Stock looms are included in JSON; Lampy Paperwork needs its planned update to use them.','Keep a project JSON or Excel backup for descriptions, connector overrides and component lengths.');
+  if (project.looms.length) add('warning',loomCategory(project.looms[0]),null,'name','Stock looms are included in JSON; Lampy Paperwork needs its planned update to use them.','Keep a project JSON or Excel backup for descriptions, connector overrides and component lengths.');
   const loomIds=new Set();
   project.looms.forEach((loom, i) => {
-    if (typeof loom.id!=='string' || !loom.id.trim() || loomIds.has(loom.id)) add('error','Stock / Pre-Made Looms',i,'name','Loom IDs must be non-empty and unique.','Use a unique ID for each stock loom.');
+    if (typeof loom.id!=='string' || !loom.id.trim() || loomIds.has(loom.id)) add('error',loomCategory(loom),i,'name','Loom IDs must be non-empty and unique.','Use a unique ID for each stock loom.');
     loomIds.add(loom.id);
-    if (!loom.name?.trim()) add('error','Stock / Pre-Made Looms',i,'name','Loom name is required.','Name this packaged item.');
-    lengths(loom.lengths,'Stock / Pre-Made Looms',i);
-    if (!Array.isArray(loom.components) || !loom.components.length) add('error','Stock / Pre-Made Looms',i,'components','A loom needs components.','Add the cables inside one loom.');
+    if (!loom.name?.trim()) add('error',loomCategory(loom),i,'name','Loom name is required.','Name this packaged item.');
+    lengths(loom.lengths,loomCategory(loom),i);
+    if (!Array.isArray(loom.components) || !loom.components.length) add('error',loomCategory(loom),i,'components','A loom needs components.','Add the cables inside one loom.');
     (loom.components || []).forEach((c, j) => {
-      if (typeof c.type!=='string' || !c.type.trim() || !Number.isSafeInteger(c.count) || c.count <= 0) add('error','Stock / Pre-Made Looms',i,'components',`Component ${j+1} needs a type and positive integer count.`,'Count cables inside one loom, not stock quantities.');
-      if (c.lengths?.length) lengths(c.lengths,'Stock / Pre-Made Looms',i,'components');
+      if (typeof c.type!=='string' || !c.type.trim() || !Number.isSafeInteger(c.count) || c.count <= 0) add('error',loomCategory(loom),i,'components',`Component ${j+1} needs a type and positive integer count.`,'Count cables inside one loom, not stock quantities.');
+      if (c.lengths?.length) lengths(c.lengths,loomCategory(loom),i,'components');
     });
   });
   if (refs) issues.push(...validateReferences(refs));
@@ -444,6 +446,7 @@ export function mergeProjects(current, incoming, partial = false) {
       matched.add(target);
     });
   }
+  for(const category of projectLoomCategories(incoming))selectLoomCategory(result,category);
   for (const loom of incoming.looms) {
     const i = result.looms.findIndex(l => l.id === loom.id);
     if (i < 0) result.looms.push(clone(loom)); else result.looms[i] = clone(loom);
@@ -452,7 +455,7 @@ export function mergeProjects(current, incoming, partial = false) {
 }
 
 // Reconcile published additions/updates without overwriting local reference edits or deletions.
-const publishedMatch=(rows,row)=>rows.find(r=>row.id&&r.id===row.id)||referenceMatch(rows,String(row.name||''));
+const publishedMatch=(rows,row)=>{const named=rows.find(r=>String(r.name||'').toLocaleLowerCase()===String(row.name||'').toLocaleLowerCase()),ids=rows.filter(r=>row.id&&r.id===row.id);return named||(ids.length===1?ids[0]:referenceMatch(rows,String(row.name||'')));};
 export function mergePublishedReference(local,published,previous){
   if(!local)return clone(published);
   const prior=previous?.items||[],remote=published.items||[],result=clone(local);
@@ -472,14 +475,35 @@ export function syncNewReferenceStock(project,refs,newTypes){
       rows.push(defaultCable(type));project.rowIds[category].push(uid());setCableAdaptor(project,category,rows.length-1,type.adaptor===true);cables++;
     }
   }
-  const plan=project.loomTab||project.looms.length?referenceLoomsForProject(project,{...refs,cable_types:{items:eligible}}):{looms:[],mismatches:[]};
-  if(plan.looms.length)addReferenceLooms(project,plan);
-  return {cables,looms:plan.looms.length,mismatches:plan.mismatches};
+  let looms=0;const mismatches=[];
+  for(const category of projectLoomCategories(project)){
+    const plan=referenceLoomsForProject(project,{...refs,cable_types:{items:eligible}},category);
+    if(plan.looms.length)addReferenceLooms(project,plan);
+    looms+=plan.looms.length;mismatches.push(...plan.mismatches);
+  }
+  return {cables,looms,mismatches};
 }
 
 // Category sheets preserve original reference objects and category wording.
 export function cableTypeSheets(refs){return [...new Set([...(refs.categories?.items||[]).map(r=>r.name),...(refs.cable_types?.items||[]).map(r=>r.category||''),''])];}
-export function isLoomCategory(category,refs){return category==='Stock / Pre-Made Looms'||referenceMatch(refs.categories?.items||[],category)?.id==='cat-looms';}
+export const LOOM_CATEGORY='Stock / Pre-Made Looms';
+export function isLoomCategory(category,refs={}){
+  const ref=referenceMatch(refs.categories?.items||[],category);
+  return [LOOM_CATEGORY,'FOH Snake'].includes(category)||ref?.type==='loom'||ref?.id==='cat-looms'||[LOOM_CATEGORY,'FOH Snake'].includes(ref?.name);
+}
+export function loomCategoryName(category,refs={}){return referenceMatch(refs.categories?.items||[],category)?.name||category;}
+export function loomCategory(loom){return loom.category||LOOM_CATEGORY;}
+export function projectLoomCategories(project){return [...new Set([...(project.loomTab?[LOOM_CATEGORY]:[]),...(project.loomCategories||[]),...project.looms.map(loomCategory)])];}
+export function selectLoomCategory(project,category){
+  if(category===LOOM_CATEGORY)project.loomTab=true;
+  else project.loomCategories=[...new Set([...(project.loomCategories||[]),category])];
+}
+export function projectLoomRows(project,category){return project.looms.filter(l=>loomCategory(l)===category);}
+export function replaceProjectLooms(project,category,looms){
+  const remaining=new Map(looms.map(l=>[l.id,l]));
+  project.looms=project.looms.flatMap(row=>{if(loomCategory(row)!==category)return [row];const next=remaining.get(row.id);remaining.delete(row.id);return next?[next]:[];}).concat([...remaining.values()]);
+}
+
 // Legacy reference rows gain editor defaults in memory only, without changing source data.
 export function referenceLoom(row){return {lengths:[],components:[],description:'',lengthUnit:'m',...row};}
 export function replaceLoomReferences(items,category,looms){

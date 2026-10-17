@@ -121,10 +121,10 @@ test('Settings looms edit, add and delete references without touching stock or o
  referenceBaseline=clone(refs);
  const stockBefore=JSON.stringify(project),otherBefore=JSON.stringify(refs.cable_types.items[0]);
  const context=loomContext(true,category);renderLooms(context);
- captured[1].apply([{id:0,col:{key:'name'},value:'Renamed'},{id:1,col:{key:'count'},value:4},{id:0,col:{key:'lengths'},value:[30,15]}]);
+ captured[1].apply([{id:0,col:{key:'name'},value:'Renamed'},{id:1,col:{key:'count'},value:4}]);
  `,ctx);
  const saved=JSON.parse(vm.runInContext('JSON.stringify(refs.cable_types.items[1])',ctx));
- assert.equal(saved.name,'Renamed');assert.equal(saved.components[0].count,4);assert.deepEqual(saved.lengths,[30,15]);assert.equal(saved.lengthUnit,'ft');assert.deepEqual(saved.aliases,['Alias']);assert.deepEqual(saved.custom,{keep:true});
+ assert.equal(saved.name,'Renamed');assert.equal(saved.components[0].count,4);assert.deepEqual(saved.lengths,[20,10]);assert.equal(saved.lengthUnit,'ft');assert.deepEqual(saved.aliases,['Alias']);assert.deepEqual(saved.custom,{keep:true});
  assert.equal(vm.runInContext('JSON.stringify(project)===stockBefore&&JSON.stringify(refs.cable_types.items[0])===otherBefore',ctx),true);
  vm.runInContext(`context.mutate(looms=>looms.push({...newLoom(),category,name:'Added'}));confirmAction=(title,text,fn)=>fn();captured[1].remove([1]);`,ctx);
  assert.equal(vm.runInContext('refs.cable_types.items[1].components.length',ctx),0);
@@ -206,4 +206,50 @@ test('startup refresh merges published cable files through saved references and 
  vm.runInContext('project.stock.cables.Data.pop();project.rowIds.Data.pop();save();',ctx);
  await vm.runInContext('start()',ctx);
  assert.equal(vm.runInContext('project.stock.cables.Data.length',ctx),1);
+});
+
+test('FOH stock uses a separate loom context for edits, deletion, saving and layout keys',()=>{
+ const ctx=loomController();vm.runInContext(`
+ project.looms.push({...newLoom(),name:'Existing',components:[]},{...newLoom(),category:'FOH Snake',name:'Snake',components:[{id:'part',type:'DMX',count:2,connectors:{},lengths:[]}]});
+ const other=JSON.stringify(project.looms[0]);page='looms:FOH Snake';renderLooms();
+ captured[1].apply([{id:1,col:{key:'count'},value:5}]);
+ `,ctx);
+ assert.equal(vm.runInContext('captured[1].label',ctx),'FOH Snake');assert.equal(vm.runInContext('captured[1].key',ctx),'looms:FOH Snake');assert.equal(vm.runInContext('project.looms[1].components[0].count',ctx),5);assert.equal(vm.runInContext('JSON.stringify(project.looms[0])===other',ctx),true);
+ vm.runInContext('confirmAction=(title,text,fn)=>fn();captured[1].remove([0]);',ctx);assert.equal(vm.runInContext('project.looms.length',ctx),1);assert.equal(vm.runInContext('JSON.stringify(project.looms[0])===other',ctx),true);
+});
+test('FOH Settings use the shared loom grid while retaining other reference categories',()=>{
+ const ctx=loomController();vm.runInContext(`
+ refs.cable_types.items.push({...newLoom(),id:'ref',category:'FOH Snake',name:'Snake',aliases:['Alias'],lengthUnit:'m',components:[{id:'c',type:'DMX',count:2,connectors:{},lengths:[]}]});
+ referenceBaseline=clone(refs);const other=JSON.stringify(refs.cable_types.items[0]),stock=JSON.stringify(project);renderLooms(loomContext(true,'FOH Snake'));
+ captured[1].apply([{id:1,col:{key:'count'},value:4}]);
+ `,ctx);
+ assert.equal(vm.runInContext('refs.cable_types.items[1].components[0].count',ctx),4);assert.equal(vm.runInContext('refs.cable_types.items[1].category',ctx),'FOH Snake');assert.equal(vm.runInContext('JSON.stringify(project)===stock&&JSON.stringify(refs.cable_types.items[0])===other',ctx),true);
+});
+
+
+test('Settings loom sheets omit length controls while stock tables retain them and saved reference lengths survive',()=>{
+ const ctx=loomController();vm.runInContext(`
+ refs.cable_types.items.push({...newLoom(),id:'saved',category:'FOH Snake',name:'Snake',lengthUnit:'ft',lengths:[304],components:[]});referenceBaseline=clone(refs);
+ renderLooms(loomContext(true,'FOH Snake'));
+ captured[1].apply([{id:0,col:{key:'name'},value:'Renamed snake'}]);
+ `,ctx);
+ assert.deepEqual(Array.from(vm.runInContext('captured[1].columns.map(c=>c.key)',ctx)),['name','count']);
+ assert.equal(vm.runInContext('captured[1].lengths',ctx),undefined);
+ assert.deepEqual(Array.from(vm.runInContext('refs.cable_types.items[1].lengths',ctx)),[304]);assert.equal(vm.runInContext('refs.cable_types.items[1].lengthUnit',ctx),'ft');
+ assert(Array.from(vm.runInContext('captured[0].columns.map(c=>c.key)',ctx)).includes('lengths'));
+ const source=fs.readFileSync(new URL('../js/app.js',import.meta.url),'utf8');const pane=source.slice(source.indexOf('function editLoom('),source.indexOf('function renderLooms('));
+ assert(!pane.includes("node('label','Length unit')"));
+});
+
+test('adding FOH opens its own tab, while deletion confirmation and undo leave pre-made looms intact',()=>{
+ const ctx=controller();vm.runInContext(`
+ save=()=>{};renderShell=()=>{};render=()=>{};notice=()=>{};navigate=next=>page=next;
+ refs={categories:{items:[{id:'cat-foh-snake',name:'FOH Snake',type:'loom'}]},cable_types:{items:[{id:'snake',name:'Snake',category:'FOH Snake',lengths:[],components:[]}]},manifest:{catalogues:[]},lighting_vendors:{vendors:[]}};
+ project=newProject('Test');project.looms.push({...newLoom(),name:'Original loom'});const original=JSON.stringify(project.looms[0]);
+ addLoomCategory('FOH Snake');const added=JSON.stringify(project);let confirmDelete;confirmAction=(title,message,fn)=>confirmDelete=fn;
+ deleteCategory('FOH Snake',page);
+ `,ctx);
+ assert.equal(vm.runInContext('page',ctx),'looms:FOH Snake');assert.equal(vm.runInContext('JSON.stringify(project)===added',ctx),true);
+ vm.runInContext('confirmDelete();',ctx);assert.equal(vm.runInContext('page',ctx),'vendor');assert.equal(vm.runInContext('project.looms.length',ctx),1);assert.equal(vm.runInContext('JSON.stringify(project.looms[0])===original',ctx),true);
+ vm.runInContext('undo();',ctx);assert.equal(vm.runInContext('JSON.stringify(project)===added',ctx),true);
 });

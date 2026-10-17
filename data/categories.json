@@ -38,12 +38,13 @@
       ]
     },
     {
-      "id": "cat-looms",
+      "id": "cat-foh-snake",
       "name": "FOH Snake",
       "aliases": [
         "Snake",
         "FOH Multi"
-      ]
+      ],
+      "type": "loom"
     }
   ]
 }

@@ -1,4 +1,4 @@
-import {checkLengthDisplay,clone, parseJSON, parseLengths, projectFromStock, snapshot, uid, object, safeKey, isCableAdaptor, setCableAdaptor} from './model.js';
+import {LOOM_CATEGORY,projectLoomCategories,projectLoomRows,selectLoomCategory,replaceProjectLooms,checkLengthDisplay,clone, parseJSON, parseLengths, projectFromStock, snapshot, uid, object, safeKey, isCableAdaptor, setCableAdaptor} from './model.js';
 
 export const CABLE_COLUMNS = ['key','name','direction','start_connector','end_connector','lengths','connectors_json','custom_json','adaptor'];
 const LOOM_COLUMNS = ['key','name','lengths','description','custom_json'];
@@ -22,8 +22,9 @@ export function toWorkbook(project,X,{category=null,blank=false}={}) {
   const book=X.utils.book_new(),used=new Set(RESERVED.map(n=>n.toLowerCase()));
   const sourceRows={};
   const mapping=[['sheet','category','kind']];
-  const cats=category&&category!=='Stock / Pre-Made Looms'?[category]:category?[]:Object.keys(project.stock.cables);
-  if(!cats.length&&!category)cats.push('Data');
+  const selectedLoom=category&&(category===LOOM_CATEGORY||projectLoomCategories(project).includes(category));
+  const cats=category&&!selectedLoom?[category]:category?[]:Object.keys(project.stock.cables);
+  if(!cats.length&&!category&&!projectLoomCategories(project).length)cats.push('Data');
   for(const cat of cats) {
     const name=sheetName(cat,used);mapping.push([name,cat,'cables']);
     const rows=[CABLE_COLUMNS];
@@ -34,16 +35,19 @@ export function toWorkbook(project,X,{category=null,blank=false}={}) {
     ]);});
     addSheet(X,book,name,rows,[39,25,19,23,23,45,48,48,12]);
   }
-  const includeLooms=(!category&&(project.looms.length>0||project.loomTab||blank))||category==='Stock / Pre-Made Looms';
-  if(includeLooms){
-    const name=sheetName('Stock - Pre-Made Looms',used);mapping.push([name,'Stock / Pre-Made Looms','looms']);
-    const rows=[LOOM_COLUMNS],components=[COMPONENT_COLUMNS];
-    if(!blank)project.looms.forEach(loom=>{
+  const loomCategories=category?(selectedLoom?[category]:[]):projectLoomCategories(project);
+  if(blank&&!category&&!loomCategories.includes(LOOM_CATEGORY))loomCategories.push(LOOM_CATEGORY);
+  const includeLooms=loomCategories.length>0,components=[COMPONENT_COLUMNS];
+  for(const loomCategory of loomCategories){
+    const name=sheetName(loomCategory===LOOM_CATEGORY?'Stock - Pre-Made Looms':loomCategory,used);mapping.push([name,loomCategory,'looms']);
+    const rows=[LOOM_COLUMNS];
+    if(!blank)projectLoomRows(project,loomCategory).forEach(loom=>{
       rows.push([loom.id,loom.name,loom.lengths.join(', '),loom.description||'',json(omit(loom,['id','name','lengths','description','components']))]);
       loom.components.forEach(c=>components.push([loom.id,c.id,c.type,c.count,json(c.connectors||{}),(c.lengths||[]).join(', '),json(omit(c,['id','type','count','connectors','lengths']))]));
     });
-    addSheet(X,book,name,rows,[39,30,45,50,50]);addSheet(X,book,'_Components',components,[39,39,28,12,48,32,48]);
+    addSheet(X,book,name,rows,[39,30,45,50,50]);
   }
+  if(includeLooms)addSheet(X,book,'_Components',components,[39,39,28,12,48,32,48]);
   addSheet(X,book,'_Categories',mapping,[31,50,12]);
   const metadata={format:'lampy-cable-workbook',formatVersion:1,scope:category?'category':'vendor',category,stock:omit(project.stock,['cables']),stockLooms:!!project.stockLooms,filename:project.filename,vendorVersion:project.vendorVersion,loomCategory:includeLooms,sourceRows};
   if(project.lengthDisplay!==undefined)metadata.lengthDisplay=clone(checkLengthDisplay(project.lengthDisplay));
@@ -91,7 +95,8 @@ export function fromWorkbook(book,X,current) {
     if(!map.category || !safeKey(map.category))throw new Error('Invalid category name in mapping sheet.');
     mapped.add(map.sheet);categories.add(`${map.kind}:${map.category}`);
     if(map.kind==='looms'){
-      for(const row of records(book,map.sheet,X,LOOM_COLUMNS))p.looms.push({...custom(row.custom_json,['id','name','lengths','description','components'],'Loom custom fields'),id:String(row.key||uid()),name:String(row.name),lengths:importedLengths(row.lengths),description:String(row.description),components:[]});
+      selectLoomCategory(p,map.category);
+      for(const row of records(book,map.sheet,X,LOOM_COLUMNS))p.looms.push({...custom(row.custom_json,['id','name','lengths','description','components'],'Loom custom fields'),...(map.category!==LOOM_CATEGORY?{category:map.category}:{}),id:String(row.key||uid()),name:String(row.name),lengths:importedLengths(row.lengths),description:String(row.description),components:[]});
     }else if(map.kind==='cables'){
       p.stock.cables[map.category]=[];p.rowIds[map.category]=[];
       for(const row of records(book,map.sheet,X,CABLE_COLUMNS.filter(c=>c!=='adaptor'),['adaptor'])){
@@ -143,6 +148,6 @@ export function replaceWorkbook(current,incoming,partial,mappings) {
   if(!partial){const result=clone(incoming);result.baseline=clone(current.baseline);return result;}
   const result=clone(current);
   if(mappings.some(map=>map.kind==='looms')&&incoming.stockLooms)result.stockLooms=true;
-  for(const map of mappings){if(map.kind==='looms')result.looms=clone(incoming.looms);else{result.stock.cables[map.category]=clone(incoming.stock.cables[map.category]);result.rowIds[map.category]=clone(incoming.rowIds[map.category]);result.stock.cables[map.category].forEach((_,i)=>setCableAdaptor(result,map.category,i,isCableAdaptor(incoming,map.category,i)));}}
+  for(const map of mappings){if(map.kind==='looms'){replaceProjectLooms(result,map.category,clone(projectLoomRows(incoming,map.category)));selectLoomCategory(result,map.category);}else{result.stock.cables[map.category]=clone(incoming.stock.cables[map.category]);result.rowIds[map.category]=clone(incoming.rowIds[map.category]);result.stock.cables[map.category].forEach((_,i)=>setCableAdaptor(result,map.category,i,isCableAdaptor(incoming,map.category,i)));}}
   return result;
 }

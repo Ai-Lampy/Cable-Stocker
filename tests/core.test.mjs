@@ -368,3 +368,53 @@ test('new custom categories can seed from cable file without a separate category
  const r={categories:{items:[]},cable_types:{items:[{name:'Custom cable',category:'New type',connectors:{male:'A',female:'B'},direction:'male-female'}]}};
  assert(M.cableTypeSheets(r).includes('New type'));assert.equal(M.categoryCables('New type',r)[0].row.name,'Custom cable');
 });
+
+function fohFixture(){
+ const r=loomReferenceFixture();r.categories.items.push({id:'cat-foh-snake',name:'FOH Snake',aliases:['Snake','FOH Multi'],type:'loom'});
+ const snake=M.clone(r.cable_types.items[0]);Object.assign(snake,{id:'ref-snake',name:'FOH package',aliases:['FOH package alias'],category:'FOH Snake'});r.cable_types.items.push(snake);return r;
+}
+test('FOH Snake and its aliases use loom behaviour with a unique category ID',()=>{
+ const r=fohFixture();for(const name of ['FOH Snake','Snake','FOH Multi'])assert.equal(M.isLoomCategory(name,r),true);
+ assert.equal(M.isLoomCategory('Motor',r),false);assert.equal(M.isLoomCategory('FOH Snake'),true);
+ const categories=refs.categories.items;assert.equal(new Set(categories.map(c=>c.id)).size,categories.length);assert.equal(M.referenceMatch(categories,'FOH Snake').type,'loom');
+});
+test('adding either loom category loads only its references and keeps unit safeguards',()=>{
+ const r=fohFixture(),p=newProjectFixture('ft');M.addReferenceLooms(p,M.referenceLoomsForProject(p,r,'FOH Snake'));
+ assert.deepEqual(M.projectLoomCategories(p),['FOH Snake']);assert.equal(p.looms.length,1);assert.equal(p.looms[0].category,'FOH Snake');assert.deepEqual(p.looms[0].lengths,[304]);
+ M.addReferenceLooms(p,M.referenceLoomsForProject(p,r));assert.equal(p.looms.length,2);assert.equal(M.projectLoomRows(p,'FOH Snake').length,1);assert.equal(M.projectLoomRows(p,M.LOOM_CATEGORY).length,1);
+ assert.equal(M.referenceLoomsForProject(p,r,'FOH Snake').looms.length,0);
+ const metric=newProjectFixture();const plan=M.referenceLoomsForProject(metric,r,'FOH Snake');assert.equal(plan.mismatches.length,1);M.addReferenceLooms(metric,plan);assert.deepEqual(metric.looms[0].lengths,[]);assert.deepEqual(metric.looms[0].components[0].lengths,[]);
+});
+test('new FOH references load only when that category is selected and do not revive deleted categories',()=>{
+ const r=fohFixture(),p=newProjectFixture('ft');p.loomTab=true;
+ assert.equal(M.syncNewReferenceStock(p,r,r.cable_types.items).looms,1);assert.equal(M.projectLoomRows(p,'FOH Snake').length,0);
+ M.selectLoomCategory(p,'FOH Snake');assert.equal(M.syncNewReferenceStock(p,r,r.cable_types.items).looms,1);
+ const before=M.clone(p);assert.equal(M.syncNewReferenceStock(p,r,r.cable_types.items).looms,0);assert.deepEqual(p,before);
+ M.removeProjectCategory(p,'FOH Snake',{looms:true});assert.equal(p.looms.length,1);assert.equal(M.syncNewReferenceStock(p,r,r.cable_types.items).looms,0);assert.equal(p.loomTab,true);
+});
+test('FOH edits and deletion preserve other looms and the review baseline',()=>{
+ const p=newProjectFixture('ft'),r=fohFixture();for(const cat of [M.LOOM_CATEGORY,'FOH Snake'])M.addReferenceLooms(p,M.referenceLoomsForProject(p,r,cat));p.baseline=M.snapshot(p);
+ const other=M.clone(M.projectLoomRows(p,M.LOOM_CATEGORY));const rows=M.clone(M.projectLoomRows(p,'FOH Snake'));rows[0].components[0].count=7;M.replaceProjectLooms(p,'FOH Snake',rows);
+ assert.deepEqual(M.projectLoomRows(p,M.LOOM_CATEGORY),other);assert(M.changes(p).some(c=>c.category==='FOH Snake'&&c.kind==='modified'));
+ rows[0].components[0].count=0;M.replaceProjectLooms(p,'FOH Snake',rows);assert(M.validate(p).some(i=>i.category==='FOH Snake'&&i.field==='components'));
+ M.removeProjectCategory(p,M.LOOM_CATEGORY,{looms:true});assert.equal(p.looms.length,1);assert.equal(p.looms[0].category,'FOH Snake');assert.deepEqual(M.projectLoomCategories(p),['FOH Snake']);assert.equal(p.baseline.looms.length,2);
+});
+test('FOH project and Excel round trips retain separate sheets and agreed stock schema',()=>{
+ const p=newProjectFixture('ft'),r=fohFixture();for(const cat of [M.LOOM_CATEGORY,'FOH Snake'])M.addReferenceLooms(p,M.referenceLoomsForProject(p,r,cat));
+ assert.deepEqual(M.restoreProject(M.clone(p)),p);const result=roundtrip(p);assert.deepEqual(result.project.looms,p.looms);assert.deepEqual(M.projectLoomCategories(result.project),M.projectLoomCategories(p));
+ assert.equal(result.categories.filter(m=>m.kind==='looms').length,2);assert.deepEqual(M.runtimeJSON(result.project),M.runtimeJSON(p));
+ const output=M.runtimeJSON(p);assert.deepEqual(Object.keys(output.looms[1]),['id','name','lengths','cables']);assert.deepEqual(M.runtimeJSON(M.projectFromStock(output)),output);
+});
+test('FOH category Excel export and replacement affect only that category, including empty sheets',()=>{
+ const p=newProjectFixture('ft'),r=fohFixture();for(const cat of [M.LOOM_CATEGORY,'FOH Snake'])M.addReferenceLooms(p,M.referenceLoomsForProject(p,r,cat));
+ const exported=roundtrip(p,{category:'FOH Snake'});assert.equal(exported.project.looms.length,1);assert.equal(exported.categories.length,1);assert.equal(exported.categories[0].category,'FOH Snake');
+ exported.project.looms[0].components[0].count=9;let result=replaceWorkbook(p,exported.project,true,exported.categories);assert.deepEqual(M.projectLoomRows(result,M.LOOM_CATEGORY),M.projectLoomRows(p,M.LOOM_CATEGORY));assert.equal(M.projectLoomRows(result,'FOH Snake')[0].components[0].count,9);
+ const blank=roundtrip(p,{category:'FOH Snake',blank:true});assert.deepEqual(M.projectLoomCategories(blank.project),['FOH Snake']);result=replaceWorkbook(p,blank.project,true,blank.categories);assert.equal(result.looms.length,1);assert(M.projectLoomCategories(result).includes('FOH Snake'));
+ const merged=M.mergeProjects(newProjectFixture(),blank.project,true);assert(M.projectLoomCategories(merged).includes('FOH Snake'));
+});
+test('cached duplicate category IDs reconcile by name without merging FOH into pre-made looms',()=>{
+ const old={items:[{id:'cat-looms',name:M.LOOM_CATEGORY,aliases:[]},{id:'cat-looms',name:'FOH Snake',aliases:['Snake']}]};
+ const published=M.clone(old);published.items[1].id='cat-foh-snake';published.items[1].type='loom';
+ assert.deepEqual(M.mergePublishedReference(old,published,old),published);
+ const local=M.clone(old);local.items[1].aliases.push('My alias');const result=M.mergePublishedReference(local,published,old);assert.deepEqual(result.items[1],local.items[1]);assert.equal(result.items[0].name,M.LOOM_CATEGORY);assert(M.isLoomCategory('My alias',{categories:result}));
+});

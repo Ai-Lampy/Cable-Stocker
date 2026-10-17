@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.1.41 — 2026-10-17
+
+Previous version: v1.1.40. Local release for manual upload; not deployed.
+
+- Treat FOH Snake as a separate loom category in project tabs and Settings Cable Types. Use the shared Add/Edit loom pane, expandable component rows, quantities, vendor available lengths, saving, undo/redo and confirmed deletion. Keep category edits, loading, previews, layout preferences and deletion separate from Stock / Pre-Made Looms.
+- Correct FOH Snake's duplicate category ID to `cat-foh-snake` and mark it as a loom category. Preserve its name and aliases. Match published category updates by name when repairing duplicate IDs, retaining local edits. New published loom references populate only their selected category; preserve duplicate and unit-mismatch safeguards.
+- Remove the available-length column and length-unit control from Settings loom sheets, including FOH Snake. Keep vendor project length controls and preserve previously saved reference lengths/units, aliases, components and custom data.
+- Preserve separate loom categories in project JSON and full/category Excel backups, including empty tabs. Export each loom category as its own worksheet and limit partial replacement to that category. Loom-only full workbooks no longer add an unrelated empty Data sheet.
+- Keep the agreed cable-stock JSON unchanged: both categories export into the existing `looms` array. That format has no category field; reopening it groups all looms under Stock / Pre-Made Looms. Use project JSON or Excel to retain FOH Snake grouping. Existing reference records remain in their assigned categories; the supplied Snake W-1 record remains in Stock / Pre-Made Looms.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/excel.js`, `js/version.js`, `data/categories.json`, `tests/core.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted project files: none. User cable_types.json edits, other reference inputs, project JSON and backups preserved. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 188 automated tests passed, covering scoped reference loading/refresh, unit mismatches, duplicate prevention, isolated stock/Settings edits, category deletion/undo, project and JSON/Excel round trips, empty/category workbooks, cached duplicate IDs and removal of Settings length controls. JavaScript syntax, JSON validity, local paths, version consistency and data preservation checks passed.
+- Browser testing not run, as requested. Visual layout and live behaviour for v1.1.41 remain unverified. No test downloads, temporary project files or obsolete artifacts remained. Separate Paperwork compatibility and user acceptance remain pending.
+
 ## v1.1.40 — 2026-10-16
 
 Previous version: v1.1.39. Local release for manual upload; not deployed.

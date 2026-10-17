@@ -1,7 +1,7 @@
 import {vendorProjectFilename,loadVendorProject} from './vendor-projects.js';
 import {watchUpdates, safeRefresh, freshDocumentURL} from './updates.js';
 import {APP_VERSION} from './version.js';
-import {mergePublishedReference,newPublishedCableTypes,syncNewReferenceStock,referenceLoomsForProject,addReferenceLooms,removeProjectCategory,isLoomCategory,referenceLoom,replaceLoomReferences,LENGTH_DISPLAYS,lengthUnitLabel,formatLength,loomRows,loomOrder,prepareLoomDraft,clone,same,uid,cableTypeSheets,cableTypeRows,connectorTypeSheets,connectorTypeRows,connectorTypeCategories,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,stockLoomJSON,parseLengths,combineLengths,referenceMatch,defaultCable,inheritCableConnectors,fillCableConnectors,connectorReviews,approveConnector,cableNeedsConnectorInputs,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,colourSuggestions,resolveColour,validateLengthColours,changes,validate,normaliseVendorVersion,incrementVersion,mergeProjects,relativePath} from './model.js';
+import {loomCategory,loomCategoryName,projectLoomCategories,projectLoomRows,replaceProjectLooms,selectLoomCategory,mergePublishedReference,newPublishedCableTypes,syncNewReferenceStock,referenceLoomsForProject,addReferenceLooms,removeProjectCategory,isLoomCategory,referenceLoom,replaceLoomReferences,LENGTH_DISPLAYS,lengthUnitLabel,formatLength,loomRows,loomOrder,prepareLoomDraft,clone,same,uid,cableTypeSheets,cableTypeRows,connectorTypeSheets,connectorTypeRows,connectorTypeCategories,visibleTableColumns,object,safeKey,parseJSON,projectFromStock,restoreProject,newProject,snapshot,runtimeJSON,stockLoomJSON,parseLengths,combineLengths,referenceMatch,defaultCable,inheritCableConnectors,fillCableConnectors,connectorReviews,approveConnector,cableNeedsConnectorInputs,getCell,setCell,baselineRow,stockImportChanges,syncVendorManifest,categoryCables,isCableAdaptor,setCableAdaptor,colourSuggestions,resolveColour,validateLengthColours,changes,validate,normaliseVendorVersion,incrementVersion,mergeProjects,relativePath} from './model.js';
 import {Grid,display,sortedLengths} from './grid.js';
 import {toWorkbook,fromWorkbook,replaceWorkbook} from './excel.js';
 
@@ -51,7 +51,7 @@ function renderShell(){
     remove.setAttribute('aria-label',`Delete ${label} category from project`);remove.title=`Delete ${label} from this project`;group.append(b,remove);nav.append(group);
   };tab('Vendor','vendor');
   for(const cat of Object.keys(project.stock.cables))tab(cat,`category:${cat}`);
-  if(project.looms.length||project.loomTab)tab(LOOMS,'looms');
+  for(const category of projectLoomCategories(project))tab(category,loomPage(category));
   const add=btn('+',addCategory,'add-category');add.setAttribute('aria-label','Add or search category');nav.append(add);
   const issues=allIssues(),errors=issues.filter(i=>i.level==='error').length;$('#error-count').textContent=errors;$('#error-count').classList.toggle('zero',!errors);$('#errors-button').setAttribute('aria-label',`Errors ${errors}, warnings ${issues.length-errors}`);
   const reviews=connectorReviews(project,refs).length;let badge=$('#connector-review-count');if(!badge){badge=node('span',null,'review-badge');badge.id='connector-review-count';$('#errors-button').append(badge);}badge.hidden=!reviews;badge.textContent=`⚠ ${reviews}`;badge.title=`${reviews} connectors need review`;$('#errors-button').setAttribute('aria-label',`Errors ${errors}, warnings ${issues.length-errors}, ${reviews} connectors need review`);
@@ -62,7 +62,8 @@ function rebuildLists(){const host=$('#datalists');host.replaceChildren();const 
 function navigate(next){page=next;renderAll();window.scrollTo({top:0,behavior:'instant'});}
 function renderAll(){renderShell();render();}
 function heading(title,description,actions=[]){const head=node('div',null,'page-heading'),text=node('div');text.append(node('span','CABLE STOCK WORKSPACE','eyebrow'),node('h1',title));if(description)text.append(node('p',description));head.append(text);if(actions.length){const a=node('div',null,'actions');a.append(...actions);head.append(a);}$('#main').append(head);}
-function render(){grid=null;$('#main').replaceChildren();if(page==='settings')renderSettings();else if(page==='errors')renderErrors();else if(page==='looms')renderLooms();else if(page.startsWith('category:')&&project.stock.cables[page.slice(9)])renderCategory(page.slice(9));else{page='vendor';renderVendor();}}
+function loomPage(category){return category===LOOMS?'looms':`looms:${category}`;}
+function render(){grid=null;$('#main').replaceChildren();if(page==='settings')renderSettings();else if(page==='errors')renderErrors();else if(page==='looms'||page.startsWith('looms:'))renderLooms();else if(page.startsWith('category:')&&project.stock.cables[page.slice(9)])renderCategory(page.slice(9));else{page='vendor';renderVendor();}}
 function openDialog(title,build,actions=[]){const dialog=$('#dialog');if(dialog.open)dialog.close();const content=$('#dialog-content');content.replaceChildren();const head=node('div',null,'dialog-head'),close=btn('×',()=>dialog.close(),'dialog-close');close.setAttribute('aria-label','Close dialog');head.append(node('h2',title),close);const body=node('div',null,'dialog-body');content.append(head,body);build(body);const footer=node('div',null,'dialog-actions');for(const action of actions)footer.append(btn(action.label,()=>action.run?.(dialog),action.cls));if(!actions.length)footer.append(btn('Close',()=>dialog.close()));content.append(footer);dialog.showModal();return body;}
 function confirmAction(title,message,onConfirm,label='Continue'){openDialog(title,b=>b.append(node('p',message)),[{label:'Cancel',run:d=>d.close()},{label,cls:'primary',run:d=>{d.close();onConfirm();}}]);}
 function requireSafe(message,fn){if(dirty)confirmAction('Protect your draft',message,fn);else fn();}
@@ -209,8 +210,8 @@ function bumpVersion(major){try{const next=incrementVersion(project.vendorVersio
 function deleteCategory(category,dest=`category:${category}`){
   if(grid?.editing&&!grid.commitEditor())return;
   if(saveBlocked){notice(saveError||'Saving is paused. Download a backup before changing this project.',true);return;}
-  const workspace=project,looms=dest==='looms';
-  const count=looms?project.looms.length:(project.stock.cables[category]?.length||0);
+  const workspace=project,looms=dest==='looms'||dest.startsWith('looms:');
+  const count=looms?projectLoomRows(project,category).length:(project.stock.cables[category]?.length||0);
   confirmAction('Delete project category',`Delete ${category} from this project, including ${count} ${looms?'looms and their components':'cable rows'}? Settings references stay available. You can undo this.`,()=>{
     if(project!==workspace||saveBlocked){notice('The workspace changed. Select the category again before deleting it.',true);return;}
     change(()=>{removeProjectCategory(project,category,{looms});if(page===dest)page='vendor';});
@@ -226,16 +227,16 @@ function addCategory(){let input;openDialog('Add a cable category',body=>{
   const l=field('Category name','',()=>{},{list:'categories-list'});input=l.querySelector('input');body.append(l);select.onchange=()=>input.value=select.value;
 },[{label:'Cancel',run:d=>d.close()},{label:'Add category',cls:'primary',run:d=>{
   const name=input.value.trim();if(!name||!safeKey(name)){notice('Enter a valid category name.',true);return;}d.close();
-  if(isLoomCategory(name,refs)){addLoomCategory();return;}
+  if(isLoomCategory(name,refs)){addLoomCategory(loomCategoryName(name,refs));return;}
   if(!Object.hasOwn(project.stock.cables,name))change(()=>{const entries=categoryCables(name,refs);project.stock.cables[name]=entries.map(e=>e.row);project.rowIds[name]=entries.map(()=>uid());entries.forEach((e,i)=>setCableAdaptor(project,name,i,e.adaptor));});
   navigate(`category:${name}`);
 }}]);}
-function addLoomCategory(){
+function addLoomCategory(category=LOOMS){
   if(saveBlocked){notice(saveError||'Saving is paused. Download a backup first.',true);return;}
-  const workspace=project,referenceWorkspace=refs,plan=referenceLoomsForProject(project,refs);
+  const workspace=project,referenceWorkspace=refs,plan=referenceLoomsForProject(project,refs,category);
   const apply=keepMismatchedLengths=>{
     if(project!==workspace||refs!==referenceWorkspace||saveBlocked){notice('The workspace changed. Add the category again.',true);return;}
-    change(()=>addReferenceLooms(project,plan,{keepMismatchedLengths}));navigate('looms');
+    change(()=>addReferenceLooms(project,plan,{keepMismatchedLengths}));navigate(loomPage(category));
     if(plan.looms.length)notice(`${plan.looms.length} reference loom(s) added.${plan.mismatches.length&&!keepMismatchedLengths?' Lengths with a different unit were left empty.':''}`);
   };
   if(!plan.mismatches.length){apply(false);return;}
@@ -326,16 +327,16 @@ function lengthEditor(target,after,{commit=fn=>change(fn,{renderPage:false}),dis
 }
 const expandedLooms=new Set();
 function newLoom(){return {id:uid(),name:'',lengths:[],description:'',components:[]};}
-function loomContext(reference=false,category=cableTypesSheet){
-  return {reference,category,key:reference?`settings:cable_types:${JSON.stringify(category)}`:'looms',
-    get:()=>reference?cableTypeRows(refs.cable_types.items,category).map(referenceLoom):project.looms,
-    baseline:()=>reference?cableTypeRows(referenceBaseline.cable_types.items,category).map(referenceLoom):project.baseline.looms||[],
-    mutate(fn,options={}){change(()=>{if(reference){const looms=clone(this.get());fn(looms);refs.cable_types.items=replaceLoomReferences(refs.cable_types.items,category,looms);}else fn(project.looms);},{...options,references:reference});}
+function loomContext(reference=false,category=reference?cableTypesSheet:page.startsWith('looms:')?page.slice(6):LOOMS){
+  return {reference,category,key:reference?`settings:cable_types:${JSON.stringify(category)}`:loomPage(category),
+    get:()=>reference?cableTypeRows(refs.cable_types.items,category).map(referenceLoom):projectLoomRows(project,category),
+    baseline:()=>reference?cableTypeRows(referenceBaseline.cable_types.items,category).map(referenceLoom):projectLoomRows(project.baseline,category),
+    mutate(fn,options={}){change(()=>{if(reference){const looms=clone(this.get());fn(looms);refs.cable_types.items=replaceLoomReferences(refs.cable_types.items,category,looms);}else{const looms=clone(this.get());fn(looms);replaceProjectLooms(project,category,looms);}},{...options,references:reference});}
   };
 }
 function editLoom(existing,context=loomContext()){
   if(grid?.editing&&!grid.commitEditor())return false;
-  const draft=existing?clone(existing):{...newLoom(),...(context.reference?{category:context.category,aliases:[],lengthUnit:project.stock.vendor.lengthUnit}:{})},original=clone(draft),workspace=project,referenceWorkspace=refs;
+  const draft=existing?clone(existing):{...newLoom(),...(context.category!==LOOMS?{category:context.category}:{}),...(context.reference?{category:context.category,aliases:[],lengthUnit:project.stock.vendor.lengthUnit}:{})},original=clone(draft),workspace=project,referenceWorkspace=refs;
   const pane=node('dialog',null,'loom-pane');pane.id='loom-pane';pane.setAttribute('aria-labelledby','loom-pane-title');
   const title=node('h2',existing?'Edit loom':'Add loom');title.id='loom-pane-title';
   const header=node('div',null,'dialog-head'),body=node('div',null,'loom-pane-body'),footer=node('div',null,'dialog-actions');
@@ -364,28 +365,28 @@ function editLoom(existing,context=loomContext()){
   draw();
   body.append(nameLabel);
   if(context.reference){const aliasesLabel=node('label','Aliases (comma-separated)'),aliases=node('input');aliases.value=(draft.aliases||[]).join(', ');aliases.oninput=()=>draft.aliases=aliases.value.split(',').map(v=>v.trim()).filter(Boolean);aliasesLabel.append(aliases);body.append(aliasesLabel);
-    const label=node('label','Length unit'),unit=node('select');for(const [value,text]of [['m','Metric (m)'],['ft','Imperial (ft)']]){const option=node('option',text);option.value=value;unit.append(option);}unit.value=draft.lengthUnit;unit.onchange=()=>{const value=unit.value;unit.value=draft.lengthUnit;confirmAction('Change loom length unit','Length numbers will stay the same; no conversion is performed.',()=>{draft.lengthUnit=value;unit.value=value;},'Change unit');};label.append(unit);body.append(label);
+
   }
-  body.append(node('p','Add the cable types and quantities inside one loom. Available lengths are edited on the saved loom row.','muted'),table,btn('+ Cable type',addComponent),warning,discard);
+  body.append(node('p',context.reference?'Add the cable types and quantities inside one loom. Set available lengths in the vendor project.':'Add the cable types and quantities inside one loom. Available lengths are edited on the saved loom row.','muted'),table,btn('+ Cable type',addComponent),warning,discard);
   discard.append(node('p','Discard your unsaved loom changes?'),btn('Keep editing',()=>discard.hidden=true),btn('Discard changes',close,'danger'));
   footer.append(btn('Cancel',cancel),btn('Save loom',()=>{
     try{
       if(project!==workspace||context.reference&&refs!==referenceWorkspace||saveBlocked)throw new Error('The workspace changed. Keep this pane open and copy your entries before reloading.');
       const saved=prepareLoomDraft(draft,refs.cable_types.items),index=existing?context.get().findIndex(l=>l.id===existing.id):-1;
       if(existing&&index<0)throw new Error('This loom no longer exists.');
-      context.mutate(looms=>{if(existing)looms[index]=saved;else looms.push(saved);if(!context.reference)project.loomTab=true;});
+      context.mutate(looms=>{if(existing)looms[index]=saved;else looms.push(saved);if(!context.reference)selectLoomCategory(project,context.category);});
       close();notice(context.reference?'Loom reference saved locally; download cable_types.json to keep a separate copy.':'Loom saved locally; download a project backup to keep a separate copy.');
     }catch(e){warning.textContent=e.message;warning.hidden=false;}
   },'primary'));
   pane.append(header,body,footer);pane.oncancel=e=>{e.preventDefault();cancel();};document.body.append(pane);pane.showModal();name.focus();return false;
 }
 function renderLooms(context=loomContext(),host=null){
-  if(!host)heading(LOOMS,'Expand a loom name to show its cable types and quantities.',[btn('Add loom',()=>editLoom(),'primary'),btn('Loom JSON preview',previewLooms),btn('Loom Excel',()=>reviewExport('excel',LOOMS))]);
+  if(!host)heading(context.category,'Expand a loom name to show its cable types and quantities.',[btn('Add loom',()=>editLoom(null,context),'primary'),btn('Loom JSON preview',()=>previewLooms(context.category)),btn('Loom Excel',()=>reviewExport('excel',context.category))]);
   if(!host){host=node('div',null,'grid-panel');$('#main').append(host);}
-  const editLengths=loom=>lengthEditor(loom,renderAll,{displayProject:context.reference?{...project,stock:{vendor:{lengthUnit:loom.lengthUnit}}}:project,commit:fn=>context.mutate(looms=>{fn();looms.find(l=>l.id===loom.id).lengths=loom.lengths;},{renderPage:false})});
+  const editLengths=loom=>lengthEditor(loom,renderAll,{displayProject:project,commit:fn=>context.mutate(looms=>{fn();looms.find(l=>l.id===loom.id).lengths=loom.lengths;},{renderPage:false})});
   const rows=()=>loomRows(context.get()),value=(row,key)=>key==='name'?(row.component?.type??row.loom.name):key==='count'?(row.component?.count??''):key==='lengths'?(row.component?.lengths??row.loom.lengths):row.component?'':row.loom[key];
   const baseline=row=>{const loom=context.baseline().find(l=>l.id===row.loom.id);return row.component?loom?.components.find(c=>c.id===row.component.id):loom;};
-  grid=new Grid(host,{current:()=>grid,key:context.key,label:context.reference?'Loom references':LOOMS,highlightContext:JSON.stringify(context.reference?referenceBaseline.cable_types:[project.stock.vendor,project.baseline]),rowKey:r=>r.component?`${r.loom.id}:${r.component.id}`:r.loom.id,
+  grid=new Grid(host,{current:()=>grid,key:context.key,label:context.reference?'Loom references':context.category,highlightContext:JSON.stringify(context.reference?referenceBaseline.cable_types:[project.stock.vendor,project.baseline]),rowKey:r=>r.component?`${r.loom.id}:${r.component.id}`:r.loom.id,
     newEntries:false,addLabel:'Add loom',rows,get:value,order:(filter,sort)=>loomOrder(rows(),expandedLooms,filter,sort),rowClass:row=>row.component?'loom-child-row':'loom-parent-row',
     columns:[{key:'name',label:'Name / Cable Type',render:(text,cell,editor)=>{
       const row=rows()[editor.rowId];if(!row)return;
@@ -394,15 +395,15 @@ function renderLooms(context=loomContext(),host=null){
       }
       cell.append(node('span',text,'cell-text'));
       if(!row.component){const edit=btn('Edit loom',e=>{e.stopPropagation();editLoom(row.loom,context);},'cell-action');edit.setAttribute('aria-label',`Edit loom ${row.loom.name}`);cell.append(edit);}
-    }},{key:'count',label:'Quantity',type:'integer'},{key:'lengths',label:context.reference?'Available lengths':`Available lengths (${lengthUnitLabel(project)})`,type:'lengths',render:(lengths,cell,editor)=>{
-      const row=rows()[editor.rowId],chips=node('div',null,'cell-chips');for(const length of sortedLengths(lengths))chips.append(context.reference?node('span',formatLength(length,{...project,stock:{vendor:{lengthUnit:row.loom.lengthUnit}}}),'chip mini'):makeLengthChip(length));cell.append(chips);
+    }},{key:'count',label:'Quantity',type:'integer'},{key:'lengths',label:`Available lengths (${lengthUnitLabel(project)})`,type:'lengths',render:(lengths,cell,editor)=>{
+      const row=rows()[editor.rowId],chips=node('div',null,'cell-chips');for(const length of sortedLengths(lengths))chips.append(makeLengthChip(length));cell.append(chips);
       if(!row.component)cell.append(btn('Edit lengths',e=>{e.stopPropagation();if(grid.editing&&!grid.commitEditor())return;editLengths(row.loom);},'cell-action'));
-    }}],
+    }}].filter(col=>!context.reference||col.key!=='lengths'),
     readOnly:(i,key)=>{const row=rows()[i];return !row||(!row.component&&key==='count')||(!!row.component&&key==='lengths');},readOnlyMessage:'Edit loom quantities on child rows and available lengths on the parent row.',
     changed:(i,key)=>{const row=rows()[i],old=baseline(row);return !!old&&!(!row.component&&key==='count')&&!same(key==='name'&&row.component?old.type:old[key],value(row,key));},added:i=>!baseline(rows()[i]),
     add:()=>editLoom(null,context),apply:patches=>{context.mutate(looms=>{const before=loomRows(looms);for(const p of patches){const row=before[p.id];if(!row)throw new Error('Use Add loom to create a loom.');const target=row.component||row.loom,key=row.component&&p.col.key==='name'?'type':p.col.key;target[key]=p.value;}},{renderPage:false});},
     remove:ids=>{const selected=ids.map(i=>rows()[i]),parents=new Set(selected.filter(r=>!r.component).map(r=>r.loom.id));confirmAction('Delete loom rows','Delete the selected rows? Deleting a parent also deletes its components. Undo is available.',()=>context.mutate(looms=>{for(const row of selected)if(row.component&&!parents.has(row.loom.id)){const loom=looms.find(l=>l.id===row.loom.id);loom.components=loom.components.filter(c=>c.id!==row.component.id);}for(let i=looms.length-1;i>=0;i--)if(parents.has(looms[i].id))looms.splice(i,1);}),'Delete rows');},
-    undo,redo,notice,save:saveTable,saved:renderAll,lengthChip:makeLengthChip,lengths:i=>editLengths(rows()[i].loom)});
+    undo,redo,notice,save:saveTable,saved:renderAll,lengthChip:makeLengthChip,lengths:context.reference?undefined:i=>editLengths(rows()[i].loom)});
 }
 function refRows(key=settingsTab){return refs[key].items||refs[key].vendors||refs[key].catalogues;}
 function refColumns(key,includeHidden=false){if(key==='length_colours')return [{key:'length',label:`Length (${lengthUnitLabel(project)})`,type:'positive',format:value=>formatLength(value,project)},...['colour1','colour2','colour3'].map((key,i)=>({key,label:`Colour ${i+1}`,width:180,suggestions:v=>colourSuggestions(v,colourPalette),editFormat:v=>colourPalette.colours[v]?.names[0]||v,parse:v=>resolveColour(v,colourPalette),render:renderColourCell}))];if(key==='manifest')return [{key:'vendor',label:'vendor',width:280,list:'vendors-list'},{key:'file',label:'file',width:500}];if(key==='lighting_vendors')return [{key:'name',label:'Name',width:280},{key:'logo',label:'Logo path',width:400}];const columns=[{key:'name',label:'Canonical name',width:230},{key:'aliases',label:'Aliases (comma-separated)',type:'aliases',width:300}];if(key==='connector_types')columns.push({key:'category',label:'Category',width:180,suggestions:value=>connectorTypeSheets(refs).filter(name=>(name||'Uncategorised').toLocaleLowerCase().includes(String(value).trim().toLocaleLowerCase())).map(name=>({value:name,label:name||'Uncategorised'})),suggestionsLabel:'Available categories',noSuggestions:'No matching categories. Type a new category or clear the cell for Uncategorised.'});if(key==='cable_types')columns.push({key:'adaptor',label:'Adaptor',type:'boolean',width:105},{key:'category',label:'Default category',list:'categories-list',width:180},{key:'direction',label:'Direction',list:'directions-list',width:170},{key:'connectors',label:'Default connectors JSON',type:'json',width:350});return key==='cable_types'?columns.filter(c=>includeHidden||c.key!=='direction'||cableTypeRows(refs.cable_types.items,cableTypesSheet).some(r=>r.adaptor)):columns;}
@@ -456,14 +457,14 @@ function renderErrors(){
   const groups=Map.groupBy?Map.groupBy(issues,x=>x.category):issues.reduce((m,i)=>(m.has(i.category)?m.get(i.category).push(i):m.set(i.category,[i]),m),new Map());
   for(const [category,items]of groups){const group=node('section',null,'issue-group');group.append(node('h2',category));for(const issue of items){const detail=node('details',null,'issue'),summary=node('summary');summary.append(node('span',issue.level,`severity ${issue.level}`),node('span',`${issue.row!=null?`Row ${issue.row+1}: `:''}${issue.message}`));detail.append(summary,node('p',issue.fix),btn(issue.connectorReview?'Review connector':'Jump to field',()=>issue.connectorReview?reviewConnector(issue.connectorReview):jump(issue)));group.append(detail);}$('#main').append(group);}
 }
-function jump(issue){if(issue.category.startsWith('Settings: ')){settingsTab=issue.category.slice(10);if(settingsTab==='connector_types')connectorTypesSheet=connectorTypeCategories(refRows('connector_types')[issue.row],refs)[0];if(settingsTab==='cable_types')cableTypesSheet=refRows('cable_types')[issue.row]?.category||'';navigate('settings');}else if(issue.category==='Vendor'){navigate('vendor');const labels={name:'Vendor name',lengthUnit:'Length unit',filename:'Cable-stock output filename',vendorVersion:'Vendor version'};const label=[...document.querySelectorAll('#main label')].find(l=>l.firstChild?.textContent===labels[issue.field]);(label?.control||label?.querySelector('input,select'))?.focus();return;}else if(issue.category===LOOMS){const loom=project.looms[issue.row||0];if(loom)expandedLooms.add(loom.id);navigate('looms');const id=grid.o.rows().findIndex(row=>row.loom.id===loom?.id&&!row.component);if(id>=0)grid.select(grid.ids.indexOf(id),0);return;}else {navigate(`category:${issue.category}`);if(['start','end','connectors','direction'].includes(issue.field)&&!isCableAdaptor(project,issue.category,issue.row)){editCableConnectors(issue.category,issue.row);return;}}if(grid&&issue.row!=null){let row=['Settings: cable_types','Settings: connector_types'].includes(issue.category)?grid.o.rows().indexOf(refRows(settingsTab)[issue.row]):issue.row;if(issue.category==='Settings: cable_types'&&isLoomCategory(cableTypesSheet,refs)){const target=refRows('cable_types')[issue.row];row=grid.o.rows().findIndex(r=>!r.component&&r.loom.id===target?.id);}if(issue.category==='Settings: length_colours'){const target=refRows('length_colours')[issue.row];row=grid.o.rows().indexOf(target);if(row<0){notice(`This colour assignment belongs to ${target?.vendor||'an unset vendor'} (${target?.unit||'unit unset'}). Select that vendor and unit on the Vendor tab to edit it.`,true);return;}}const col=Math.max(0,grid.o.columns.findIndex(c=>c.key===issue.field));grid.select(Math.max(0,grid.ids.indexOf(row)),col);}}
+function jump(issue){if(issue.category.startsWith('Settings: ')){settingsTab=issue.category.slice(10);if(settingsTab==='connector_types')connectorTypesSheet=connectorTypeCategories(refRows('connector_types')[issue.row],refs)[0];if(settingsTab==='cable_types')cableTypesSheet=refRows('cable_types')[issue.row]?.category||'';navigate('settings');}else if(issue.category==='Vendor'){navigate('vendor');const labels={name:'Vendor name',lengthUnit:'Length unit',filename:'Cable-stock output filename',vendorVersion:'Vendor version'};const label=[...document.querySelectorAll('#main label')].find(l=>l.firstChild?.textContent===labels[issue.field]);(label?.control||label?.querySelector('input,select'))?.focus();return;}else if(projectLoomCategories(project).includes(issue.category)){const loom=project.looms[issue.row||0];if(loom)expandedLooms.add(loom.id);navigate(loomPage(issue.category));const id=grid.o.rows().findIndex(row=>row.loom.id===loom?.id&&!row.component);if(id>=0)grid.select(grid.ids.indexOf(id),0);return;}else {navigate(`category:${issue.category}`);if(['start','end','connectors','direction'].includes(issue.field)&&!isCableAdaptor(project,issue.category,issue.row)){editCableConnectors(issue.category,issue.row);return;}}if(grid&&issue.row!=null){let row=['Settings: cable_types','Settings: connector_types'].includes(issue.category)?grid.o.rows().indexOf(refRows(settingsTab)[issue.row]):issue.row;if(issue.category==='Settings: cable_types'&&isLoomCategory(cableTypesSheet,refs)){const target=refRows('cable_types')[issue.row];row=grid.o.rows().findIndex(r=>!r.component&&r.loom.id===target?.id);}if(issue.category==='Settings: length_colours'){const target=refRows('length_colours')[issue.row];row=grid.o.rows().indexOf(target);if(row<0){notice(`This colour assignment belongs to ${target?.vendor||'an unset vendor'} (${target?.unit||'unit unset'}). Select that vendor and unit on the Vendor tab to edit it.`,true);return;}}const col=Math.max(0,grid.o.columns.findIndex(c=>c.key===issue.field));grid.select(Math.max(0,grid.ids.indexOf(row)),col);}}
 function download(name,value,type='application/json'){
   const blob=value instanceof Blob?value:new Blob([typeof value==='string'?value:JSON.stringify(value,null,2)+'\n'],{type});const url=URL.createObjectURL(blob),a=node('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);notice(`Download requested: ${name}`);
 }
 function safeFilename(){return /^[^/\\]+\.json$/i.test(project.filename)?project.filename:'unconfirmed_cable_stock.json';}
 function downloadBackupNow(){download(`${safeFilename().replace(/\.json$/i,'')}.lampy-project.json`,project);dirty=false;save();}
 function downloadBackup(){openDialog('Review project backup',body=>{body.append(node('p','Complete generator backup: cable stock, looms, adaptor markers, vendor version and imported baseline. This file is for reopening in this app.','note'));reviewBody(body);},[{label:'Cancel',run:d=>d.close()},{label:'Download project backup',cls:'primary',run:d=>{downloadBackupNow();d.close();}}]);}
-function previewLooms(){const text=JSON.stringify({looms:project.looms.map(stockLoomJSON)},null,2);openDialog('Loom JSON · stock fragment',body=>{body.append(node('p','Loom stock fragment only. Use the complete cable-stock export to include vendor details and reopen it in this app. Lampy Paperwork needs its planned update to use these looms.','note warning'));reviewBody(body,changes(project).filter(c=>c.category===LOOMS),allIssues().filter(i=>i.category===LOOMS));body.append(node('pre',text));},[{label:'Copy JSON',run:async()=>{try{await navigator.clipboard.writeText(text);notice('Loom fragment copied.');}catch{notice('Select and copy the preview text.',true);}}},{label:'Download fragment',run:()=>download('looms.fragment.json',text)},{label:'Close',run:d=>d.close()}]);}
+function previewLooms(category=LOOMS){const text=JSON.stringify({looms:projectLoomRows(project,category).map(stockLoomJSON)},null,2);openDialog('Loom JSON · stock fragment',body=>{body.append(node('p','Loom stock fragment only. Use the complete cable-stock export to include vendor details and reopen it in this app. Lampy Paperwork needs its planned update to use these looms.','note warning'));reviewBody(body,changes(project).filter(c=>c.category===category),allIssues().filter(i=>i.category===category));body.append(node('pre',text));},[{label:'Copy JSON',run:async()=>{try{await navigator.clipboard.writeText(text);notice('Loom fragment copied.');}catch{notice('Select and copy the preview text.',true);}}},{label:'Download fragment',run:()=>download('looms.fragment.json',text)},{label:'Close',run:d=>d.close()}]);}
 function preview(category){const value=category?{[category]:clone(project.stock.cables[category])}:runtimeJSON(project);const text=JSON.stringify(value,null,2);openDialog(category?`${category} · JSON fragment`:'Complete Lampy cable-stock JSON',body=>{if(category)body.append(node('p','Category fragment only. This is not a complete vendor document.','note warning'));reviewBody(body,changes(project).filter(c=>!category||c.category===category),allIssues().filter(i=>!category||i.category===category));body.append(node('pre',text));},[{label:'Copy JSON',run:async()=>{try{await navigator.clipboard.writeText(text);notice('JSON copied.');}catch{notice('Clipboard unavailable. Select and copy the preview text.',true);}}},{label:category?'Download fragment':'Download cable-stock JSON',run:()=>download(category?`${category.replace(/[/\\]/g,'_')}.fragment.json`:safeFilename(),text)},{label:'Close',run:d=>d.close()}]);}
 function reviewBody(body,changeList=changes(project),issues=allIssues()){
   body.append(node('p',`${changeList.length} changes · ${issues.filter(i=>i.level==='error').length} errors · ${issues.filter(i=>i.level==='warning').length} warnings`,'note'));

@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.40.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.41.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -62,7 +62,7 @@ Selecting a different vendor looks for its saved project and asks before replaci
 
 On the Vendor tab, select **Vendor name** to show all available vendors in alphabetical order. Type to filter, click a vendor, or use the arrow keys and Enter/Tab to choose one. You can also type a new name and press Enter or leave the field. The text box starts at half its field width and grows to fit longer names as you type or select them, up to the available space beside the **❌** clear-search button. The clear button moves with the field, staying directly to its right as it grows or shrinks. Very long names scroll within the input when no more space is available. The clear button empties the search text and shows all vendors. Clearing the search does not delete or replace your loaded project; leaving it blank or pressing Escape restores the current vendor name. Switching vendors keeps the existing project-replacement confirmation.
 
-Each project category tab has a **×** button to delete that category and its contents from the current project. The Looms tab deletes its saved looms and components. Confirm **Delete category** to proceed, or Cancel to keep everything. Deleting the active category returns you to Vendor; deleting another tab keeps your current view. Settings references and other categories remain available. To undo, press **Ctrl/⌘+Z** outside an input, or use a table's Undo button. Undo history lasts for the current session. The Vendor tab cannot be deleted.
+Each project category tab has a **×** button to delete that category and its contents from the current project. Each loom category tab deletes only its own saved looms and components. Confirm **Delete category** to proceed, or Cancel to keep everything. Deleting the active category returns you to Vendor; deleting another tab keeps your current view. Settings references and other categories remain available. To undo, press **Ctrl/⌘+Z** outside an input, or use a table's Undo button. Undo history lasts for the current session. The Vendor tab cannot be deleted.
 
 **Vendor name** does not show a yellow change highlight. It retains its normal focus outline, and vendor changes still appear in **Review & export**. **Length unit** shows a yellow highlight when it differs from the imported baseline. Table highlights follow the saving rules below.
 
@@ -76,7 +76,7 @@ Plain cable-stock JSON import previews compare against your current draft by mat
 | `*.lampy-project.json` | Reopen vendor work | Cable stock, composite looms, adaptor markers, generator vendor version, filename, row identities and imported baseline. **Not** a Lampy Paperwork input. |
 | `.xlsx` | Spreadsheet editing and backup | Cable categories, adaptor markers, looms/components, vendor metadata, custom fields and stable row keys. |
 
-Cable-stock JSON exports pre-made looms using `id`, `name`, available `lengths` and a `cables` array of `cableType` / `quantity` entries. Cable-only files remain unchanged when no looms are present. Generator vendor version, adaptor markers, loom descriptions, connector overrides and component-specific lengths remain in project/Excel backups. Imported custom fields stay preserved. Lampy Paperwork needs its planned update before it can use the stock-loom definitions; exporting them does not update Paperwork.
+Cable-stock JSON exports pre-made looms using `id`, `name`, available `lengths` and a `cables` array of `cableType` / `quantity` entries. Cable-only files remain unchanged when no looms are present. Generator vendor version, adaptor markers, loom category grouping, descriptions, connector overrides and component-specific lengths remain in project/Excel backups. The agreed cable-stock JSON has one combined `looms` array without category fields; reopening that export places all entries under Stock / Pre-Made Looms. Use a project JSON or Excel backup to retain the separate FOH Snake tab. Imported custom fields stay preserved. Lampy Paperwork needs its planned update before it can use the stock-loom definitions; exporting them does not update Paperwork.
 
 New projects start at vendor version **v1**, including an empty project started when no saved vendor project exists. Saved and imported project versions remain unchanged. Vendor versions such as `v2` and `v2.1` are independent of the app version. Major/minor buttons require confirmation. A category JSON preview/download is a labelled fragment, not a complete vendor file.
 
@@ -100,7 +100,7 @@ Every cable table, Settings table and the main loom table has **Save table** but
 
 ## Composite looms
 
-Add **Stock / Pre-Made Looms** from the category selector to copy the pre-made looms in your Cable Types reference into this vendor project. Copies retain names, component quantities, connectors and matching-unit available lengths. Existing vendor looms are kept; adding the category again adds missing reference looms without duplicating or overwriting existing ones. Reference and component IDs are replaced with independent project IDs. If the tab was previously empty, add the category again to load its references.
+Add **Stock / Pre-Made Looms** or **FOH Snake** from the category selector. Each has its own tab and loads only the Cable Types references assigned to that category (including its aliases). FOH Snake uses the same Add/Edit loom pane, expandable component rows, quantities, available-length controls, table saving, undo and deletion. An empty reference category opens an empty tab where you can add a loom. Copies retain names, component quantities, connectors and matching-unit available lengths. Existing vendor looms are kept; adding the category again adds missing reference looms without duplicating or overwriting existing ones. Reference and component IDs are replaced with independent project IDs. If the tab was previously empty, add the category again to load its references.
 
 If a reference loom uses a different unit, the app asks you to Cancel, add without those lengths, or explicitly keep the same numbers in the vendor's unit. It never converts numbers. For example, choose feet on the Vendor tab before adding a 304 ft reference loom if you want its original length and unit retained.
 
@@ -110,7 +110,7 @@ Saved looms appear as parent rows sorted by Name. Set available lengths on the p
 
 Quantity describes cables **inside one loom**, never the number of looms owned. Recognised cable types inherit connectors when saved from the pane; existing connector overrides, descriptions, optional component lengths and custom fields remain preserved. Use **Save table** to save locally and clear highlights, and project JSON or Excel for a separate backup. New looms are created through **Add loom**, not blank main-table rows. Complete cable-stock JSON includes the agreed stock-loom fields. Project JSON and Excel retain the full editor data as well.
 
-The **Loom JSON** preview copies or downloads the same stock structure as a fragment named `looms.fragment.json`. A fragment omits vendor details and ordinary cables; use the complete cable-stock export when you want to reopen the file in the generator.
+The **Loom JSON** preview copies or downloads only the active loom category in the same stock structure as a fragment named `looms.fragment.json`. A fragment omits vendor details and ordinary cables; use the complete cable-stock export when you want to reopen the file in the generator.
 
 Example loom fragment:
 
@@ -151,7 +151,7 @@ Loom columns: `key`, `name`, `lengths`, `description`, `custom_json`.
 
 `_Components` columns: `loom_key`, `component_key`, `type`, `count`, `connectors_json`, `lengths`, `custom_json`.
 
-`_Categories` maps Excel-safe sheet names to full category names and kinds (`cables` or `looms`). It preserves names longer than 31 characters and forbidden Excel characters. Map any new sheets. To remove a category from a full workbook, remove both its sheet and mapping row.
+`_Categories` maps Excel-safe sheet names to full category names and kinds (`cables` or `looms`). Each selected loom category has its own worksheet, with a shared `_Components` sheet. Exporting or replacing one category affects only that category. The mapping preserves names longer than 31 characters and forbidden Excel characters. Map any new sheets. To remove a category from a full workbook, remove both its sheet and mapping row.
 
 `_Metadata` has editable `vendor_name`, `length_unit`, `vendor_version` and `filename` rows. Its `json_…` rows explicitly preserve custom document metadata and original cable-row values. Keep them unchanged. Large metadata is split across cells. Unchanged partially invalid imported values remain preserved and flagged. Changed invalid length lists are rejected on import.
 
@@ -163,9 +163,9 @@ Excel's 32,767-character limit applies to each cell. Oversized row metadata requ
 
 Settings → **Cable Types** has a separate sheet for each category, including custom categories and **Uncategorised**. Ordinary cable sheets let new and pasted rows inherit the active category; editing Default category moves the row to that sheet. Search, selection, deletion and Save operate on the active sheet; downloading cable_types.json includes every category.
 
-The **Stock / Pre-Made Looms** reference sheet uses the same loom editor and expandable table as vendor stock. **Add loom** opens a side pane with Loom name, aliases, length unit and a two-column Cable Type / Quantity table. Save loom adds a parent row; expand it to edit component types and quantities as normal 35 px rows. Edit available lengths on the parent, including Copy Lengths and Replace/Merge. Length chips sort lowest to highest. Top and bottom **Save table**, sorting, search, column widths, undo/redo and protected deletion work on this sheet.
+The **Stock / Pre-Made Looms** and **FOH Snake** reference sheets use the shared loom editor and expandable table. **Add loom** opens a side pane with Loom name, aliases and a two-column Cable Type / Quantity table. Save loom adds a parent row; expand it to edit component types and quantities as normal 35 px rows. Settings loom sheets show only **Name / Cable Type** and **Quantity**. They have no length column or length-unit control; set available lengths in the vendor project. Top and bottom **Save table**, sorting, search, column widths, undo/redo and protected deletion work on each sheet.
 
-Each reference loom retains its own `lengthUnit` (`m` or `ft`); changing it requires confirmation and never converts numbers. Older loom reference rows without units are treated as metres and keep their original fields; use Edit loom to add any missing components. Aliases and custom fields are preserved. These entries stay in the existing `items` array in **data/cable_types.json**, with lengths and structured components. Download **cable_types.json** to retain your reference edits and upload it to that destination yourself. Settings reference looms remain separate from vendor stock and its project/Excel backups; editing one does not change the other.
+Previously saved reference lengths and units are preserved, although their controls are hidden in Settings. Their existing unit-mismatch safeguards still apply when copying them into vendor stock. Aliases and custom fields are preserved. These entries stay in the existing `items` array in **data/cable_types.json**, with structured components. FOH Snake has its own unique category ID and loom type in **data/categories.json**. References belong to the category named in their `category` field; existing records are not moved automatically. Download **cable_types.json** to retain your reference edits and upload it to that destination yourself. Settings reference looms remain separate from vendor stock and its project/Excel backups; editing one does not change the other.
 
 After you upload updated `data/cable_types.json`, **refresh or reopen the app** to load new published cable types across every category, including looms. The app reconciles Categories, Cable Types and Connectors files with saved Settings: new records become available, unchanged records receive published updates, and your local reference edits/deletions are retained. Categories present only in the cable file are also offered by the category selector.
 
