@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.41.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.42.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -163,7 +163,7 @@ Excel's 32,767-character limit applies to each cell. Oversized row metadata requ
 
 Settings → **Cable Types** has a separate sheet for each category, including custom categories and **Uncategorised**. Ordinary cable sheets let new and pasted rows inherit the active category; editing Default category moves the row to that sheet. Search, selection, deletion and Save operate on the active sheet; downloading cable_types.json includes every category.
 
-The **Stock / Pre-Made Looms** and **FOH Snake** reference sheets use the shared loom editor and expandable table. **Add loom** opens a side pane with Loom name, aliases and a two-column Cable Type / Quantity table. Save loom adds a parent row; expand it to edit component types and quantities as normal 35 px rows. Settings loom sheets show only **Name / Cable Type** and **Quantity**. They have no length column or length-unit control; set available lengths in the vendor project. Top and bottom **Save table**, sorting, search, column widths, undo/redo and protected deletion work on each sheet.
+The **Stock / Pre-Made Looms** and **FOH Snake** reference sheets use the shared loom editor and expandable table. **Add loom** opens a side pane with Loom name, aliases and a two-column Cable Type / Quantity table. Save loom adds a parent row; expand it to edit component types and quantities as normal 35 px rows. Settings loom sheets show **Name / Cable Type**, **Aliases (comma-separated)**, **Default category** and **Quantity**. Edit aliases and default category on the parent row; those cells stay blank and read-only on component rows. Default category offers loom categories and moves the complete reference, including its components, to the selected Settings sheet. Ordinary cable categories are rejected to protect the composite structure. Search includes aliases and category names; both columns support sorting. These reference edits do not move existing vendor project looms. They have no length column or length-unit control; set available lengths in the vendor project. Top and bottom **Save table**, sorting, search, column widths, undo/redo and protected deletion work on each sheet.
 
 Previously saved reference lengths and units are preserved, although their controls are hidden in Settings. Their existing unit-mismatch safeguards still apply when copying them into vendor stock. Aliases and custom fields are preserved. These entries stay in the existing `items` array in **data/cable_types.json**, with structured components. FOH Snake has its own unique category ID and loom type in **data/categories.json**. References belong to the category named in their `category` field; existing records are not moved automatically. Download **cable_types.json** to retain your reference edits and upload it to that destination yourself. Settings reference looms remain separate from vendor stock and its project/Excel backups; editing one does not change the other.
 

@@ -233,7 +233,7 @@ test('Settings loom sheets omit length controls while stock tables retain them a
  renderLooms(loomContext(true,'FOH Snake'));
  captured[1].apply([{id:0,col:{key:'name'},value:'Renamed snake'}]);
  `,ctx);
- assert.deepEqual(Array.from(vm.runInContext('captured[1].columns.map(c=>c.key)',ctx)),['name','count']);
+ assert.deepEqual(Array.from(vm.runInContext('captured[1].columns.map(c=>c.key)',ctx)),['name','aliases','category','count']);
  assert.equal(vm.runInContext('captured[1].lengths',ctx),undefined);
  assert.deepEqual(Array.from(vm.runInContext('refs.cable_types.items[1].lengths',ctx)),[304]);assert.equal(vm.runInContext('refs.cable_types.items[1].lengthUnit',ctx),'ft');
  assert(Array.from(vm.runInContext('captured[0].columns.map(c=>c.key)',ctx)).includes('lengths'));
@@ -252,4 +252,28 @@ test('adding FOH opens its own tab, while deletion confirmation and undo leave p
  assert.equal(vm.runInContext('page',ctx),'looms:FOH Snake');assert.equal(vm.runInContext('JSON.stringify(project)===added',ctx),true);
  vm.runInContext('confirmDelete();',ctx);assert.equal(vm.runInContext('page',ctx),'vendor');assert.equal(vm.runInContext('project.looms.length',ctx),1);assert.equal(vm.runInContext('JSON.stringify(project.looms[0])===original',ctx),true);
  vm.runInContext('undo();',ctx);assert.equal(vm.runInContext('JSON.stringify(project)===added',ctx),true);
+});
+
+
+test('Settings loom aliases and category columns edit parents, move complete references and preserve vendor data',()=>{
+ const ctx=loomController();vm.runInContext(`
+ refs.categories={items:[{id:'cat-looms',name:LOOMS,aliases:['Looms']},{id:'cat-foh-snake',name:'FOH Snake',aliases:['Snake'],type:'loom'}]};
+ refs.cable_types.items.push({...newLoom(),id:'ref',category:LOOMS,name:'Package',aliases:[],lengthUnit:'ft',lengths:[304],custom:{keep:true},components:[{id:'part',type:'DMX',count:2,connectors:{male:'Override'},lengths:[]}]});
+ referenceBaseline=clone(refs);const stock=JSON.stringify(project),normal=JSON.stringify(refs.cable_types.items[0]);renderLooms(loomContext(true,LOOMS));
+ `,ctx);
+ const o=vm.runInContext('captured[1]',ctx),aliases=o.columns.find(c=>c.key==='aliases'),category=o.columns.find(c=>c.key==='category');
+ assert.deepEqual(parseCell('A, B; C',aliases),['A','B','C']);assert.equal(parseCell('Snake',category),'FOH Snake');assert.throws(()=>parseCell('Data',category),/loom category/);assert.throws(()=>parseCell('',category),/loom category/);
+ assert.deepEqual(Array.from(category.suggestions('FOH'),x=>x.value),['FOH Snake']);
+ assert.equal(o.readOnly(0,'aliases'),false);assert.equal(o.readOnly(1,'aliases'),true);assert.equal(o.readOnly(1,'category'),true);assert.equal(o.changed(1,'aliases'),false);assert.equal(o.changed(1,'category'),false);
+ o.apply([{id:0,col:aliases,value:['Stage snake','FOH bundle']},{id:0,col:category,value:'FOH Snake'}]);
+ assert.equal(o.rows().length,0);vm.runInContext("renderLooms(loomContext(true,'FOH Snake'));",ctx);
+ assert.equal(vm.runInContext('captured[2].rows().length',ctx),2);const row=JSON.parse(vm.runInContext('JSON.stringify(refs.cable_types.items[1])',ctx));
+ assert.deepEqual(row.aliases,['Stage snake','FOH bundle']);assert.equal(row.category,'FOH Snake');assert.equal(row.components[0].count,2);assert.equal(row.components[0].connectors.male,'Override');assert.deepEqual(row.lengths,[304]);assert.equal(row.lengthUnit,'ft');assert.deepEqual(row.custom,{keep:true});
+ assert.equal(vm.runInContext('JSON.stringify(project)===stock&&JSON.stringify(refs.cable_types.items[0])===normal',ctx),true);
+ assert.deepEqual(Array.from(vm.runInContext('captured[0].columns.map(c=>c.key)',ctx)),['name','count','lengths']);
+});
+test('loom aliases and category support group filtering and sorting',()=>{
+ const looms=[{id:'a',name:'Alpha',aliases:['Zulu alias'],category:'FOH Snake',lengths:[],components:[{type:'DMX',count:2}]},{id:'z',name:'Zulu',aliases:['Alpha alias'],category:'Stock / Pre-Made Looms',lengths:[],components:[]}];
+ const rows=M.loomRows(looms);assert.deepEqual(M.loomOrder(rows,new Set(),'zulu alias'),[0,1]);assert.deepEqual(M.loomOrder(rows,new Set(),'FOH'),[0,1]);
+ assert.deepEqual(M.loomOrder(rows,new Set(),'',{key:'aliases',dir:1}),[2,0]);assert.deepEqual(M.loomOrder(rows,new Set(),'',{key:'category',dir:1}),[0,2]);
 });

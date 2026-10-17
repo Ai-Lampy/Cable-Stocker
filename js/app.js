@@ -395,12 +395,16 @@ function renderLooms(context=loomContext(),host=null){
       }
       cell.append(node('span',text,'cell-text'));
       if(!row.component){const edit=btn('Edit loom',e=>{e.stopPropagation();editLoom(row.loom,context);},'cell-action');edit.setAttribute('aria-label',`Edit loom ${row.loom.name}`);cell.append(edit);}
-    }},{key:'count',label:'Quantity',type:'integer'},{key:'lengths',label:`Available lengths (${lengthUnitLabel(project)})`,type:'lengths',render:(lengths,cell,editor)=>{
+    }},...(context.reference?[{key:'aliases',label:'Aliases (comma-separated)',type:'aliases'},{key:'category',label:'Default category',
+      suggestions:query=>cableTypeSheets(refs).filter(name=>isLoomCategory(name,refs)&&name.toLocaleLowerCase().includes(String(query).trim().toLocaleLowerCase())).map(name=>({value:name,label:name})),
+      suggestionsLabel:'Available loom categories',noSuggestions:'Choose Stock / Pre-Made Looms or FOH Snake.',
+      parse:value=>{const category=String(value).trim();if(!isLoomCategory(category,refs))throw new Error('Choose a loom category such as Stock / Pre-Made Looms or FOH Snake.');return loomCategoryName(category,refs);}
+    }]:[]),{key:'count',label:'Quantity',type:'integer'},{key:'lengths',label:`Available lengths (${lengthUnitLabel(project)})`,type:'lengths',render:(lengths,cell,editor)=>{
       const row=rows()[editor.rowId],chips=node('div',null,'cell-chips');for(const length of sortedLengths(lengths))chips.append(makeLengthChip(length));cell.append(chips);
       if(!row.component)cell.append(btn('Edit lengths',e=>{e.stopPropagation();if(grid.editing&&!grid.commitEditor())return;editLengths(row.loom);},'cell-action'));
     }}].filter(col=>!context.reference||col.key!=='lengths'),
-    readOnly:(i,key)=>{const row=rows()[i];return !row||(!row.component&&key==='count')||(!!row.component&&key==='lengths');},readOnlyMessage:'Edit loom quantities on child rows and available lengths on the parent row.',
-    changed:(i,key)=>{const row=rows()[i],old=baseline(row);return !!old&&!(!row.component&&key==='count')&&!same(key==='name'&&row.component?old.type:old[key],value(row,key));},added:i=>!baseline(rows()[i]),
+    readOnly:(i,key)=>{const row=rows()[i];return !row||(!row.component&&key==='count')||(!!row.component&&['lengths','aliases','category'].includes(key));},readOnlyMessage:context.reference?'Edit aliases and default category on the loom parent, and quantities on child rows.':'Edit loom quantities on child rows and available lengths on the parent row.',
+    changed:(i,key)=>{const row=rows()[i],old=baseline(row);return !!old&&!(!row.component&&key==='count')&&!(row.component&&['aliases','category'].includes(key))&&!same(key==='name'&&row.component?old.type:old[key],value(row,key));},added:i=>!baseline(rows()[i]),
     add:()=>editLoom(null,context),apply:patches=>{context.mutate(looms=>{const before=loomRows(looms);for(const p of patches){const row=before[p.id];if(!row)throw new Error('Use Add loom to create a loom.');const target=row.component||row.loom,key=row.component&&p.col.key==='name'?'type':p.col.key;target[key]=p.value;}},{renderPage:false});},
     remove:ids=>{const selected=ids.map(i=>rows()[i]),parents=new Set(selected.filter(r=>!r.component).map(r=>r.loom.id));confirmAction('Delete loom rows','Delete the selected rows? Deleting a parent also deletes its components. Undo is available.',()=>context.mutate(looms=>{for(const row of selected)if(row.component&&!parents.has(row.loom.id)){const loom=looms.find(l=>l.id===row.loom.id);loom.components=loom.components.filter(c=>c.id!==row.component.id);}for(let i=looms.length-1;i>=0;i--)if(parents.has(looms[i].id))looms.splice(i,1);}),'Delete rows');},
     undo,redo,notice,save:saveTable,saved:renderAll,lengthChip:makeLengthChip,lengths:context.reference?undefined:i=>editLengths(rows()[i].loom)});

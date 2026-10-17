@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.42 — 2026-10-17
+
+Previous version: v1.1.41. Local release for manual upload; not deployed.
+
+- Add editable Aliases (comma-separated) and Default category columns to Settings → Cable Types → Stock / Pre-Made Looms and FOH Snake. Keep metadata on parent rows and component metadata cells blank/read-only. Vendor stock tables retain their existing columns; Settings length controls remain hidden.
+- Offer filtered loom-category choices, resolve category aliases, and move the complete reference between Settings sheets without losing components, IDs, connector overrides, saved lengths or custom fields. Reject empty/ordinary cable categories to protect composite data. Include aliases and category names in group filtering and sorting.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New/deleted project files: none. Reference JSON, user projects and backups preserved. No upload/deployment or Lampy Paperwork changes.
+- Validation: 190 automated tests passed, including column editability, alias parsing, category suggestions/validation, scoped moves, data preservation, filtering/sorting and existing JSON/Excel regression tests. JavaScript syntax, JSON validity, local module paths and version consistency passed.
+- Approved local browser checks passed: columns visible in both sheets, alias edit/Tab commit, filtered category selection and moving the complete loom, child metadata read-only, invalid category rejection, bottom Save accepting an active edit, alias search and persistence after reopening. No console warnings/errors in the checked flows. Other browsers, narrow screens and live deployment were not tested.
+- Cleanup: removed isolated local test storage, closed the test tab and stopped the local server. No downloads or temporary project files; screenshot retained outside the project. Existing Paperwork compatibility remains pending.
+
 ## v1.1.41 — 2026-10-17
 
 Previous version: v1.1.40. Local release for manual upload; not deployed.
