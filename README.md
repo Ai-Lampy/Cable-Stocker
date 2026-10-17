@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.44.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.45.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -279,4 +279,4 @@ Length chips display from lowest to highest, including decimal lengths. This cha
 
 ## Connector form and hidden columns
 
-Direction and connector columns appear only for adaptors. Select an editable Direction cell with one click, Tab or the arrow keys to open all three choices immediately: **bidirectional**, **male > female** and **female > male**. Start/end connector cells follow that order; bidirectional uses one shared connector. JSON stores `male-female`, `female-male` or `bidirectional`; imported arrow wording is also accepted and preserved. Excel start/end columns follow the selected direction. A custom/incomplete cable has a **Connectors** button inside its name cell. Use that form to choose direction and enter connector names, then **Save connectors**. **Cancel** leaves the row unchanged. Connector errors for non-adaptors open the form. Recognised cables still inherit missing defaults.
+Direction and connector columns appear only for adaptors. Select an editable Direction cell with one click, Tab or the arrow keys to open all five choices immediately: **bidirectional**, **male > female**, **female > male**, **male > male** and **female > female**. Start/end connector cells follow that order; bidirectional uses one shared connector. JSON stores `male-female`, `female-male`, `male-male`, `female-female` or `bidirectional`; imported arrow wording is also accepted and preserved. Male > Male and Female > Female keep independent connector types in `connectors.start` and `connectors.end`; direction specifies their genders. Existing connector properties are preserved. Excel start/end columns follow the selected direction. Downstream Lampy Paperwork support for these additional directions has not been verified. A custom/incomplete cable has a **Connectors** button inside its name cell. Use that form to choose direction and enter connector names, then **Save connectors**. **Cancel** leaves the row unchanged. Connector errors for non-adaptors open the form. Recognised cables still inherit missing defaults.

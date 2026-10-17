@@ -133,7 +133,9 @@ export function referenceMatch(entries, text) {
 export const DIRECTION_OPTIONS = [
   {value:'bidirectional',label:'bidirectional'},
   {value:'male-female',label:'male > female'},
-  {value:'female-male',label:'female > male'}
+  {value:'female-male',label:'female > male'},
+  {value:'male-male',label:'male > male'},
+  {value:'female-female',label:'female > female'}
 ];
 export function cableDirection(value){
   const text=String(value??'').trim().toLowerCase();
@@ -141,7 +143,7 @@ export function cableDirection(value){
 }
 export function parseDirection(value){
   const direction=cableDirection(value);
-  if(!direction)throw new Error('Choose bidirectional, male > female or female > male.');
+  if(!direction)throw new Error('Choose bidirectional, male > female, female > male, male > male or female > female.');
   return direction;
 }
 export function directionLabel(value){return DIRECTION_OPTIONS.find(option=>option.value===cableDirection(value))?.label??value;}
@@ -149,10 +151,12 @@ export function connectorKeys(direction){
   switch(cableDirection(direction)){
     case 'male-female':return ['male','female'];
     case 'female-male':return ['female','male'];
+    case 'male-male':case 'female-female':return ['start','end'];
     case 'bidirectional':return ['end'];
     default:return [];
   }
 }
+export function sameGenderDirection(value){return ['male-male','female-female'].includes(cableDirection(value));}
 export function defaultCable(ref, wording) {
   return {name: wording || ref?.name || '', direction: ref?.direction || 'male-female', connectors: clone(ref?.connectors || {male: '', female: ''}), lengths: []};
 }
@@ -273,12 +277,16 @@ export function validateLengthColours(data,palette) {
   });return issues;
 }
 export function getCell(row, key) {
+  if(['start','end'].includes(key)&&sameGenderDirection(row.direction))return row.connectors?.[key]??'';
   if(['start','end'].includes(key)){const keys=connectorKeys(row.direction);return row.connectors?.[key==='start'?keys[0]:keys.at(-1)]??row.connectors?.end??'';}
   if (key === 'custom') return Object.fromEntries(Object.entries(row).filter(([k]) => !['name','direction','connectors','lengths'].includes(k)));
   return row[key];
 }
 export function setCell(row, key, value) {
-  if (key === 'start' || key === 'end') {
+  if(key==='direction'&&cableDirection(value)&&cableDirection(value)!==cableDirection(row.direction)&&(sameGenderDirection(value)||sameGenderDirection(row.direction))){
+    const start=getCell(row,'start'),end=getCell(row,'end');row.direction=value;
+    setCell(row,'start',start);if(cableDirection(value)!=='bidirectional')setCell(row,'end',end);
+  } else if (key === 'start' || key === 'end') {
     if (!object(row.connectors)) row.connectors = {};
     const keys=connectorKeys(row.direction);if(!keys.length)throw new Error('Choose a valid direction before editing connectors.');
     row.connectors[key==='start'?keys[0]:keys.at(-1)] = value;
@@ -375,7 +383,7 @@ export function validate(project, refs) {
       else if (names.has(row.name.toLowerCase())) add('warning',category,i,'name',`Duplicate cable name: ${row.name}.`,'Check whether this is a deliberate variant.');
       names.add(String(row.name).toLowerCase());
       lengths(row.lengths,category,i);
-      if (!cableDirection(row.direction)) add('warning',category,i,'direction','Unsupported cable direction.','Choose bidirectional, male > female or female > male.');
+      if (!cableDirection(row.direction)) add('warning',category,i,'direction','Unsupported cable direction.','Choose bidirectional, male > female, female > male, male > male or female > female.');
       if (!object(row.connectors)) add('error',category,i,'start','Connectors are invalid.','Enter the connectors using the connector columns.');
       else {
         const keys = connectorKeys(row.direction);
@@ -429,7 +437,7 @@ export function validateReferences(refs) {
       } else if (key === 'cable_types') {
         if (!object(row.connectors)) add(key,i,'connectors','Default connectors must be a JSON object.');
         if (!row.category?.trim()) add(key,i,'category','A default category is required.');
-        if (!cableDirection(row.direction)) add(key,i,'direction','Choose bidirectional, male > female or female > male.');
+        if (!cableDirection(row.direction)) add(key,i,'direction','Choose bidirectional, male > female, female > male, male > male or female > female.');
       }
     });
   }

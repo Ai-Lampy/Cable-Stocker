@@ -377,7 +377,7 @@ function fohFixture(){
 test('FOH Snake and its aliases use loom behaviour with a unique category ID',()=>{
  const r=fohFixture();for(const name of ['FOH Snake','Snake','FOH Multi'])assert.equal(M.isLoomCategory(name,r),true);
  assert.equal(M.isLoomCategory('Motor',r),false);assert.equal(M.isLoomCategory('FOH Snake'),true);
- const categories=refs.categories.items;assert.equal(new Set(categories.map(c=>c.id)).size,categories.length);assert.equal(M.referenceMatch(categories,'FOH Snake').type,'loom');
+ const categories=refs.categories.items;assert.equal(new Set(categories.map(c=>c.id)).size,categories.length);const snake=M.referenceMatch(categories,'FOH Snake');assert(snake);for(const name of [snake.name,...(snake.aliases||[])])assert.equal(M.isLoomCategory(name,refs),true);
 });
 test('adding either loom category loads only its references and keeps unit safeguards',()=>{
  const r=fohFixture(),p=newProjectFixture('ft');M.addReferenceLooms(p,M.referenceLoomsForProject(p,r,'FOH Snake'));
@@ -457,4 +457,45 @@ test('Excel direction-only reversal retains gendered connector identities',()=>{
  const p=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[{name:'Test',direction:'male-female',connectors:{male:'M',female:'F'},lengths:[2]}]}});
  const book=toWorkbook(p,X);book.Sheets.Data.C2.v='female-male';const row=fromWorkbook(book,X,p).project.stock.cables.Data[0];
  assert.deepEqual(row.connectors,{male:'M',female:'F'});assert.equal(M.getCell(row,'start'),'F');
+});
+
+test('same-gender directions accept labels and tokens with independent connectors',()=>{
+ for(const gender of ['male','female']){
+  const token=`${gender}-${gender}`,label=`${gender} > ${gender}`;
+  assert.equal(M.parseDirection(label.toUpperCase()),token);assert.equal(M.directionLabel(token),label);
+  const row={direction:token,connectors:{start:'XLR-3',end:'XLR-5',custom:'keep'}};
+  M.setCell(row,'start','RJ45');assert.equal(M.getCell(row,'end'),'XLR-5');
+  M.setCell(row,'end','etherCON');assert.equal(M.getCell(row,'start'),'RJ45');assert.equal(row.connectors.custom,'keep');
+  assert.deepEqual(M.validateReferences({cable_types:{items:[{...row,name:'Test',category:'Data'}]}}),[]);
+ }
+});
+test('direction transitions keep both connector types and existing metadata',()=>{
+ const row={direction:'male-female',connectors:{male:'XLR-3',female:'XLR-5',custom:42}};
+ for(const direction of ['male-male','female-female','female-male','male-male']){
+  M.setCell(row,'direction',direction);assert.equal(M.getCell(row,'start'),'XLR-3');assert.equal(M.getCell(row,'end'),'XLR-5');assert.equal(row.connectors.custom,42);
+ }
+ M.setCell(row,'direction','bidirectional');assert.equal(M.getCell(row,'start'),'XLR-3');assert.equal(M.getCell(row,'end'),'XLR-3');
+});
+test('same-gender missing defaults inherit and unknown endpoints remain reviewable',()=>{
+ const row={name:'Known',direction:'male-male',connectors:{start:'Override'},lengths:[5]};
+ const r={cable_types:{items:[{name:'Known',direction:'male-male',connectors:{start:'A',end:'B'}}]},connector_types:{items:[{name:'Override'}]}};
+ const p=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[row]}},'test.json');
+ M.fillCableConnectors(p,r);assert.deepEqual(p.stock.cables.Data[0].connectors,{start:'Override',end:'B'});
+ assert.equal(M.cableNeedsConnectorInputs(p.stock.cables.Data[0],r.cable_types.items),false);
+ assert.deepEqual(M.connectorReviews(p,r)[0].usages.map(u=>u.key),['end']);M.approveConnector(p,r,'B','Approved');assert.deepEqual(M.connectorReviews(p,r),[]);assert.deepEqual(M.validate(p),[]);
+ delete p.stock.cables.Data[0].connectors.start;assert.equal(M.getCell(p.stock.cables.Data[0],'start'),'');assert.equal(M.validate(p)[0].field,'start');
+ const unknown={name:'Unknown',direction:'female-female',connectors:{},lengths:[1]};p.stock.cables.Data.push(unknown);M.fillCableConnectors(p,r);assert.deepEqual(unknown.connectors,{start:'Unknown',end:'Unknown'});
+});
+test('same-gender JSON, project and Excel round trips keep distinct endpoint types',()=>{
+ const rows=['male-male','female-female','Male > Male','Female > Female'].map(direction=>({name:direction,direction,connectors:{start:'A',end:'B',custom:42},lengths:[2,5]}));
+ const p=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:rows}},'test.json');
+ assert.deepEqual(M.runtimeJSON(M.projectFromStock(M.runtimeJSON(p))),M.runtimeJSON(p));assert.deepEqual(M.restoreProject(M.clone(p)),p);assert.deepEqual(M.runtimeJSON(roundtrip(p).project),M.runtimeJSON(p));
+ const book=toWorkbook(p,X);assert.equal(book.Sheets.Data.D2.v,'A');assert.equal(book.Sheets.Data.E2.v,'B');book.Sheets.Data.D2.v='Changed';assert.deepEqual(fromWorkbook(book,X,p).project.stock.cables.Data[0].connectors,{start:'Changed',end:'B',custom:42});
+});
+test('Excel direction-only edits map same-gender endpoints without losing connector data',()=>{
+ const p=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[{name:'Test',direction:'male-female',connectors:{male:'A',female:'B',custom:42},lengths:[5]}]}},'test.json');
+ for(const direction of ['male-male','female-female','female-male']){
+  const book=toWorkbook(p,X);book.Sheets.Data.C2.v=direction;p.stock.cables.Data=fromWorkbook(book,X,p).project.stock.cables.Data;
+  assert.equal(M.getCell(p.stock.cables.Data[0],'start'),'A');assert.equal(M.getCell(p.stock.cables.Data[0],'end'),'B');assert.equal(p.stock.cables.Data[0].connectors.custom,42);
+ }
 });

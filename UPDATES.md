@@ -2,12 +2,14 @@
 
 ## Pending
 
-- Reference-data review: choose supported directions and appropriate connector defaults for Socapex Splitter, 63A 3ø > Tails and 125A 3ø > Tails in `data/cable_types.json`. Their custom splitter/tails direction text is outside the three supported choices; the reference-data validation test remains failing. Existing blank connector defaults also remain for review. Do not infer physical connector arrangements or overwrite user data.
+- Reference-data review: review remaining blank connector defaults in `data/cable_types.json` where explicit types are needed. Existing cable-name fallback and approval remain available. Do not infer physical connector arrangements or overwrite user data. The previously flagged splitter/tails direction values now pass validation in the user-updated reference file.
 
 - User acceptance of the initial release in day-to-day cable-stock editing.
 - Lampy Paperwork needs a separate future update to consume the agreed vendor stock-loom structure. Cable Stocker now exports it; Paperwork changes are outside this release. No implementation or deployment has been performed in Paperwork.
 
 ## Completed
+
+- v1.1.45 (local release for manual upload) — 2026-10-17: added Male > Male and Female > Female directions with independent endpoint editing, preservation on direction changes, validation and JSON/Excel support. Upload: `js/app.js`, `js/model.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; also include v1.1.44 `js/grid.js` if not yet uploaded. All 206 automated tests and non-browser checks passed. Browser testing not run, as requested. No new/deleted project files. User JSON/backups preserved; no upload/deployment or Lampy Paperwork changes. Results and compatibility limits in CHANGELOG.md.
 
 - v1.1.44 (local release for manual upload) — 2026-10-17: Direction dropdowns now open on single-cell selection by mouse or keyboard in stock and Settings. Upload: `js/app.js`, `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; include v1.1.43 files if not yet uploaded. Approved local browser checks passed; 200/201 automated tests passed with the existing reference-data audit still pending. No new/deleted project files. User JSON/backups preserved; no upload/deployment or Lampy Paperwork changes. Details in CHANGELOG.md.
 

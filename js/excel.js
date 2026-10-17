@@ -1,4 +1,4 @@
-import {getCell,setCell,cableDirection,LOOM_CATEGORY,projectLoomCategories,projectLoomRows,selectLoomCategory,replaceProjectLooms,checkLengthDisplay,clone, parseJSON, parseLengths, projectFromStock, snapshot, uid, object, safeKey, isCableAdaptor, setCableAdaptor} from './model.js';
+import {sameGenderDirection,getCell,setCell,cableDirection,LOOM_CATEGORY,projectLoomCategories,projectLoomRows,selectLoomCategory,replaceProjectLooms,checkLengthDisplay,clone, parseJSON, parseLengths, projectFromStock, snapshot, uid, object, safeKey, isCableAdaptor, setCableAdaptor} from './model.js';
 
 export const CABLE_COLUMNS = ['key','name','direction','start_connector','end_connector','lengths','connectors_json','custom_json','adaptor'];
 const LOOM_COLUMNS = ['key','name','lengths','description','custom_json'];
@@ -107,6 +107,8 @@ export function fromWorkbook(book,X,current) {
         const start=String(row.start_connector),end=String(row.end_connector);
         const original=base||{direction:row.direction,connectors};
         const originalStart=getCell(original,'start'),originalEnd=getCell(original,'end');
+        const remapDirection=base&&!jsonChanged&&cableDirection(row.direction)&&cableDirection(row.direction)!==cableDirection(base.direction)&&(sameGenderDirection(row.direction)||sameGenderDirection(base.direction));
+        if(remapDirection){if(!object(connectors))throw new Error('Repair connectors_json before changing direction.');setCell({direction:base.direction,connectors},'direction',String(row.direction));}
         // Preserve unknown connector fields and exact shape unless the endpoint cells changed.
         if(start!==originalStart||end!==originalEnd){
           if(!object(connectors))throw new Error('Repair connectors_json before editing connector endpoints.');
@@ -118,7 +120,7 @@ export function fromWorkbook(book,X,current) {
         }
         if(!base||String(row.name)!==String(base.name??''))result.name=String(row.name);
         if(!base||String(row.direction)!==String(base.direction??''))result.direction=String(row.direction);
-        if(!base||jsonChanged||start!==originalStart||end!==originalEnd)result.connectors=connectors;
+        if(!base||jsonChanged||remapDirection||start!==originalStart||end!==originalEnd)result.connectors=connectors;
         const baseLengths=base?(Array.isArray(base.lengths)?base.lengths.join(', '):json(base.lengths)??''):null;
         if(!base||String(row.lengths)!==baseLengths)result.lengths=importedLengths(row.lengths);
         for(const key of Object.keys(omit(result,['name','direction','connectors','lengths'])))delete result[key];

@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.45 — 2026-10-17
+
+Previous version: v1.1.44. Local release for manual upload; not deployed.
+
+- Add Male > Male and Female > Female to the direction options in stock tables, Settings and connector forms. Retain immediate dropdown opening on cell selection, existing choices and case-insensitive typed labels.
+- Store the additional direction tokens as `male-male` and `female-female`. Keep two independent endpoint types in `connectors.start` and `connectors.end`, allowing different connectors of the same gender. Preserve existing connector properties and imported arrow wording. Keep start/end types when switching into or out of these directions; form labels identify the correct gender at each end.
+- Support the new endpoints in inheritance, fallback, review/approval, validation, project backups and JSON/Excel round trips. Excel direction-only changes retain endpoint types and custom connector fields. Existing forward, reverse and bidirectional mappings remain supported.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Include `js/grid.js` from v1.1.44 if it has not yet been uploaded. New/deleted project files: none. User JSON, original examples and backups preserved; no upload/deployment or Lampy Paperwork changes.
+- Validation: all 206 automated tests passed, including five new same-gender tests covering distinct endpoint editing, direction transitions, inheritance/review/approval, missing endpoints, JSON/project/Excel round trips and Excel direction-only changes. Extended dropdown assertions to five choices. Updated the existing FOH Snake regression to assert actual loom recognition by name/aliases instead of requiring the optional `type` property in user reference data. The user's latest splitter/tails direction values now pass the reference-data audit; no reference files were modified by this release. JavaScript syntax, JSON parsing, local import paths, version consistency and protected data hashes passed.
+- Browser testing not run, as requested. Visual behaviour and live deployment remain unverified for this release. Downstream Lampy Paperwork support for these additional directions and `start`/`end` connector fields is unverified; Paperwork was not accessed or changed.
+- Cleanup: removed temporary audit/test output outside the project. No browser storage, downloads or temporary project files were created.
+
 ## v1.1.44 — 2026-10-17
 
 Previous version: v1.1.43. Local release for manual upload; not deployed.

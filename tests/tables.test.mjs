@@ -278,10 +278,10 @@ test('loom aliases and category support group filtering and sorting',()=>{
  assert.deepEqual(M.loomOrder(rows,new Set(),'',{key:'aliases',dir:1}),[2,0]);assert.deepEqual(M.loomOrder(rows,new Set(),'',{key:'category',dir:1}),[0,2]);
 });
 
-test('stock and Settings direction cells offer all three choices and validate typed input',()=>{
+test('stock and Settings direction cells offer all five choices and validate typed input',()=>{
  const ctx=controller();vm.runInContext("refs={cable_types:{items:[{name:'Test',category:'Data',adaptor:true}]}};cableTypesSheet='Data'",ctx);
  const cols=[vm.runInContext("cableColumns.find(c=>c.key==='direction')",ctx),vm.runInContext("refColumns('cable_types').find(c=>c.key==='direction')",ctx)];
- for(const col of cols){assert.equal(col.editOnSelect,true);assert.deepEqual(Array.from(col.suggestions('male-female'),x=>x.label),['bidirectional','male > female','female > male']);assert.equal(col.format('female-male'),'female > male');assert.equal(parseCell('female > male',col),'female-male');assert.throws(()=>parseCell('male > Tails',col),/Choose/);}
+ for(const col of cols){assert.equal(col.editOnSelect,true);assert.deepEqual(Array.from(col.suggestions('male-female'),x=>x.label),['bidirectional','male > female','female > male','male > male','female > female']);assert.equal(col.format('female-male'),'female > male');assert.equal(parseCell('female > male',col),'female-male');assert.throws(()=>parseCell('male > Tails',col),/Choose/);}
 });
 
 function selectionGrid(){
