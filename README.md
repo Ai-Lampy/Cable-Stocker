@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.48.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.49.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -72,13 +72,13 @@ Plain cable-stock JSON import previews compare against your current draft by mat
 
 | Output | Purpose | Contents |
 | --- | --- | --- |
-| Lampy cable-stock JSON | Vendor cable and pre-made loom catalogue | `vendor`, `cables` containing separate ordinary cable and loom category arrays, and retained imported custom fields. Loom IDs are exported; editor component IDs and preferences are not. The supplied handoff specifies categorized loom support in Lampy Paperwork V51.19; aliases still need its loader update. |
+| Lampy cable-stock JSON | Vendor cable and pre-made loom catalogue | `vendor`, `cables` containing separate ordinary cable and loom category arrays, and retained imported custom fields. Loom IDs are exported; editor component IDs and preferences are not. The supplied handoff specifies categorized loom support in Lampy Paperwork V51.20, including declared aliases in loom members. |
 | `*.lampy-project.json` | Reopen vendor work | Cable stock, composite looms, adaptor markers, generator vendor version, filename, row identities and imported baseline. **Not** a Lampy Paperwork input. |
 | `.xlsx` | Spreadsheet editing and backup | Cable categories, adaptor markers, looms/components, vendor metadata, custom fields and stable row keys. |
 
 Cable-stock JSON stores pre-made looms in `cables["Stock / Pre-Made Looms"]` and FOH snakes in `cables["FOH Snake"]`, alongside the other category arrays. Each loom keeps `id`, `name`, available `lengths` and a `cables` array of `cableType` / `quantity` entries. Import restores each group to its own tab, including empty selected categories. Ordinary cable rows retain their existing structure. Older files with a root `looms` array still import into Stock / Pre-Made Looms; their next export uses the category structure. Old combined files cannot identify which entries were FOH snakes; reopen your project/Excel backup to retain that distinction.
 
-Generator vendor version, adaptor markers, descriptions, connector overrides and component-specific lengths remain in project/Excel backups. Imported custom fields stay preserved. The supplied handoff specifies categorized looms and loom-only lengths for Lampy Paperwork V51.19. Alias support and cables with no individually available lengths still need loader updates. Exporting files does not update Paperwork.
+Generator vendor version, adaptor markers, descriptions, connector overrides and component-specific lengths remain in project/Excel backups. Imported custom fields stay preserved. The supplied handoff specifies categorized looms and loom-only lengths for Lampy Paperwork V51.20, including declared aliases in loom members. Cables with no individually available lengths still need a loader update. Exporting files does not update Paperwork.
 
 New projects start at vendor version **v1**, including an empty project started when no saved vendor project exists. Saved and imported project versions remain unchanged. Vendor versions such as `v2` and `v2.1` are independent of the app version. Major/minor buttons require confirmation. A category JSON preview/download is a labelled fragment, not a complete vendor file.
 
@@ -115,9 +115,9 @@ Every advertised loom length must appear in each member cable's `lengths` or `lo
 
 Individual cables require supported direction tokens and both endpoints. Explicit `connectors.start` and `connectors.end` override gender lookup for every direction, including bidirectional cables. Otherwise male-female uses male then female, female-male uses female then male, and bidirectional uses end for both. Same-gender directions use explicit start/end. Conflicting definitions are errors; editing an explicit endpoint also updates its existing corresponding gender field to agree.
 
-Export sorts and deduplicates valid numeric length arrays on copies and converts supported direction labels to their JSON tokens. It never adds availability, guesses missing references or moves ambiguous stock. Project/Excel backups preserve original ordering, custom data and invalid entries for recovery. JSON imports reject duplicate keys, including escaped or nested duplicates. Errors remain visible in review; **Download anyway** remains available for inspection and does not make an invalid catalogue valid.
+Export omits empty `loomOnlyLengths` arrays and deduplicates valid aliases without case or surrounding whitespace, retaining the first supplied spelling. Repeating an alias for the same cable or listing its own name is accepted. Export sorts and deduplicates valid numeric length arrays on copies and converts supported direction labels to their JSON tokens. It never adds availability, guesses missing references or moves ambiguous stock. Project/Excel backups preserve original ordering, custom data and invalid entries for recovery. JSON imports reject duplicate keys, including escaped or nested duplicates. Errors remain visible in review; **Download anyway** remains available for inspection and does not make an invalid catalogue valid.
 
-Cables with only `loomOnlyLengths` and an empty individual `lengths` array are reported for a Lampy Paperwork loader update. Keep their real availability instead of inventing individual stock. Declared aliases are preserved with a compatibility warning until Paperwork implements alias lookup; exports use canonical member names where resolution is unambiguous.
+Cables with only `loomOnlyLengths` and an empty individual `lengths` array are reported for a Lampy Paperwork loader update. Keep their real availability instead of inventing individual stock. The supplied V51.20 handoff supports declared aliases for loom members; exports use canonical member names where resolution is unambiguous. This does not imply alias search in Paperwork’s manual cable picker.
 
 ## Composite looms
 

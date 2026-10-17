@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.1.49 — 2026-10-17
+
+Previous version: v1.1.48. Local release for manual upload; not deployed.
+
+- Follow the updated supplied Lampy Paperwork V51.20 handoff. Remove the obsolete alias-loader warning and update current help. Declared aliases resolve loom members to canonical names; matching stays vendor-scoped, case-insensitive and trimmed, without approximate punctuation/spelling substitutions. This does not claim alias search in Paperwork's manual cable picker or independent verification of Paperwork.
+- Deduplicate valid exported alias arrays by case/outer whitespace while retaining the first supplied spelling. Self aliases remain valid. Preserve original alias arrays in projects, baselines and Excel backups. Cross-category ambiguity remains an error even without a referencing loom.
+- Omit empty optional loomOnlyLengths arrays from cable-stock exports; explain this normalization in review. Keep invalid non-empty values visible and flagged. Keep original backup data unchanged. Empty individual lengths remain errors requiring a separate Paperwork loader update; never invent availability.
+- Recognise custom loom groups from cables member lists, including records with conflicting loom-level direction/connectors so those fields receive the correct validation. Preserve category names, IDs and custom fields. Malformed structural imports remain rejected before replacing the draft. Validate that all connector field values are strings, including fields not used by endpoint lookup.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/handoff.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New files: none. Deleted files: none.
+- Validation: 254 automated non-browser tests passed, including seven new regressions for alias normalization/ambiguity, empty and invalid loom-only values, custom loom groups, legacy/nested global uniqueness and connector value types. Existing JSON/Excel round trips, editor/controller, table selection, update notification and safe-refresh regressions passed. JavaScript syntax, JSON validity, local asset/module paths and protected-file hashes checked.
+- Known issues: existing stock-review items remain in UPDATES.md. No stock declarations were changed. Mixed individual cables and looms within one category are rejected on import; use separate cable and loom category arrays as in the handoff example. Browser testing not run, as requested; live release behaviour is unverified. Lampy Paperwork untouched; no upload or deployment.
+- Cleanup: removed temporary audit/test output after checks; no test downloads or temporary project artifacts created. User projects, reference data, images and backups preserved.
+
 ## v1.1.48 — 2026-10-17
 
 Previous version: v1.1.47. Local release for manual upload; not deployed.

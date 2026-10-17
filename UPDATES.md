@@ -2,13 +2,17 @@
 
 ## Pending
 
+- Import limitation: mixed individual cable and loom records within one category are rejected safely. Keep separate cable and loom category arrays; broader mixed-category editing remains unresolved.
+
 - Reference-data review: confirm remaining missing connector defaults where needed. Missing stock endpoints now remain errors; Cable Stocker does not guess connectors. Do not overwrite supplied data.
 - Stock review under the handoff rules: Christie Lites UK project has three unresolved `32A 3Ph` member references and missing Whirlwind 12-Pair loom-only availability at 504 feet. Siyan LTD has seven cables without individually available lengths, a missing Socapex 19-Pin member reference and missing XLR-5 availability for its advertised loom lengths. Confirm declarations before editing; project JSON and backups are unchanged.
-- Lampy Paperwork integration: the supplied handoff states V51.19 supports categorized looms and loom-only lengths. Alias resolution and exclusively loom-only cables with an empty individual lengths array still need separate loader updates. No Paperwork inspection, change or deployment was performed for this update.
+- Lampy Paperwork integration: the updated handoff states V51.20 supports categorized looms, declared aliases in loom members and loom-only lengths. Only exclusively loom-only cables with an empty individual lengths array still need a loader update. No Paperwork inspection, change or deployment was performed for this update.
 - User acceptance of the initial release in day-to-day cable-stock editing.
 
 
 ## Completed
+
+- v1.1.49 (local release for manual upload) — 2026-10-17: applied the updated V51.20 handoff; removed the obsolete alias warning, deduplicated exported aliases, omitted empty loom-only arrays, broadened custom loom recognition and validated connector field types. Upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/handoff.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. All 254 non-browser automated tests passed. Browser testing not run, as requested. New/deleted files: none. Stock data and backups preserved; no Lampy Paperwork changes, upload or deployment. Details in CHANGELOG.md.
 
 - v1.1.48 (local release for manual upload) — 2026-10-17: implemented handoff validation, aliases and loom-only availability editors, canonical member exports, explicit endpoint support, fixed length display and preservation of saved stock during reference refresh. Upload: `js/app.js`, `js/model.js`, `js/grid.js`, `js/excel.js`, `js/version.js`, `tests/core.test.mjs`, `tests/loom-stock.test.mjs`, `tests/tables.test.mjs`, `tests/handoff.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; include earlier unuploaded release files. All 247 automated tests and non-browser checks passed. Browser testing not run, as requested. New: `tests/handoff.test.mjs`; deleted files: none. User JSON/backups unchanged; stock review items listed above. No Lampy Paperwork changes, upload or deployment. Full changes, compatibility limits and audit in CHANGELOG.md.
 

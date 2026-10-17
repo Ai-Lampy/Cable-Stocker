@@ -55,7 +55,7 @@ function importStockLooms(project) {
   }
   for(const [category,rows] of Object.entries(project.stock.cables)) {
     // Known sheets include empty arrays. Recognise other named composite groups by their stock structure.
-    if(isLoomCategory(category)||rows.some(row=>typeof row.id==='string'&&Array.isArray(row.lengths)&&Array.isArray(row.cables)&&row.cables.every(c=>object(c)&&typeof c.cableType==='string')&&!Object.hasOwn(row,'direction')&&!Object.hasOwn(row,'connectors')))
+    if(isLoomCategory(category)||rows.some(row=>Array.isArray(row.cables)))
       groups.push([category,rows,false]);
   }
   const ids=new Set();
@@ -129,7 +129,14 @@ export function removeProjectCategory(project,category,{looms=false}={}) {
 }
 export function runtimeJSON(project) {
   const stock=clone(project.stock),rows=Object.values(project.stock.cables).flat();
-  for(const row of Object.values(stock.cables).flat()){for(const key of ['lengths','loomOnlyLengths'])if(Object.hasOwn(row,key))row[key]=normalisedLengths(row[key]);const direction=cableDirection(row.direction);if(direction)row.direction=direction;}
+  for(const row of Object.values(stock.cables).flat()){
+    for(const key of ['lengths','loomOnlyLengths'])if(Object.hasOwn(row,key))row[key]=normalisedLengths(row[key]);
+    if(Array.isArray(row.loomOnlyLengths)&&!row.loomOnlyLengths.length)delete row.loomOnlyLengths;
+    if(Array.isArray(row.aliases)&&row.aliases.every(alias=>typeof alias==='string'&&alias.trim())){
+      const seen=new Set();row.aliases=row.aliases.filter(alias=>{const key=cableNameKey(alias);if(seen.has(key))return false;seen.add(key);return true;});
+    }
+    const direction=cableDirection(row.direction);if(direction)row.direction=direction;
+  }
   for(const category of projectLoomCategories(project)) {
     if(!safeKey(category)||Object.hasOwn(stock.cables,category))throw new Error(`Cannot export duplicate or unsafe category: ${category}. Keep the project backup and resolve the category conflict.`);
     stock.cables[category]=projectLoomRows(project,category).map(loom=>stockLoomJSON(loom,rows));
@@ -385,7 +392,7 @@ export function validate(project, refs) {
   const lengths = (values, category, row, field = 'lengths',required=true) => {
     if(!Array.isArray(values)||values.some(n=>typeof n!=='number'||!Number.isFinite(n)||n<=0))add('error',category,row,field,'Lengths must be an array of positive numbers.','Edit lengths; remove invalid values.');
     else {
-      if(required&&!values.length)add('error',category,row,field,field==='lengths'?'No individually available lengths. Lampy Paperwork V51.19 requires a non-empty lengths array.':'No available lengths.','Supply confirmed availability, or request a loader update for exclusively loom-only stock. Do not invent lengths.');
+      if(required&&!values.length)add('error',category,row,field,field==='lengths'?'No individually available lengths. Lampy Paperwork V51.20 requires a non-empty lengths array.':'No available lengths.','Supply confirmed availability, or request a loader update for exclusively loom-only stock. Do not invent lengths.');
       if(new Set(values).size!==values.length)add('warning',category,row,field,'Duplicate lengths; export removes duplicates and sorts numerically.','Review the exported lengths. Your original draft is preserved.');
     }
   };
@@ -396,17 +403,19 @@ export function validate(project, refs) {
   for(const {category,index:i,row} of records){
     if(typeof row.name!=='string'||!row.name.trim())add('error',category,i,'name','Cable name is empty or invalid.','Enter the canonical cable name.');
     if(row.aliases!==undefined&&(!Array.isArray(row.aliases)||row.aliases.some(a=>typeof a!=='string'||!a.trim())))add('error',category,i,'aliases','Aliases must be an array of non-empty names.','Enter only supplied aliases, separated by commas.');
-    else if(row.aliases?.length)add('warning',category,i,'aliases','Declared aliases need the Lampy Paperwork loader update. Export uses canonical names for unambiguous loom references.','Retain supplied aliases; use canonical cable names until alias support is available.');
     lengths(row.lengths,category,i);
-    if(row.loomOnlyLengths!==undefined){lengths(row.loomOnlyLengths,category,i,'loomOnlyLengths',false);if(Array.isArray(row.lengths)&&Array.isArray(row.loomOnlyLengths)&&row.lengths.some(n=>row.loomOnlyLengths.includes(n)))add('error',category,i,'loomOnlyLengths','A length appears in both individual and loom-only availability.','Confirm its availability and keep it in only one array.');}
+    if(row.loomOnlyLengths!==undefined){lengths(row.loomOnlyLengths,category,i,'loomOnlyLengths',false);if(Array.isArray(row.loomOnlyLengths)&&!row.loomOnlyLengths.length)add('warning',category,i,'loomOnlyLengths','Empty loom-only lengths will be omitted from cable-stock JSON.','Keep the field absent when no loom-only availability is declared. The backup retains your original data.');if(Array.isArray(row.lengths)&&Array.isArray(row.loomOnlyLengths)&&row.lengths.some(n=>row.loomOnlyLengths.includes(n)))add('error',category,i,'loomOnlyLengths','A length appears in both individual and loom-only availability.','Confirm its availability and keep it in only one array.');}
     if(project.stock.vendor.lengthUnit==='ft'&&[row.name,...(Array.isArray(row.aliases)?row.aliases:[])].some(n=>cableNameKey(n)==='whirlwind 12-pair')&&row.lengths?.includes?.(504))add('error',category,i,'loomOnlyLengths',"Whirlwind 504' must remain loom-only.",'Move confirmed 504-foot availability to loomOnlyLengths; do not advertise it individually.');
     if(!cableDirection(row.direction))add('error',category,i,'direction','Unsupported cable direction.','Choose a supported direction.');
     if(!object(row.connectors))add('error',category,i,'start','Connectors are invalid.','Enter the confirmed connectors.');
-    else for(const side of ['start','end']){
+    else {
+    if(Object.values(row.connectors).some(value=>typeof value!=='string'))add('error',category,i,'start','Connector fields must contain strings.','Review connector values; preserve the original in your project backup.');
+    for(const side of ['start','end']){
       const key=endpointKey(row,side),value=row.connectors[key];
       if(typeof value!=='string'||!value.trim())add('error',category,i,side,`Missing ${side} connector.`,'Enter confirmed connector details; no connector is guessed.');
       const gender=connectorKeys(row.direction)[side==='start'?0:connectorKeys(row.direction).length-1];
       if(key===side&&['male','female'].includes(gender)&&gender!==side&&Object.hasOwn(row.connectors,gender)&&row.connectors[gender]!==value)add('error',category,i,side,`Explicit ${side} connector conflicts with ${gender}.`,'Explicit start/end take precedence. Correct the conflicting definition.');
+    }
     }
   }
   const loomIds=new Set(),loomNames=new Set();

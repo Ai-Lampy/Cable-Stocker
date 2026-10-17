@@ -15,7 +15,7 @@ function excel(p){return fromWorkbook(X.read(X.write(toWorkbook(p,X),{type:'arra
 test('handoff catalogue validates; exported aliases resolve canonically without changing the project',()=>{
  const p=project(),before=M.clone(p);assert.deepEqual(errors(p),[]);const output=M.runtimeJSON(p);
  assert.deepEqual(output.cables['FOH Snake'][0].cables.map(c=>c.cableType),['Whirlwind 12-Pair','32A 3ø']);assert.deepEqual(output.cables.Data[0].aliases,['W-1']);assert.deepEqual(output.cables.Data[0].loomOnlyLengths,[504]);assert(!output.cables.Data[0].lengths.includes(504));assert.equal(output.looms,undefined);assert.deepEqual(p,before);
- assert(M.validate(p).some(i=>i.level==='warning'&&i.field==='aliases'));assert(!M.validate(p).some(i=>i.message.includes('planned update')));
+ assert(!M.validate(p).some(i=>i.level==='warning'&&i.field==='aliases'));assert(!M.validate(p).some(i=>i.message.includes('planned update')));
  const reopened=M.projectFromStock(output,p.filename);assert.deepEqual(M.runtimeJSON(reopened),output);assert.deepEqual(M.stockImportChanges(reopened,p),[]);
 });
 test('every member must support every loom length; missing references never manufacture cables',()=>{
@@ -72,4 +72,36 @@ test('supported typed direction labels export canonical tokens without rewriting
 });
 test('all supplied project backups restore without mutation under the new handoff rules',()=>{
  const dir=new URL('../projects/',import.meta.url);for(const file of fs.readdirSync(dir).filter(n=>n.endsWith('.lampy-project.json'))){const data=M.parseJSON(fs.readFileSync(new URL(file,dir),'utf8')),p=M.restoreProject(data);assert.deepEqual(p,data);const before=M.clone(p);M.validate(p);M.runtimeJSON(p);assert.deepEqual(p,before);}
+});
+
+test('V51.20 accepts repeated self aliases and deduplicates export copies without losing backup data',()=>{
+ const p=project(),row=p.stock.cables.Data[0];row.aliases=['W-1',' w-1 ','WHIRLWIND 12-PAIR','Whirlwind 12-Pair'];const before=M.clone(p);
+ assert.deepEqual(errors(p),[]);assert(!M.validate(p).some(i=>i.field==='aliases'));
+ assert.deepEqual(M.runtimeJSON(p).cables.Data[0].aliases,['W-1','WHIRLWIND 12-PAIR']);assert.deepEqual(p,before);assert.deepEqual(excel(p).stock,p.stock);
+});
+test('empty optional loom-only availability is omitted only on export; invalid values remain flagged',()=>{
+ const p=project(),row=p.stock.cables.Mains[0];row.loomOnlyLengths=[];const before=M.clone(p);
+ assert(!Object.hasOwn(M.runtimeJSON(p).cables.Mains[0],'loomOnlyLengths'));assert(M.validate(p).some(i=>i.field==='loomOnlyLengths'&&i.message.includes('omitted')));assert.deepEqual(p,before);assert.deepEqual(excel(p).stock,p.stock);
+ for(const invalid of [null,'504',[0],['504']]){row.loomOnlyLengths=invalid;assert(errors(p).some(i=>i.field==='loomOnlyLengths'));assert.deepEqual(M.runtimeJSON(p).cables.Mains[0].loomOnlyLengths,invalid);}
+});
+test('alias validation rejects malformed lists, is order independent and needs no referencing loom',()=>{
+ for(const aliases of [null,'Name',[''],['  '],[7]]){const p=project();p.stock.cables.Data[0].aliases=aliases;assert(errors(p).some(i=>i.field==='aliases'));}
+ for(const reverse of [false,true]){const p=project();p.looms=[];p.stock.cables={Data:[cable('A',{aliases:['B']})],Mains:[cable('B')]};if(reverse)p.stock.cables=Object.fromEntries(Object.entries(p.stock.cables).reverse());assert.equal(errors(p).filter(i=>i.message.includes('Ambiguous')).length,2);}
+ const a=project(),b=project();b.stock.cables.Data[0].name='Other';assert.equal(M.resolveStockCable(a.stock.cables.Data,'Other').length,0);assert.equal(M.resolveStockCable(b.stock.cables.Data,'W-1').length,1);
+});
+test('custom loom categories are recognised by member lists and retain invalid loom fields for review',()=>{
+ const stock=fixture();stock.cables['Custom assemblies']=stock.cables['FOH Snake'];delete stock.cables['FOH Snake'];stock.cables['Custom assemblies'][0].direction='male-female';
+ const p=M.projectFromStock(stock,'test.json');assert.equal(p.looms[1].category,'Custom assemblies');assert(errors(p).some(i=>i.message.includes('inherit direction')));assert.deepEqual(M.runtimeJSON(p).cables['Custom assemblies'][0].direction,'male-female');assert.deepEqual(excel(p).looms,p.looms);
+ const broken=M.clone(stock);delete broken.cables['Custom assemblies'][0].id;assert.throws(()=>M.projectFromStock(broken),/IDs/);
+});
+test('nested and legacy loom names collide globally after case and surrounding whitespace are ignored',()=>{
+ const stock=fixture();stock.looms=[{id:'legacy',name:' FOH LOOM ',lengths:[24],cables:[{cableType:'W-1',quantity:1}]}];
+ const p=M.projectFromStock(stock,'test.json');assert(errors(p).some(i=>i.message.includes('names must be unique')));stock.looms[0].id='foh';assert.throws(()=>M.projectFromStock(stock),/unique/);
+});
+test('non-string connector fields are invalid even when explicit endpoint lookup succeeds',()=>{
+ const p=project();p.stock.cables.Data[0].connectors={start:'A',end:'B',unused:7};assert(errors(p).some(i=>i.message.includes('Connector fields must contain strings')));assert.equal(M.runtimeJSON(p).cables.Data[0].connectors.unused,7);
+});
+test('mixed cable and loom imports refuse replacement without altering the supplied source',()=>{
+ const stock=fixture();stock.cables.Mixed=[cable('Individual'),{id:'mixed',name:'Mixed loom',lengths:[24],cables:[{cableType:'W-1',quantity:1}]}];const before=M.clone(stock);
+ assert.throws(()=>M.projectFromStock(stock),/Stock looms/);assert.deepEqual(stock,before);
 });
