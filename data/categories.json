@@ -9,7 +9,10 @@
     {
       "id": "cat-2",
       "name": "Multi",
-      "aliases": []
+      "aliases": [
+        "Soca",
+        "Socapex"
+      ]
     },
     {
       "id": "cat-3",
@@ -32,6 +35,14 @@
       "aliases": [
         "Pre-made Looms",
         "Stock Looms"
+      ]
+    },
+    {
+      "id": "cat-looms",
+      "name": "FOH Snake",
+      "aliases": [
+        "Snake",
+        "FOH Multi"
       ]
     }
   ]
