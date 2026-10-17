@@ -281,5 +281,25 @@ test('loom aliases and category support group filtering and sorting',()=>{
 test('stock and Settings direction cells offer all three choices and validate typed input',()=>{
  const ctx=controller();vm.runInContext("refs={cable_types:{items:[{name:'Test',category:'Data',adaptor:true}]}};cableTypesSheet='Data'",ctx);
  const cols=[vm.runInContext("cableColumns.find(c=>c.key==='direction')",ctx),vm.runInContext("refColumns('cable_types').find(c=>c.key==='direction')",ctx)];
- for(const col of cols){assert.deepEqual(Array.from(col.suggestions('male-female'),x=>x.label),['bidirectional','male > female','female > male']);assert.equal(col.format('female-male'),'female > male');assert.equal(parseCell('female > male',col),'female-male');assert.throws(()=>parseCell('male > Tails',col),/Choose/);}
+ for(const col of cols){assert.equal(col.editOnSelect,true);assert.deepEqual(Array.from(col.suggestions('male-female'),x=>x.label),['bidirectional','male > female','female > male']);assert.equal(col.format('female-male'),'female > male');assert.equal(parseCell('female > male',col),'female-male');assert.throws(()=>parseCell('male > Tails',col),/Choose/);}
+});
+
+function selectionGrid(){
+ const g=grid([{name:'A',direction:'male-female'}]);g.ids=[0];g.o.columns=[{key:'name'},{key:'direction',editOnSelect:true}];g.selection={r:0,c:0,rr:0,cc:0};g.paint=()=>{};g.focusCell=()=>{};g.edit=(r,c)=>{g.opened=[r,c];};return g;
+}
+test('single selection opens opted-in direction cells only',()=>{
+ const g=selectionGrid();g.select(0,0);assert.equal(g.opened,undefined);g.select(0,1);assert.deepEqual(g.opened,[0,1]);
+});
+test('range and read-only selections do not open a direction editor',()=>{
+ const g=selectionGrid();g.select(0,1,true);assert.equal(g.opened,undefined);g.o.readOnly=()=>true;g.select(0,1);assert.equal(g.opened,undefined);
+});
+test('explicit editing suppresses recursive select-to-edit and retains typed replacement',()=>{
+ const g=selectionGrid();g.edit=Grid.prototype.edit;g.table={querySelector:()=>({replaceChildren(){}})};g.editorOriginal='male > female';g.editor={setAttribute(){},focus(){},select(){},setSelectionRange(){}};g.showSuggestions=()=>{g.shown=(g.shown||0)+1;};
+ g.edit(0,1,'f');assert.equal(g.editor.value,'f');assert.equal(g.editing,true);assert.equal(g.shown,1);
+});
+test('invalid active edit prevents changing selection or opening another editor',()=>{
+ const g=selectionGrid();g.editing=true;g.commitEditor=()=>false;assert.equal(g.select(0,1),false);assert.equal(g.opened,undefined);assert.equal(g.selection.c,0);
+});
+test('Tab navigation into a direction cell opens the choices',()=>{
+ const g=selectionGrid();g.host={isConnected:true};g.moveTab();assert.deepEqual(g.opened,[0,1]);
 });

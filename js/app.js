@@ -247,7 +247,7 @@ function addLoomCategory(category=LOOMS){
   },[{label:'Cancel',run:d=>d.close()},{label:`Keep numbers as ${project.stock.vendor.lengthUnit}`,run:d=>{d.close();apply(true);}},{label:'Add without mismatched lengths',cls:'primary',run:d=>{d.close();apply(false);}}]);
 }
 function adaptorAfterPaste(current,i,patches){const patch=patches?.find(p=>p.id===i&&p.col.key==='adaptor');return patch?['true','yes'].includes(String(patch.text).trim().toLowerCase()):!!current;}
-const directionColumn={format:directionLabel,editFormat:directionLabel,parse:parseDirection,suggestions:()=>DIRECTION_OPTIONS,suggestionsLabel:'Available directions'};
+const directionColumn={editOnSelect:true,format:directionLabel,editFormat:directionLabel,parse:parseDirection,suggestions:()=>DIRECTION_OPTIONS,suggestionsLabel:'Available directions'};
 const cableColumns=[{key:'name',label:'Cable type / name',list:'cables-list',width:220},{key:'adaptor',label:'Adaptor',type:'boolean',width:105},{key:'direction',label:'Adaptor direction',...directionColumn,width:165},{key:'start',label:'Start connector',list:'connectors-list',width:185},{key:'end',label:'End connector',list:'connectors-list',width:185},{key:'lengths',label:'Available lengths',type:'lengths',width:380},{key:'connectors',label:'Connectors JSON',type:'json',width:250},{key:'custom',label:'Custom fields JSON',type:'json',width:240}];
 function renderCategory(category){
   const repaired=clone(project.stock.cables[category]);let inherited=false;for(const row of repaired)inherited=inheritCableConnectors(row,refs.cable_types.items)||inherited;if(inherited)change(()=>project.stock.cables[category]=repaired,{renderPage:false});

@@ -145,7 +145,7 @@ export class Grid {
   bounds(){const s=this.selection;return {r:Math.min(s.r,s.rr),rr:Math.max(s.r,s.rr),c:Math.min(s.c,s.cc),cc:Math.max(s.c,s.cc)};}
   value(id,key){const row=this.o.rows()[id];return row?this.o.get(row,key):'';}
   currentGrid(){return this.host.isConnected?this:(this.o.current?.()||[...document.querySelectorAll('[data-lampy-grid]')].map(el=>el.lampyGrid).find(g=>g.o.key===this.o.key)||this);}
-  select(r,c,extend=false){if(this.editing){if(!this.commitEditor())return false;const target=this.currentGrid();if(target!==this)return target.select(r,c,extend);}if(!this.ids.length)return; r=Math.max(0,Math.min(this.ids.length-1,r));c=Math.max(0,Math.min(this.o.columns.length-1,c));if(extend){this.selection.rr=r;this.selection.cc=c;}else this.selection={r,c,rr:r,cc:c};this.paint();this.focusCell(extend?r:undefined,extend?c:undefined);}
+  select(r,c,extend=false,openEditor=true){if(this.editing){if(!this.commitEditor())return false;const target=this.currentGrid();if(target!==this)return target.select(r,c,extend,openEditor);}if(!this.ids.length)return; r=Math.max(0,Math.min(this.ids.length-1,r));c=Math.max(0,Math.min(this.o.columns.length-1,c));if(extend){this.selection.rr=r;this.selection.cc=c;}else this.selection={r,c,rr:r,cc:c};this.paint();this.focusCell(extend?r:undefined,extend?c:undefined);if(openEditor&&!extend&&this.o.columns[c].editOnSelect&&!this.o.readOnly?.(this.ids[r],this.o.columns[c].key))this.edit(r,c);}
   paint(){
     const b=this.bounds();this.table.querySelectorAll(':scope > tbody > tr > td[data-r]').forEach(td=>{const r=+td.dataset.r,c=+td.dataset.c,selected=r>=b.r&&r<=b.rr&&c>=b.c&&c<=b.cc;td.classList.toggle('selected',selected);td.setAttribute('aria-selected',String(selected));td.querySelector('.fill-handle')?.remove();});
     const {r,c}=this.selection;
@@ -167,7 +167,7 @@ export class Grid {
     if(!ok){this.editing=true;this.editor.focus();}return ok;
   }
   edit(r,c,initial){
-    this.select(r,c);if(this.editing)return;
+    if(this.select(r,c,false,false)===false||this.editing)return;
     const col=this.o.columns[c];if(this.o.readOnly?.(this.ids[r],col.key))return;
     const td=this.table.querySelector(`:scope > tbody > tr > td[data-r="${r}"][data-c="${c}"]`);if(!td)return;
     this.editing=true;this.editor.disabled=false;this.editor.value=initial===undefined?this.editorOriginal:initial;

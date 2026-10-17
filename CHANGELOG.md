@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.44 — 2026-10-17
+
+Previous version: v1.1.43. Local release for manual upload; not deployed.
+
+- Open all three direction choices immediately when an editable Direction cell is selected by one click, Tab/Shift+Tab or arrow-key navigation in stock and Settings tables. No double-click or F2 is required.
+- Keep the behaviour limited to Direction cells. Read-only cells and range selections do not open an editor. Preserve typed replacement, validation, option selection, Tab commit, Escape cancellation and saving without recursive selection/editing.
+- Updated/upload: `js/app.js`, `js/grid.js`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. If v1.1.43 has not been uploaded, also upload its `js/model.js`, `js/excel.js` and `tests/core.test.mjs`. New/deleted project files: none. User JSON, original examples and backups preserved. No upload/deployment or Lampy Paperwork changes.
+- Validation: 200/201 automated tests passed, including five new selection/navigation regression tests. The existing reference-data audit still fails on the three unsupported splitter/tails direction values recorded under v1.1.43. JavaScript syntax, JSON validity, local imports, version consistency and protected data hashes passed.
+- Approved local browser checks passed: one-click dropdown in both stock and Settings, reversed connector display after choice, Shift+Tab/arrow navigation into the cell, Tab away, Escape closing, read-only exclusion, keyboard choice and top/bottom saving. No console warnings/errors in the checked flows. Live deployment and other browsers were not tested.
+- Cleanup: restored isolated browser storage, closed test tab and stopped local server; removed scratch files outside the project. No downloads or temporary project files. Screenshot retained outside the project.
+
 ## v1.1.43 — 2026-10-17
 
 Previous version: v1.1.42. Local release for manual upload; not deployed.
