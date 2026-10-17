@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import {Grid,parseCell,sortedLengths} from '../js/grid.js';
+import {Grid,parseCell,sortedLengths,captureScroll,restoreScroll} from '../js/grid.js';
 import * as M from '../js/model.js';
 function grid(rows=[]){const g=Object.create(Grid.prototype);Object.assign(g,{o:{rows:()=>rows,columns:[{key:'name',width:500}],get:(r,k)=>r[k]},prefs:{widths:{}},filter:'',sort:null});return g;}
 test('empty tables expose five entry slots without changing exported rows',()=>{const rows=[],g=grid(rows);assert.deepEqual(g.indices(),[0,1,2,3,4]);assert.equal(g.value(4,'name'),'');assert.deepEqual(rows,[]);});
@@ -16,7 +16,7 @@ test('existing layout preferences migrate once to centre/default widths without 
  const next=new Grid({dataset:{}},{key:'test',columns:[{key:'name'}]});assert.equal(next.prefs.align,'right');assert.equal(next.prefs.widths.name,25);
  }finally{Grid.prototype.render=render;globalThis.localStorage=saved;}
 });
-function editable(rows=[]){const g=grid(rows);Object.assign(g,{renderBody(){},focusCell(){},o:{...g.o,notice(){},apply(patches,allowNew){for(const p of patches){if(p.id>=rows.length)assert.equal(allowNew,true);while(rows.length<=p.id)rows.push({});rows[p.id][p.col.key]=p.value;}}}});return g;}
+function editable(rows=[]){const g=grid(rows);Object.assign(g,{host:{isConnected:true},ids:g.indices(),selection:{r:0,c:0,rr:0,cc:0},renderBody(){},focusCell(){},o:{...g.o,notice(){},apply(patches,allowNew){for(const p of patches){if(p.id>=rows.length)assert.equal(allowNew,true);while(rows.length<=p.id)rows.push({});rows[p.id][p.col.key]=p.value;}}}});return g;}
 test('entering a blank slot creates only the required data rows',()=>{const rows=[],g=editable(rows);assert.equal(g.apply([{id:0,col:{key:'name'},text:'New cable'}]),true);assert.deepEqual(rows,[{name:'New cable'}]);});
 test('clearing untouched entry slots does not add records',()=>{const rows=[],g=editable(rows);assert.equal(g.apply([{id:4,col:{key:'name'},text:''}]),true);assert.deepEqual(rows,[]);});
 test('invalid rectangular input leaves entry slots and existing data intact',()=>{const rows=[{name:'Existing'}],g=editable(rows);assert.equal(g.apply([{id:0,col:{key:'name'},text:'Changed'},{id:1,col:{key:'length',type:'positive'},text:'bad'}]),false);assert.deepEqual(rows,[{name:'Existing'}]);});
@@ -302,4 +302,80 @@ test('invalid active edit prevents changing selection or opening another editor'
 });
 test('Tab navigation into a direction cell opens the choices',()=>{
  const g=selectionGrid();g.host={isConnected:true};g.moveTab();assert.deepEqual(g.opened,[0,1]);
+});
+
+
+test('row-number width participates in table sizing and resets with other widths',()=>{
+ const g=enterGrid();g.table={style:{}};g.prefs.widths={__rowNumber:86,name:230};g.sizeColumns();assert.equal(g.table.style.width,'316px');
+ g.pref=()=>{};g.resetWidths();assert.equal(g.columnWidth({key:'__rowNumber'}),42);g.sizeColumns();assert.equal(g.table.style.width,'192px');
+});
+test('row-number resize handle supports mouse and keyboard with saved preferences',()=>{
+ const saved=globalThis.document;globalThis.document={createElement:()=>({setAttribute(){},setPointerCapture(){}})};
+ try{const g=grid();g.prefs.zoom=2;g.table={style:{}};g.pref=()=>g.saved=true;const th={style:{},getBoundingClientRect:()=>({width:84})};const h=g.resizeHandle(th,{key:'__rowNumber',label:'#'});
+ h.onpointerdown({preventDefault(){},clientX:10,pointerId:1});h.onpointermove({clientX:110});assert.equal(g.prefs.widths.__rowNumber,92);h.onpointerup();assert(g.saved);
+ h.onkeydown({key:'ArrowLeft',preventDefault(){},stopPropagation(){}});assert.equal(g.prefs.widths.__rowNumber,72);assert.equal(th.style.width,'72px');
+ }finally{globalThis.document=saved;}
+});
+test('scroll snapshots preserve document and horizontal table positions',()=>{
+ const saved=globalThis.window;let result;globalThis.window={scrollX:15,scrollY:1800,scrollTo:position=>result=position};
+ try{const scroller={scrollLeft:320,scrollTop:0},position=captureScroll(scroller);scroller.scrollLeft=0;restoreScroll(scroller,position);assert.equal(scroller.scrollLeft,320);assert.deepEqual(result,{left:15,top:1800,behavior:'instant'});}finally{globalThis.window=saved;}
+});
+test('table rebuild keeps filter, row identity, column identity, entry slots and scroll',()=>{
+ const rows=[{id:'a',name:'Alpha'},{id:'b',name:'Beta'}],g=selectionGrid();g.o.rows=()=>rows;g.o.rowKey=r=>r.id;g.o.key='test';g.sort={key:'name',dir:1};g.filter='a';g.entryIds=new Set([8]);g.ids=g.indices();g.selection={r:1,rr:1,c:1,cc:1};g.scroller={scrollLeft:240,scrollTop:0};const view=g.captureView();
+ rows[1].name='Aardvark';const next=grid(rows);next.o.key='test';next.o.rowKey=r=>r.id;next.o.columns=[{key:'direction'},{key:'name'}];const search={value:''};next.host={querySelector:()=>search};next.scroller={scrollLeft:0,scrollTop:0};next.renderBody=()=>{};
+ next.restoreView(view);assert.equal(next.filter,'a');assert.equal(search.value,'a');assert.equal(next.selection.r,0);assert.equal(next.selection.c,0);assert.equal(next.scroller.scrollLeft,240);assert(next.entryIds.has(8));
+ next.o.key='other';next.filter='keep';next.restoreView(view);assert.equal(next.filter,'keep');
+});
+test('committing an edit follows the replacement grid without revealing a distant row',()=>{
+ const rows=[{name:'Original'}],g=editable(rows),next=editable(rows);g.o.key=next.o.key='same';let reveal;next.focusCell=(r,c,value)=>reveal=value;g.o.apply=patches=>{rows[0].name=patches[0].value;g.host.isConnected=false;};g.o.current=()=>next;
+ assert.equal(g.apply([{id:0,col:{key:'name'},text:'Changed'}]),true);assert.equal(rows[0].name,'Changed');assert.equal(reveal,false);
+});
+test('focus after redraw does not scroll, while explicit navigation can reveal cells',()=>{
+ const g=selectionGrid();let revealed=0;g.table={querySelector:()=>({focus:options=>assert.equal(options.preventScroll,true),scrollIntoView:()=>revealed++})};g.focusCell=Grid.prototype.focusCell;
+ g.focusCell(undefined,undefined,false);assert.equal(revealed,0);g.focusCell();assert.equal(revealed,1);
+});
+test('Tab and Enter after a sorted rename do not scroll to the row new position',()=>{
+ for(const method of ['moveTab','moveEnter']){const g=selectionGrid();g.ids=[0,1,2];g.selection={r:1,c:0,rr:1,cc:0};g.host={isConnected:true};g.editor={value:'new'};g.editorOriginal='old';g.commitEditor=()=>{g.ids=[1,0,2];return true;};g.currentGrid=()=>g;let args;g.select=(...values)=>args=values;g[method](false,true);assert.equal(args[4],false);}
+});
+test('connector action appears only for a committed nonblank cable name',()=>{
+ const ctx=controller();vm.runInContext(`
+ const captured=[];const fakeNode=()=>({children:[],append(...values){this.children.push(...values);},setAttribute(){}});
+ document.createElement=fakeNode;document.querySelector=()=>fakeNode();heading=()=>{};Grid=class{constructor(host,o){captured.push(o);}};
+ project=newProject('Test');project.stock.cables.Data=[defaultCable(null,''),defaultCable(null,'   '),defaultCable(null,'Custom')];project.rowIds.Data=['a','b','c'];refs={cable_types:{items:[]}};renderCategory('Data');
+ `,ctx);
+ const column=vm.runInContext("captured[0].columns.find(c=>c.key==='name')",ctx);
+ for(const [rowId,value,buttons]of [[0,'',0],[1,'   ',0],[2,'Custom',1]]){const cell={children:[],append(...nodes){this.children.push(...nodes);}};column.render(value,cell,{rowId});assert.equal(cell.children.length,1+buttons);}
+});
+
+
+test('warning badge includes ordinary warnings and hides only when no warnings remain',()=>{
+ const ctx=controller();vm.runInContext(`
+ const elements=new Map();const count={classList:{toggle(){}}},button={append(value){elements.set('#'+value.id,value);},setAttribute(key,value){this[key]=value;}};
+ elements.set('#error-count',count);elements.set('#errors-button',button);document.querySelector=key=>elements.get(key);renderIssueCounts([{level:'warning'},{level:'error'},{level:'warning'}],0);
+ `,ctx);
+ assert.equal(vm.runInContext("elements.get('#warning-count').hidden",ctx),false);assert.equal(vm.runInContext("elements.get('#warning-count').textContent",ctx),'⚠ 2');assert.equal(vm.runInContext("elements.get('#error-count').textContent",ctx),1);
+ vm.runInContext("renderIssueCounts([{level:'warning'}],1)",ctx);assert.match(vm.runInContext("elements.get('#warning-count').title",ctx),/1 connectors need review/);
+ vm.runInContext('renderIssueCounts([],0)',ctx);assert.equal(vm.runInContext("elements.get('#warning-count').hidden",ctx),true);
+});
+function issueController(){const ctx=controller();ctx.Grid=Grid;vm.runInContext(`
+ project=newProject('Test');project.stock.cables.Data=[{name:'Zulu',direction:'male-female',connectors:{},lengths:[]},{name:'Alpha',direction:'male-female',connectors:{},lengths:[]}];project.rowIds.Data=['z','a'];
+ refs={categories:{items:[{name:'Data'},{name:'Motor'}]},cable_types:{items:[]},connector_types:{items:[]},length_colours:{items:[]}};
+ `,ctx);return ctx;}
+test('issue row numbers follow displayed sorting and flag filtered-out records',()=>{
+ const ctx=issueController();assert.match(vm.runInContext("issueLocation({category:'Data',row:0})",ctx),/^Row 2 · Zulu/);
+ vm.runInContext("tableViews.set('cables:Data',{sort:{key:'name',dir:-1},filter:'',entries:[]})",ctx);assert.match(vm.runInContext("issueLocation({category:'Data',row:0})",ctx),/^Row 1 · Zulu/);
+ vm.runInContext("tableViews.get('cables:Data').filter='Alpha'",ctx);assert.match(vm.runInContext("issueLocation({category:'Data',row:0})",ctx),/^Hidden by table filter · Zulu/);assert.match(vm.runInContext("issueLocation({category:'Data',row:1})",ctx),/^Row 1 · Alpha/);
+});
+test('Settings issues use category-local row numbers rather than the reference file index',()=>{
+ const ctx=issueController();vm.runInContext(`refs.cable_types.items=[{name:'Other',category:'Data'},{name:'Zulu',category:'Motor'},{name:'Alpha',category:'Motor'}];refs.connector_types.items=[{name:'Elsewhere',category:'Data'},{name:'Zulu',category:'Motor'},{name:'Alpha',category:'Motor'}];`,ctx);
+ for(const key of ['cable_types','connector_types'])assert.match(vm.runInContext(`issueLocation({category:'Settings: ${key}',row:1})`,ctx),/^Motor · Row 2 · Zulu/);
+});
+test('length-colour issues use the affected vendor and unit sheet and numeric sorting',()=>{
+ const ctx=issueController();vm.runInContext(`refs.length_colours.items=[{vendor:'Other',unit:'m',length:1},{vendor:'Test',unit:'m',length:10},{vendor:'Test',unit:'ft',length:1},{vendor:'Test',unit:'m',length:2}];`,ctx);
+ assert.match(vm.runInContext("issueLocation({category:'Settings: length_colours',row:1})",ctx),/^Test · m · Row 2/);
+});
+test('loom issue rows include expanded child rows before the affected parent',()=>{
+ const ctx=issueController();vm.runInContext(`project.looms=[{id:'z',name:'Zulu',lengths:[],components:[]},{id:'a',name:'Alpha',lengths:[],components:[{id:'c',type:'XLR',count:1}]}];project.loomTab=true;expandedLooms.add('a');`,ctx);
+ assert.match(vm.runInContext("issueLocation({category:'Stock / Pre-Made Looms',row:0})",ctx),/^Row 3 · Zulu/);
+ assert.equal(vm.runInContext("issueLocation({category:'Vendor',row:null})",ctx),'');
 });

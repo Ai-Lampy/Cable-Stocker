@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.1.46 — 2026-10-17
+
+Previous version: v1.1.45. Local release for manual upload; not deployed.
+
+- Let cable, Settings and main loom tables grow down the page instead of stopping at the former 65vh height cap. Keep horizontal scrolling and existing row heights.
+- Preserve document/table scroll, selection by row/column identity, filters, sorting and blank entry slots through edits and table rebuilds. Avoid focusing a rebuilt first row or scrolling to the top when a renamed row changes sort position. Retain table views during session navigation and error jumps; explicit cell navigation can reveal its destination.
+- Make the # column resizable by pointer or keyboard using the existing header handles. Save its width per table; include it in Reset widths (42 px for #, 150 px for data columns). Remove fixed gutter widths.
+- Hide the Connectors cell action on empty/whitespace names and during name entry. Show it for a custom/incomplete cable after a nonblank name is committed, including with Enter. Imported and existing committed names retain normal connector access.
+- Show a yellow warning icon/count for all warnings on the Errors button, including connector reviews, alongside the red error count. Calculate issue row numbers from the displayed sort, category sheet, vendor/unit scope and expanded loom rows rather than raw file indices. Include the item name. Label filtered-out rows as hidden; clear blocking filters when jumping to a row. Correct connector-review endpoint mapping for reversed and same-gender directions.
+- Updated/upload: `js/app.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Include earlier unuploaded v1.1.45 changes (`js/model.js`, `js/excel.js`, `tests/core.test.mjs`) when applicable. New/deleted project files: none. User JSON, originals and backups preserved. Lampy Paperwork untouched; no upload/deployment.
+- Validation: all 219 automated tests passed, including 13 new regressions for row-number resize/reset, scroll/view restoration, edited-grid replacement, sorted rename navigation, connector-button gating, all-warning counts and scoped/sorted/filtered/expanded issue rows. Existing JSON/Excel and direction tests remain passing. JavaScript syntax, JSON parsing, local import paths, version consistency and protected data hashes passed.
+- Browser testing not run, as requested. Actual page geometry, pointer interactions, scrolling/focus and live deployment remain unverified for this release. Existing downstream Lampy Paperwork compatibility remains pending.
+- Cleanup: removed temporary audit/test output outside the project. No test downloads, browser storage or temporary project files created.
+
 ## v1.1.45 — 2026-10-17
 
 Previous version: v1.1.44. Local release for manual upload; not deployed.

@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.45.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.46.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -80,9 +80,13 @@ Cable-stock JSON exports pre-made looms using `id`, `name`, available `lengths` 
 
 New projects start at vendor version **v1**, including an empty project started when no saved vendor project exists. Saved and imported project versions remain unchanged. Vendor versions such as `v2` and `v2.1` are independent of the app version. Major/minor buttons require confirmation. A category JSON preview/download is a labelled fragment, not a complete vendor file.
 
+The **Errors** button shows errors in red and all warnings with a yellow ⚠ count, including connectors awaiting review. Error and warning row numbers follow the table’s displayed sorting, category sheet and expanded loom rows. Items hidden by a filter are labelled as hidden instead of showing a misleading row number; **Jump to field** clears a blocking filter to reveal the affected row. Table sorting and filtering are retained during this session.
+
 ## Tables
 
-Cable tables, Settings tables and the main loom table default to centred text and 150 px editable columns. The row-number gutter stays 42 px. Manually saved widths remain unchanged. Table zoom and saved edit-highlight baselines are retained. Columns can still shrink to 1 px.
+Tables grow down the page without an internal vertical scroll limit. Use page scrolling to reach lower rows; wide tables retain horizontal scrolling. Edits and table rebuilds preserve the page position, horizontal scroll, selection, sort and filter. Normal keyboard navigation can scroll enough to reveal the next cell. **Reset widths** resets only the current table: data columns to 150 px and **#** to 42 px.
+
+Cable tables, Settings tables and the main loom table default to centred text and 150 px editable columns. The **#** column starts at 42 px and can be resized like the data columns. Manually saved widths remain unchanged. Table zoom and saved edit-highlight baselines are retained. Columns can still shrink to 1 px.
 
 Empty cable and Settings tables show five editable entry rows. Small cable and Settings tables retain blank entry slots up to five rows. Untouched slots are presentation only: they do not add records, errors or exported rows. Entering data creates the required rows; entering a later slot also creates the preceding rows. Filters can show no matches, and sorting keeps unused slots at the end. **+ Row** adds an actual record in those tables. The main loom table shows saved parent rows and their expanded children; use **Add loom** to create a loom.
 
@@ -93,7 +97,7 @@ Every cable table, Settings table and the main loom table has **Save table** but
 - Arrows, Enter, Tab and Shift+Tab move between cells. Shift+arrows or Shift+click extends a range. Ctrl/⌘ A selects the table.
 - Ctrl/⌘ C and Ctrl/⌘ V copy/paste rectangular Excel-compatible TSV. Quoted multiline cells are supported. Toolbar Copy/Paste uses clipboard permission when available.
 - Drag the green selection corner to repeat values into a rectangle. Fill down repeats the first selected row. Invalid paste/fill operations apply no cells.
-- Drag a header separator to resize. Focus the separator and use left/right arrows for keyboard resizing. Editable columns can shrink to 1 px (the non-zero geometry guard) and expand again; narrow content is clipped or scrollable without changing its data. The row-number gutter stays 42 px. Chosen widths persist per table, including at different zoom levels.
+- Drag a header separator to resize. Focus the separator and use left/right arrows for keyboard resizing. Editable columns can shrink to 1 px (the non-zero geometry guard) and expand again; narrow content is clipped or scrollable without changing its data. The **#** column starts at 42 px and can be resized like the data columns. Chosen widths persist per table, including at different zoom levels.
 - Click a heading to sort ascending/descending. **Clear sort** restores the default ascending order. Search filters displayed rows. Clear the search filter before extending the table with pasted rows; sorting can remain active.
 - Zoom, widths, alignment and wrapping persist per table. Zoom changes the table only. Preferences never enter Lampy JSON.
 - In tables, yellow marks values changed from the imported baseline, or from that table’s last successful **Save table**. Export reviews continue to use the original import baseline and show added and removed rows. Excel imports retain the original baseline; importing another stock JSON establishes a new one.
@@ -279,4 +283,4 @@ Length chips display from lowest to highest, including decimal lengths. This cha
 
 ## Connector form and hidden columns
 
-Direction and connector columns appear only for adaptors. Select an editable Direction cell with one click, Tab or the arrow keys to open all five choices immediately: **bidirectional**, **male > female**, **female > male**, **male > male** and **female > female**. Start/end connector cells follow that order; bidirectional uses one shared connector. JSON stores `male-female`, `female-male`, `male-male`, `female-female` or `bidirectional`; imported arrow wording is also accepted and preserved. Male > Male and Female > Female keep independent connector types in `connectors.start` and `connectors.end`; direction specifies their genders. Existing connector properties are preserved. Excel start/end columns follow the selected direction. Downstream Lampy Paperwork support for these additional directions has not been verified. A custom/incomplete cable has a **Connectors** button inside its name cell. Use that form to choose direction and enter connector names, then **Save connectors**. **Cancel** leaves the row unchanged. Connector errors for non-adaptors open the form. Recognised cables still inherit missing defaults.
+Direction and connector columns appear only for adaptors. Select an editable Direction cell with one click, Tab or the arrow keys to open all five choices immediately: **bidirectional**, **male > female**, **female > male**, **male > male** and **female > female**. Start/end connector cells follow that order; bidirectional uses one shared connector. JSON stores `male-female`, `female-male`, `male-male`, `female-female` or `bidirectional`; imported arrow wording is also accepted and preserved. Male > Male and Female > Female keep independent connector types in `connectors.start` and `connectors.end`; direction specifies their genders. Existing connector properties are preserved. Excel start/end columns follow the selected direction. Downstream Lampy Paperwork support for these additional directions has not been verified. A custom/incomplete cable shows a **Connectors** button inside its name cell only after a nonblank name has been committed with Enter or another commit action. Empty names and names still being typed do not show the button. Use that form to choose direction and enter connector names, then **Save connectors**. **Cancel** leaves the row unchanged. Connector errors for non-adaptors open the form. Recognised cables still inherit missing defaults.
