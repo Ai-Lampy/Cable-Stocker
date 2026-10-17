@@ -38,13 +38,12 @@
       ]
     },
     {
-      "id": "cat-foh-snake",
+      "id": "1bb5cdb0-922c-44b6-a088-9e1b616f4960",
       "name": "FOH Snake",
       "aliases": [
         "Snake",
         "FOH Multi"
-      ],
-      "type": "loom"
+      ]
     }
   ]
 }

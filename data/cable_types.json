@@ -412,7 +412,7 @@
         "Soca Y-Split"
       ],
       "category": "Multi",
-      "direction": "male > 2 x Female",
+      "direction": "male-female",
       "connectors": {
         "male": "",
         "female": ""
@@ -427,7 +427,7 @@
         "63/3 > Tails"
       ],
       "category": "Mains",
-      "direction": "male > Tails",
+      "direction": "female-male",
       "connectors": {
         "male": "",
         "female": ""
@@ -470,7 +470,7 @@
         "125/3 > Tails"
       ],
       "category": "Mains",
-      "direction": "male > Tails",
+      "direction": "female-male",
       "connectors": {
         "male": "",
         "female": ""
