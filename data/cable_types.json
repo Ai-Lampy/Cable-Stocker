@@ -5,7 +5,8 @@
       "id": "cable-1",
       "name": "XLR-3",
       "aliases": [
-        "DMX 3-pin"
+        "DMX 3-pin",
+        "3-Pin"
       ],
       "category": "Data",
       "direction": "male-female",
@@ -17,7 +18,9 @@
     {
       "id": "cable-2",
       "name": "XLR-4",
-      "aliases": [],
+      "aliases": [
+        "4-Pin"
+      ],
       "category": "Data",
       "direction": "male-female",
       "connectors": {
@@ -29,7 +32,9 @@
       "id": "cable-3",
       "name": "XLR-5",
       "aliases": [
-        "DMX 5-pin"
+        "DMX 5-pin",
+        "5-Pin",
+        "DMX"
       ],
       "category": "Data",
       "direction": "male-female",
@@ -41,7 +46,10 @@
     {
       "id": "cable-4",
       "name": "XLR-5 Black",
-      "aliases": [],
+      "aliases": [
+        "Black 5-Pin",
+        "Black DMX"
+      ],
       "category": "Data",
       "direction": "male-female",
       "connectors": {
@@ -52,7 +60,9 @@
     {
       "id": "cable-5",
       "name": "XLR-7",
-      "aliases": [],
+      "aliases": [
+        "7-Pin"
+      ],
       "category": "Data",
       "direction": "male-female",
       "connectors": {
@@ -63,7 +73,9 @@
     {
       "id": "cable-6",
       "name": "Ethernet",
-      "aliases": [],
+      "aliases": [
+        "Patch"
+      ],
       "category": "Data",
       "direction": "bidirectional",
       "connectors": {
@@ -74,7 +86,10 @@
       "id": "cable-7",
       "name": "Ethercon",
       "aliases": [
-        "EtherCON"
+        "EtherCON",
+        "CAT 5",
+        "CAT 6",
+        "ETH"
       ],
       "category": "Data",
       "direction": "bidirectional",
@@ -85,7 +100,10 @@
     {
       "id": "cable-8",
       "name": "OpticalCON Quad Fiber",
-      "aliases": [],
+      "aliases": [
+        "Quad Fibre",
+        "Fibre"
+      ],
       "category": "Data",
       "direction": "bidirectional",
       "connectors": {
@@ -95,7 +113,9 @@
     {
       "id": "cable-9",
       "name": "Whirlwind 12-Pair",
-      "aliases": [],
+      "aliases": [
+        "Whirlwind"
+      ],
       "category": "Data",
       "direction": "male-female",
       "connectors": {
@@ -107,7 +127,8 @@
       "id": "cable-10",
       "name": "Socapex 19-Pin",
       "aliases": [
-        "Socapex"
+        "Socapex",
+        "Soca"
       ],
       "category": "Multi",
       "direction": "male-female",
@@ -119,7 +140,10 @@
     {
       "id": "cable-11",
       "name": "32A 3ø",
-      "aliases": [],
+      "aliases": [
+        "32A 3Ph",
+        "32/3"
+      ],
       "category": "Mains",
       "direction": "male-female",
       "connectors": {
@@ -131,7 +155,10 @@
     {
       "id": "cable-12",
       "name": "63A 3ø",
-      "aliases": [],
+      "aliases": [
+        "63A 3Ph",
+        "63/3"
+      ],
       "category": "Mains",
       "direction": "male-female",
       "connectors": {
@@ -142,7 +169,9 @@
     {
       "id": "cable-13",
       "name": "125A 3ø",
-      "aliases": [],
+      "aliases": [
+        "125A 3Ph"
+      ],
       "category": "Mains",
       "direction": "male-female",
       "connectors": {
@@ -154,7 +183,8 @@
       "id": "cable-14",
       "name": "TRUE 1",
       "aliases": [
-        "TRUE1"
+        "T1",
+        "Tru 1"
       ],
       "category": "TRS",
       "direction": "male-female",
@@ -177,7 +207,9 @@
     {
       "id": "cable-16",
       "name": "Socapex 7-Pin",
-      "aliases": [],
+      "aliases": [
+        "Motor Soca"
+      ],
       "category": "Motor",
       "direction": "male-female",
       "connectors": {
@@ -189,7 +221,9 @@
     {
       "id": "cable-17",
       "name": "Tajimi Motor Control",
-      "aliases": [],
+      "aliases": [
+        "Tajimi"
+      ],
       "category": "Motor",
       "direction": "male-female",
       "connectors": {
@@ -229,6 +263,106 @@
       "name": "Snake W-1 CEE 32A 3Ph 304'",
       "category": "Stock / Pre-Made Looms",
       "aliases": []
+    },
+    {
+      "id": "e6781e8e-da93-43c5-b6ba-81f8ac50971e",
+      "name": "32A 1ø",
+      "aliases": [
+        "32A 1Ph",
+        "32/1"
+      ],
+      "category": "Mains",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      }
+    },
+    {
+      "id": "a0d1d784-f361-49ce-8f4a-2b5d39b50dda",
+      "name": "63A 1ø",
+      "aliases": [
+        "63A 1Ph",
+        "63/1"
+      ],
+      "category": "Mains",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      }
+    },
+    {
+      "id": "22635adc-f89d-4c2e-858f-c27e314c1096",
+      "name": "125A 1ø",
+      "aliases": [
+        "125A 1Ph",
+        "125/1"
+      ],
+      "category": "Mains",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      }
+    },
+    {
+      "id": "adf23674-8b77-4427-8af2-b23360f89325",
+      "name": "Powerlock - 95mm",
+      "aliases": [],
+      "category": "Mains",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      }
+    },
+    {
+      "id": "93bc2779-3255-41df-b54c-33260c840692",
+      "name": "Powerlock - 120mm",
+      "aliases": [],
+      "category": "Mains",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      }
+    },
+    {
+      "id": "81c1aa5a-2df8-40bd-af56-696944e35d00",
+      "name": "Powerlock - 140mm",
+      "aliases": [],
+      "category": "Mains",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      }
+    },
+    {
+      "id": "7aaa66f0-63a1-4ef1-934b-b6cddfe6c16f",
+      "name": "16A",
+      "aliases": [],
+      "category": "TRS",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      }
+    },
+    {
+      "id": "95abab8d-d52b-4daa-b51b-e3f6ded32484",
+      "name": "Motor Loom",
+      "aliases": [
+        "Red & Yellow",
+        "Motor Bundle"
+      ],
+      "category": "Motor",
+      "direction": "male-female",
+      "connectors": {
+        "male": "",
+        "female": ""
+      }
     }
   ]
 }

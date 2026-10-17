@@ -49,17 +49,29 @@
     {
       "id": "connector-10",
       "name": "CEE 32A 3ø",
-      "aliases": []
+      "aliases": [
+        "32A 3ø",
+        "32A 3Ph",
+        "32/3"
+      ]
     },
     {
       "id": "connector-11",
       "name": "CEE 63A 3ø",
-      "aliases": []
+      "aliases": [
+        "63A 3ø",
+        "63A 3Ph",
+        "63/3"
+      ]
     },
     {
       "id": "connector-12",
       "name": "CEE 125A 3ø",
-      "aliases": []
+      "aliases": [
+        "125A 3ø",
+        "125A 3Ph",
+        "125/3"
+      ]
     },
     {
       "id": "connector-13",
@@ -88,7 +100,11 @@
     {
       "id": "connector-16",
       "name": "Socapex 7-Pin",
-      "aliases": []
+      "aliases": [
+        "Soca 7",
+        "7-Pin Soca",
+        "Motor Soca"
+      ]
     },
     {
       "id": "connector-17",
@@ -99,7 +115,9 @@
       "id": "4ba479a3-0fb0-4e54-9426-21d59ad25a63",
       "name": "CEE 32A 1ø",
       "aliases": [
-        "32A 1ø"
+        "32A 1ø",
+        "32A 1Ph",
+        "32/1"
       ],
       "category": "Mains"
     },
@@ -119,6 +137,83 @@
         "16A"
       ],
       "category": "TRS"
+    },
+    {
+      "id": "5fe46363-f153-4497-afa7-ba912d22f626",
+      "name": "Duo Fibre",
+      "aliases": [],
+      "category": "Data"
+    },
+    {
+      "id": "258e3252-a76b-48a1-ab7a-ca85d312c408",
+      "name": "Cam Lock",
+      "aliases": [
+        "Cams",
+        "C/Lock"
+      ],
+      "category": "Mains"
+    },
+    {
+      "id": "6368bf54-36ca-415a-85f1-97f7bd9fee84",
+      "name": "CEE 63A 1ø",
+      "aliases": [
+        "63A 1ø",
+        "63A 1Ph",
+        "63/1"
+      ],
+      "category": "Mains"
+    },
+    {
+      "id": "983a5e3b-262b-4f6e-98f5-87d9b6614e24",
+      "name": "CEE 125A 1ø",
+      "aliases": [
+        "125A 1ø",
+        "125A 1Ph",
+        "125/1"
+      ],
+      "category": "Mains"
+    },
+    {
+      "id": "40af9dd2-b57e-4a66-82d4-6bf4aaf769f8",
+      "name": "powerCON MALE",
+      "aliases": [
+        "powerCON Blue",
+        "P/Con Blue",
+        "P/Con IN"
+      ],
+      "category": "TRS"
+    },
+    {
+      "id": "245b9cd2-9c45-48de-9b3c-917e90586722",
+      "name": "powerCON FEMALE",
+      "aliases": [
+        "powerCON White",
+        "P/Con White",
+        "P/Con OUT"
+      ],
+      "category": "TRS"
+    },
+    {
+      "id": "7bbdea1b-5982-4f70-aec9-d2e0ccfc00ca",
+      "name": "CEE 16A 3ø",
+      "aliases": [
+        "16A 3ø",
+        "16A 3Ph",
+        "16/3",
+        "Red Motor"
+      ],
+      "category": "Motor"
+    },
+    {
+      "id": "6bced4c9-cee2-4cc3-85b5-05bcd71fc71c",
+      "name": "CEE 16A LV",
+      "aliases": [
+        "16A LV",
+        "16 Yellow",
+        "Motor LV",
+        "Low Voltage"
+      ],
+      "category": "Motor"
     }
   ]
 }
