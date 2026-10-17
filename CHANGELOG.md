@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.47 — 2026-10-17
+
+Previous version: v1.1.46. Local release for manual upload; not deployed.
+
+- Export Stock / Pre-Made Looms and FOH Snake as separate arrays inside `cables`, alongside ordinary categories. Preserve loom IDs, names, available lengths, cable quantities and imported custom fields. Complete preview/download and category fragments use the same structure. Import restores each group to its own tab and retains empty selected built-in loom categories.
+- Continue importing older root `looms` arrays into Stock / Pre-Made Looms. Preserve project and Excel backups, reject duplicate/conflicting definitions without replacing the draft, prevent category collisions from overwriting cable rows, and retain category moves in import review. Deleting a loom category removes it from the export.
+- Make # row cells select entire rows. Shift-click selects a range; Ctrl/⌘-click toggles individual rows. Shift+Space selects the active row and Shift+Up/Down extends the range. Keep selected records by identity through sorting and table rebuilds. Copy, Fill down, cell clearing, matching-row paste and Delete rows use only selected visible rows. Keep column resizing and normal cell editing.
+- Updated/upload: `js/app.js`, `js/model.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/core.test.mjs`, `tests/loom-stock.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. Include any earlier unuploaded release files. New/deleted project files: none. User project JSON, backups, original examples, reference datasets and images remain unchanged. Lampy Paperwork untouched; no upload or deployment.
+- Validation: 232 automated tests passed, including 13 added regressions for categorized loom JSON/project/Excel round trips, custom fields, empty/deleted categories, legacy imports, category moves, conflicting IDs, controller previews/imports, whole-row/range/disjoint selection, selected-only operations, sorted/filtered views, stable row identity and keyboard selection. JavaScript syntax, JSON parsing, local module/HTML asset paths and protected data hashes passed. README JSON example and version consistency checked.
+- Browser testing not run, as requested. Pointer behaviour, visual selection and live deployment remain unverified. Lampy Paperwork still needs its separate update for these categorized stock looms. Older combined exports contain no FOH grouping information; use a saved project/Excel backup to recover it. Older Cable Stocker versions do not support this new categorized loom export.
+- Cleanup: no temporary files, downloads or browser data created in the project. Removed temporary audit/test output outside the project after checks.
+
 ## v1.1.46 — 2026-10-17
 
 Previous version: v1.1.45. Local release for manual upload; not deployed.

@@ -70,3 +70,5 @@
 .tabs .project-category-tab>button.active{background:transparent;box-shadow:none}
 .tabs .project-category-tab .delete-category{padding:12px 10px;min-width:36px;font-size:19px;line-height:1;color:#7d4a43}
 .tabs .project-category-tab .delete-category:hover{background:#fff0ec;color:#a12922}
+
+.sheet .row-selector{cursor:pointer;user-select:none}.sheet .row-selector.selected{background:#dbe8d4;color:var(--deep);outline:1px solid #527e59;outline-offset:-1px}

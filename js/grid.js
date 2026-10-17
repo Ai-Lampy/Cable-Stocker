@@ -66,7 +66,7 @@ export class Grid {
     button('Clear sort',()=>this.resetSort(),'Restore the default table order');
     button('Reset widths',()=>this.resetWidths(),'Reset data columns to 150 px and # to 42 px');
     const search=el('input');search.type='search';search.placeholder='Search this table';search.setAttribute('aria-label','Search this table');search.value=this.filter;
-    search.oninput=()=>{this.filter=search.value;this.selection={r:0,c:0,rr:0,cc:0};this.renderBody();};toolbar.append(search);
+    search.oninput=()=>{this.filter=search.value;this.rowSelection=null;this.selection={r:0,c:0,rr:0,cc:0};this.renderBody();};toolbar.append(search);
     button('−',()=>this.zoom(-.1),'Zoom out');
     this.zoomLabel=button(`${Math.round(this.prefs.zoom*100)}%`,()=>{this.prefs.zoom=1;this.updateStyle();},'Reset table zoom');
     button('+',()=>this.zoom(.1),'Zoom in');
@@ -92,7 +92,7 @@ export class Grid {
       else if(e.key==='Enter'){e.preventDefault();this.moveEnter(e.shiftKey,true);}
       else if(e.key==='Escape'){e.preventDefault();this.editing=false;this.renderBody();this.focusCell();}
     };
-    this.scroller=el('div',null,'grid-scroll');this.table=el('table',null,'sheet');this.table.setAttribute('aria-label',this.o.label);this.table.setAttribute('role','grid');this.table.tabIndex=0;
+    this.scroller=el('div',null,'grid-scroll');this.table=el('table',null,'sheet');this.table.setAttribute('aria-label',this.o.label);this.table.setAttribute('role','grid');this.table.setAttribute('aria-multiselectable','true');this.table.tabIndex=0;
     this.scroller.append(this.table);this.host.append(this.scroller);
     const hint='Type to edit the selected cell · Double-click or F2: edit existing text · Tab / Enter: accept and move · Escape: cancel · Shift+arrows: select range · Drag the green corner to fill · Paste: Excel cells';
     const footer=el('div',null,'grid-footer'),bottomSave=el('button','Save table','primary save-table');bottomSave.type='button';bottomSave.title=save.title;bottomSave.onclick=save.onclick;footer.append(bottomSave);this.host.append(footer);
@@ -114,7 +114,9 @@ export class Grid {
     });head.append(tr);this.table.append(head);
     const body=el('tbody');
     this.ids.forEach((id,r)=>{
-      const row=this.o.rows()[id],tr=el('tr',null,this.o.rowClass?.(row)||'');const num=el('th',String(r+1));num.scope='row';tr.append(num);
+      const row=this.o.rows()[id],tr=el('tr',null,this.o.rowClass?.(row)||'');const num=el('th',String(r+1));num.scope='row';num.dataset.row=r;num.tabIndex=-1;num.className='row-selector';num.setAttribute('aria-label',`Select row ${r+1}`);num.title='Select row · Shift: range · Ctrl/⌘: add or remove row';
+      num.onclick=e=>{e.stopPropagation();this.selectRow(r,e.shiftKey,e.ctrlKey||e.metaKey);};
+      num.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();e.stopPropagation();this.selectRow(r,e.shiftKey,e.ctrlKey||e.metaKey);}};tr.append(num);
       this.o.columns.forEach((col,c)=>{
         const td=el('td');td.dataset.r=r;td.dataset.c=c;td.tabIndex=-1;td.setAttribute('role','gridcell');td.setAttribute('aria-label',`${col.label}, row ${r+1}`);
         const saved=this.prefs.highlights?.context===this.o.highlightContext?this.prefs.highlights:null;
@@ -150,11 +152,11 @@ export class Grid {
   sizeColumns(){this.table.style.width=`${this.columnWidth(ROW_NUMBER_COLUMN)+this.o.columns.reduce((sum,col)=>sum+this.columnWidth(col),0)}px`;}
   updateStyle(){this.table.style.zoom=this.prefs.zoom;this.table.style.textAlign=this.prefs.align;this.table.style.setProperty('--cell-justify',this.prefs.align==='center'?'center':this.prefs.align==='right'?'flex-end':'flex-start');this.table.classList.toggle('nowrap',!this.prefs.wrap);this.zoomLabel.textContent=`${Math.round(this.prefs.zoom*100)}%`;this.pref();}
   zoom(delta){this.prefs.zoom=Math.max(.5,Math.min(2,Math.round((this.prefs.zoom+delta)*10)/10));this.updateStyle();}
-  bounds(){const s=this.selection;return {r:Math.min(s.r,s.rr),rr:Math.max(s.r,s.rr),c:Math.min(s.c,s.cc),cc:Math.max(s.c,s.cc)};}
+  bounds(){if(this.rowSelection?.size){const rows=this.ids.map((id,r)=>this.rowSelection.has(this.rowIdentity(id))?r:-1).filter(r=>r>=0);if(rows.length)return {r:Math.min(...rows),rr:Math.max(...rows),c:0,cc:this.o.columns.length-1};}const s=this.selection;return {r:Math.min(s.r,s.rr),rr:Math.max(s.r,s.rr),c:Math.min(s.c,s.cc),cc:Math.max(s.c,s.cc)};}
   value(id,key){const row=this.o.rows()[id];return row?this.o.get(row,key):'';}
   captureView(){
     const s=this.selection,identity=r=>{const id=this.ids?.[r],row=this.o.rows()[id];return row?(this.o.rowKey?.(row,id)??id):id;};
-    return {key:this.o.key,filter:this.filter,sort:clone(this.sort),entries:[...(this.entryIds||[])],selection:clone(s),row:identity(s.r),lastRow:identity(s.rr),column:this.o.columns[s.c]?.key,lastColumn:this.o.columns[s.cc]?.key,scroll:captureScroll(this.scroller)};
+    return {selectedRows:this.rowSelection?this.selectedRows().map(identity):null,key:this.o.key,filter:this.filter,sort:clone(this.sort),entries:[...(this.entryIds||[])],selection:clone(s),row:identity(s.r),lastRow:identity(s.rr),column:this.o.columns[s.c]?.key,lastColumn:this.o.columns[s.cc]?.key,scroll:captureScroll(this.scroller)};
   }
   restoreView(view){
     if(!view||view.key!==this.o.key)return;
@@ -162,13 +164,28 @@ export class Grid {
     const row=(identity,fallback)=>{const index=this.ids.findIndex(id=>{const record=this.o.rows()[id];return (record?(this.o.rowKey?.(record,id)??id):id)===identity;});return index<0?Math.min(fallback,Math.max(0,this.ids.length-1)):index;};
     const column=(key,fallback)=>{const index=this.o.columns.findIndex(c=>c.key===key);return index<0?Math.min(fallback,this.o.columns.length-1):index;};
     this.selection={r:row(view.row,view.selection.r),rr:row(view.lastRow,view.selection.rr),c:column(view.column,view.selection.c),cc:column(view.lastColumn,view.selection.cc)};
+    this.rowSelection=view.selectedRows?new Set(this.ids.map(id=>this.rowIdentity(id)).filter(id=>view.selectedRows.includes(id))):null;
     const search=this.host.querySelector?.('input[type="search"]');if(search)search.value=this.filter;
     this.renderBody();restoreScroll(this.scroller,view.scroll);
   }
   currentGrid(){return this.host.isConnected?this:(this.o.current?.()||[...document.querySelectorAll('[data-lampy-grid]')].map(el=>el.lampyGrid).find(g=>g.o.key===this.o.key)||this);}
-  select(r,c,extend=false,openEditor=true,reveal=true){if(this.editing){if(!this.commitEditor())return false;const target=this.currentGrid();if(target!==this)return target.select(r,c,extend,openEditor,reveal);}if(!this.ids.length)return; r=Math.max(0,Math.min(this.ids.length-1,r));c=Math.max(0,Math.min(this.o.columns.length-1,c));if(extend){this.selection.rr=r;this.selection.cc=c;}else this.selection={r,c,rr:r,cc:c};this.paint();this.focusCell(extend?r:undefined,extend?c:undefined,reveal);if(openEditor&&!extend&&this.o.columns[c].editOnSelect&&!this.o.readOnly?.(this.ids[r],this.o.columns[c].key))this.edit(r,c,undefined,reveal);}
+  select(r,c,extend=false,openEditor=true,reveal=true){if(this.editing){if(!this.commitEditor())return false;const target=this.currentGrid();if(target!==this)return target.select(r,c,extend,openEditor,reveal);}if(!this.ids.length)return; r=Math.max(0,Math.min(this.ids.length-1,r));c=Math.max(0,Math.min(this.o.columns.length-1,c));this.rowSelection=null;if(extend){this.selection.rr=r;this.selection.cc=c;}else this.selection={r,c,rr:r,cc:c};this.paint();this.focusCell(extend?r:undefined,extend?c:undefined,reveal);if(openEditor&&!extend&&this.o.columns[c].editOnSelect&&!this.o.readOnly?.(this.ids[r],this.o.columns[c].key))this.edit(r,c,undefined,reveal);}
+  rowIdentity(id){const row=this.o.rows()[id];return row?(this.o.rowKey?.(row,id)??id):id;}
+  selectedRows(){const b=this.bounds();return this.ids.map((_,r)=>r).filter(r=>this.rowSelection?this.rowSelection.has(this.rowIdentity(this.ids[r])):r>=b.r&&r<=b.rr);}
+  selectRow(r,extend=false,toggle=false){
+    const id=this.ids[r];if(id===undefined)return false;
+    if(this.editing){if(!this.commitEditor())return false;const target=this.currentGrid();return target.selectRow(target.ids.indexOf(id),extend,toggle);}
+    const identity=this.rowIdentity(id);
+    const anchor=extend?this.selection.r:r;
+    let selected=toggle?new Set(this.rowSelection||[]):new Set();
+    if(extend)for(let i=Math.min(anchor,r);i<=Math.max(anchor,r);i++)selected.add(this.rowIdentity(this.ids[i]));
+    else if(toggle&&selected.has(identity))selected.delete(identity);else selected.add(identity);
+    this.rowSelection=selected;this.selection={r:anchor,c:0,rr:r,cc:this.o.columns.length-1};
+    this.paint();this.focusCell(r,0,false);return true;
+  }
   paint(){
-    const b=this.bounds();this.table.querySelectorAll(':scope > tbody > tr > td[data-r]').forEach(td=>{const r=+td.dataset.r,c=+td.dataset.c,selected=r>=b.r&&r<=b.rr&&c>=b.c&&c<=b.cc;td.classList.toggle('selected',selected);td.setAttribute('aria-selected',String(selected));td.querySelector('.fill-handle')?.remove();});
+    const b=this.bounds();this.table.querySelectorAll(':scope > tbody > tr > td[data-r]').forEach(td=>{const r=+td.dataset.r,c=+td.dataset.c,selected=this.rowSelection?this.rowSelection.has(this.rowIdentity(this.ids[r])):r>=b.r&&r<=b.rr&&c>=b.c&&c<=b.cc;td.classList.toggle('selected',selected);td.setAttribute('aria-selected',String(selected));td.querySelector('.fill-handle')?.remove();});
+    this.table.querySelectorAll(':scope > tbody > tr > th[data-row]').forEach(th=>{const selected=!!this.rowSelection?.has(this.rowIdentity(this.ids[+th.dataset.row]));th.classList.toggle('selected',selected);th.setAttribute('aria-selected',String(selected));th.parentElement?.setAttribute('aria-selected',String(selected));});
     const {r,c}=this.selection;
     this.editor.value=this.ids[r]===undefined?'':display(this.value(this.ids[r],this.o.columns[c].key));
     this.editor.value=this.o.columns[c].editFormat?.(this.editor.value)??this.editor.value;
@@ -176,7 +193,7 @@ export class Grid {
     this.editor.disabled=!!this.o.readOnly?.(this.ids[r],this.o.columns[c].key);
     this.editor.setAttribute('list',this.o.columns[c].list||'');
     const last=this.table.querySelector(`:scope > tbody > tr > td[data-r="${b.rr}"][data-c="${b.cc}"]`);
-    if(last){const h=el('span',null,'fill-handle');h.title='Drag to copy selected cells';h.onpointerdown=e=>{e.stopPropagation();e.preventDefault();this.filling=clone(this.bounds());const finish=()=>{const source=this.filling;this.filling=null;this.filled=true;this.fill(source);document.removeEventListener('pointerup',finish);};document.addEventListener('pointerup',finish);};last.append(h);}
+    if(last&&!this.rowSelection){const h=el('span',null,'fill-handle');h.title='Drag to copy selected cells';h.onpointerdown=e=>{e.stopPropagation();e.preventDefault();this.filling=clone(this.bounds());const finish=()=>{const source=this.filling;this.filling=null;this.filled=true;this.fill(source);document.removeEventListener('pointerup',finish);};document.addEventListener('pointerup',finish);};last.append(h);}
   }
   focusCell(r=this.selection.r,c=this.selection.c,reveal=true){const td=this.table.querySelector(`:scope > tbody > tr > td[data-r="${r}"][data-c="${c}"]`);td?.focus({preventScroll:true});if(reveal)td?.scrollIntoView({block:'nearest',inline:'nearest'});}
   commitEditor(){
@@ -245,28 +262,31 @@ export class Grid {
   }
   key(e){
     if(e.isComposing||e.target.classList?.contains('cell-editor'))return;
+    if(e.key===' '&&e.shiftKey&&!e.target.closest('input,button')){e.preventDefault();this.selectRow(this.selection.r);return;}
     if(e.key==='Enter'&&e.target.closest('td[data-r]')&&!e.target.closest('button')){e.preventDefault();const cell=e.target.closest('td[data-r]');this.selection={r:+cell.dataset.r,c:+cell.dataset.c,rr:+cell.dataset.r,cc:+cell.dataset.c};this.moveEnter(e.shiftKey);return;}
     if(e.key==='Tab'&&e.target.closest('td[data-r]')){e.preventDefault();const cell=e.target.closest('td[data-r]');this.selection={r:+cell.dataset.r,c:+cell.dataset.c,rr:+cell.dataset.r,cc:+cell.dataset.c};this.moveTab(e.shiftKey);return;}
     if(e.target.closest('input,button'))return;
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?this.o.redo():this.o.undo();return;}
-    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='a'){e.preventDefault();this.selection={r:0,c:0,rr:this.ids.length-1,cc:this.o.columns.length-1};this.paint();return;}
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='a'){e.preventDefault();this.rowSelection=null;this.selection={r:0,c:0,rr:this.ids.length-1,cc:this.o.columns.length-1};this.paint();return;}
     const moves={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
-    if(moves[e.key]){e.preventDefault();const [dr,dc]=moves[e.key],r=e.shiftKey?this.selection.rr:this.selection.r,c=e.shiftKey?this.selection.cc:this.selection.c;this.select(r+dr,c+dc,e.shiftKey&&e.key!=='Enter');}
+    if(moves[e.key]){e.preventDefault();const [dr,dc]=moves[e.key];if(this.rowSelection&&e.shiftKey&&dr){this.selectRow(Math.max(0,Math.min(this.ids.length-1,this.selection.rr+dr)),true);return;}const r=e.shiftKey?this.selection.rr:this.selection.r,c=e.shiftKey?this.selection.cc:this.selection.c;this.select(r+dr,c+dc,e.shiftKey&&e.key!=='Enter');}
     else if(e.key==='Enter'){e.preventDefault();this.moveEnter(e.shiftKey);}
     else if(e.key==='Tab'){e.preventDefault();this.moveTab(e.shiftKey);}
     else if(e.key==='F2'){e.preventDefault();this.edit(this.selection.r,this.selection.c);}
-    else if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();const b=this.bounds(),patch=[];for(let r=b.r;r<=b.rr;r++)for(let c=b.c;c<=b.cc;c++)patch.push({id:this.ids[r],col:this.o.columns[c],text:''});this.apply(patch);}
+    else if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();const b=this.bounds(),patch=[];for(const r of this.selectedRows())for(let c=b.c;c<=b.cc;c++)patch.push({id:this.ids[r],col:this.o.columns[c],text:''});this.apply(patch);}
     else if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();this.edit(this.selection.r,this.selection.c,e.key);}
   }
-  selectionText(){const b=this.bounds(),rows=[];for(let r=b.r;r<=b.rr;r++){if(this.ids[r]===undefined)continue;const row=[];for(let c=b.c;c<=b.cc;c++)row.push(this.value(this.ids[r],this.o.columns[c].key));rows.push(row);}return toTSV(rows);}
+  selectionText(){const b=this.bounds(),rows=[];for(const r of this.selectedRows()){if(this.ids[r]===undefined)continue;const row=[];for(let c=b.c;c<=b.cc;c++)row.push(this.value(this.ids[r],this.o.columns[c].key));rows.push(row);}return toTSV(rows);}
   async copy(){try{await navigator.clipboard.writeText(this.selectionText());this.o.notice('Selected cells copied.');}catch{this.o.notice('Clipboard permission unavailable. Select cells and press Ctrl/⌘ C.');}}
   async pasteClipboard(){try{this.paste(await navigator.clipboard.readText());}catch{this.o.notice('Clipboard permission unavailable. Select a cell and press Ctrl/⌘ V.');}}
   paste(text){try{
     const matrix=parseTSV(text),{r,c}=this.selection,patch=[];
     if(matrix.some(row=>row.length+c>this.o.columns.length))throw new Error('Paste exceeds the table columns. Nothing changed.');
     if(this.filter&&r+matrix.length>this.ids.length)throw new Error('Clear the search filter before pasting new rows.');
+    const selected=this.rowSelection?this.selectedRows():null;
+    if(selected&&(!selected.length||(selected.length>1&&matrix.length!==selected.length)))throw new Error('Paste needs one clipboard row per selected row. Select a single cell to paste a different range.');
     const nextId=Math.max(this.o.rows().length,...this.ids.map(id=>id+1));
-    matrix.forEach((row,dr)=>row.forEach((v,dc)=>patch.push({id:this.ids[r+dr]??nextId+(r+dr-this.ids.length),col:this.o.columns[c+dc],text:v})));
+    matrix.forEach((row,dr)=>row.forEach((v,dc)=>patch.push({id:this.ids[selected?.length>1?selected[dr]:(selected?.[0]??r)+dr]??nextId+(r+dr-this.ids.length),col:this.o.columns[c+dc],text:v})));
     this.apply(patch,true);
   }catch(error){this.o.notice(error.message,true);}}
   apply(patches,allowNew=false){try{
@@ -284,10 +304,10 @@ export class Grid {
     return true;
   }catch(error){this.o.notice(`${error.message} No cells from this operation were changed.`,true);return false;}}
   fill(source){const target=this.bounds();source||={r:target.r,rr:target.r,c:target.c,cc:target.cc};const patches=[];
-    for(let r=target.r;r<=target.rr;r++)for(let c=target.c;c<=target.cc;c++){
+    for(const r of this.selectedRows())for(let c=target.c;c<=target.cc;c++){
       const sr=source.r+(r-target.r)%(source.rr-source.r+1),sc=source.c+(c-target.c)%(source.cc-source.c+1);
       if(this.ids[r]!==undefined&&this.ids[sr]!==undefined)patches.push({id:this.ids[r],col:this.o.columns[c],text:display(this.value(this.ids[sr],this.o.columns[sc].key))});
     }this.apply(patches);
   }
-  remove(){const b=this.bounds(),ids=this.ids.slice(b.r,b.rr+1).filter(id=>id<this.o.rows().length);if(ids.length)this.o.remove(ids);}
+  remove(){const ids=this.selectedRows().map(r=>this.ids[r]).filter(id=>id<this.o.rows().length);if(ids.length)this.o.remove(ids);}
 }

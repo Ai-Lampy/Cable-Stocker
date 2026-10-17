@@ -5,9 +5,11 @@
 - Reference-data review: review remaining blank connector defaults in `data/cable_types.json` where explicit types are needed. Existing cable-name fallback and approval remain available. Do not infer physical connector arrangements or overwrite user data. The previously flagged splitter/tails direction values now pass validation in the user-updated reference file.
 
 - User acceptance of the initial release in day-to-day cable-stock editing.
-- Lampy Paperwork needs a separate future update to consume the agreed vendor stock-loom structure. Cable Stocker now exports it; Paperwork changes are outside this release. No implementation or deployment has been performed in Paperwork.
+- Lampy Paperwork needs a separate future update to consume the categorized vendor stock-loom structure (`cables["Stock / Pre-Made Looms"]` and `cables["FOH Snake"]`). Cable Stocker now exports it; Paperwork changes are outside this release. No implementation or deployment has been performed in Paperwork.
 
 ## Completed
+
+- v1.1.47 (local release for manual upload) — 2026-10-17: separate loom categories in cable-stock JSON export/import and whole-row selection using #, including Shift ranges and Ctrl/⌘ individual rows. Upload: `js/app.js`, `js/model.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/core.test.mjs`, `tests/loom-stock.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; include earlier unuploaded release files. All 232 automated tests and non-browser checks passed. Browser testing not run, as requested. No new/deleted project files. User JSON/backups preserved; Lampy Paperwork untouched; no upload/deployment. Details and compatibility limits in CHANGELOG.md.
 
 - v1.1.46 (local release for manual upload) — 2026-10-17: expanding tables, preserved edit/scroll state, resizable # column, committed-name connector actions, a yellow icon for all warnings, and issue row numbers matching displayed table order/scope. Upload: `js/app.js`, `js/grid.js`, `css/app.css`, `js/version.js`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; include any earlier unuploaded release files. All 219 automated tests and non-browser checks passed. Browser testing not run, as requested. No new/deleted project files. User JSON/backups preserved; no upload/deployment or Lampy Paperwork changes. Details and unverified browser behaviour in CHANGELOG.md.
 

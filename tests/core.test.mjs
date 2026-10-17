@@ -75,7 +75,7 @@ test('stock JSON preview compares the current draft, including vendor/root metad
 });
 test('semantic equality ignores object field order, but preserves array order',()=>{assert(M.same({x:1,y:2},{y:2,x:1}));assert(!M.same([1,2],[2,1]));});
 test('vendor version increment independent of app/runtime version',()=>{assert.equal(M.incrementVersion('v2',false),'v2.1');assert.equal(M.incrementVersion('v2.9',true),'v3');assert.throws(()=>M.incrementVersion('bad',true));const p=fresh();p.vendorVersion='v3';assert(!('version' in M.runtimeJSON(p).vendor));});
-test('runtime exports approved loom fields while excluding editor data and vendor version',()=>{const p=fresh();p.looms=[{id:'loom-test',name:'Fixture test',lengths:[30],components:[]}];p.vendorVersion='v4';assert.deepEqual(M.runtimeJSON(p),{...source,looms:[{id:'loom-test',name:'Fixture test',lengths:[30],cables:[]}]});assert(M.validate(p).some(i=>i.message.includes('planned update')));});
+test('runtime exports approved loom fields while excluding editor data and vendor version',()=>{const p=fresh();p.looms=[{id:'loom-test',name:'Fixture test',lengths:[30],components:[]}];p.vendorVersion='v4';assert.deepEqual(M.runtimeJSON(p),{...source,cables:{...source.cables,[M.LOOM_CATEGORY]:[{id:'loom-test',name:'Fixture test',lengths:[30],cables:[]}]}});assert(M.validate(p).some(i=>i.message.includes('planned update')));});
 test('project backup restores imported baseline and looms',()=>{const p=fresh();p.looms.push({id:'test-loom',name:'Test',lengths:[30],description:'',components:[{id:'comp-1',type:'DMX 5-pin',count:2,connectors:{male:'XLR-5',female:'XLR-5'},lengths:[]}]});const restored=M.restoreProject(M.parseJSON(JSON.stringify(p)));assert.deepEqual(restored,p);});
 test('Excel full binary round trip preserves authoritative JSON and no false changes',()=>{const p=fresh(),r=roundtrip(p).project;assert.deepEqual(r.stock,p.stock);assert.deepEqual(r.rowIds,p.rowIds);assert.deepEqual(M.changes(r,M.snapshot(p)),[]);});
 test('Excel aliases, overrides, custom nested data, version and composite looms round trip',()=>{
@@ -312,11 +312,11 @@ test('category deletion removes only its rows, keys and adaptor markers and pres
  assert.deepEqual(M.runtimeJSON(roundtrip(p).project),M.runtimeJSON(p));
  const after=M.clone(p);M.removeProjectCategory(p,'Missing');assert.deepEqual(p,after);
 });
-test('deleting the project loom tab clears only its looms and preserves explicit empty stock exports',()=>{
+test('deleting the project loom tab removes its export category without affecting other stock',()=>{
  const p=M.projectFromStock({vendor:{name:'Test',lengthUnit:'m'},cables:{Data:[]},looms:[{id:'l',name:'Test loom',lengths:[10],cables:[{cableType:'XLR-5',quantity:2}]}]});p.loomTab=true;
  const before=M.clone(p);M.removeProjectCategory(p,'Stock / Pre-Made Looms',{looms:true});
  assert.deepEqual(p.looms,[]);assert.equal(p.loomTab,false);assert.deepEqual(p.stock,before.stock);assert.deepEqual(p.baseline,before.baseline);
- assert.deepEqual(M.runtimeJSON(p).looms,[]);assert(M.changes(p).some(c=>c.kind==='removed'&&c.name==='Test loom'));
+ assert.equal(M.runtimeJSON(p).cables[M.LOOM_CATEGORY],undefined);assert(M.changes(p).some(c=>c.kind==='removed'&&c.name==='Test loom'));
  assert.deepEqual(M.runtimeJSON(roundtrip(p).project),M.runtimeJSON(p));assert.deepEqual(M.restoreProject(M.clone(p)),p);
 });
 
@@ -404,7 +404,7 @@ test('FOH project and Excel round trips retain separate sheets and agreed stock 
  const p=newProjectFixture('ft'),r=fohFixture();for(const cat of [M.LOOM_CATEGORY,'FOH Snake'])M.addReferenceLooms(p,M.referenceLoomsForProject(p,r,cat));
  assert.deepEqual(M.restoreProject(M.clone(p)),p);const result=roundtrip(p);assert.deepEqual(result.project.looms,p.looms);assert.deepEqual(M.projectLoomCategories(result.project),M.projectLoomCategories(p));
  assert.equal(result.categories.filter(m=>m.kind==='looms').length,2);assert.deepEqual(M.runtimeJSON(result.project),M.runtimeJSON(p));
- const output=M.runtimeJSON(p);assert.deepEqual(Object.keys(output.looms[1]),['id','name','lengths','cables']);assert.deepEqual(M.runtimeJSON(M.projectFromStock(output)),output);
+ const output=M.runtimeJSON(p);assert.deepEqual(Object.keys(output.cables['FOH Snake'][0]),['id','name','lengths','cables']);assert.deepEqual(M.runtimeJSON(M.projectFromStock(output)),output);
 });
 test('FOH category Excel export and replacement affect only that category, including empty sheets',()=>{
  const p=newProjectFixture('ft'),r=fohFixture();for(const cat of [M.LOOM_CATEGORY,'FOH Snake'])M.addReferenceLooms(p,M.referenceLoomsForProject(p,r,cat));

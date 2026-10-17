@@ -379,3 +379,36 @@ test('loom issue rows include expanded child rows before the affected parent',()
  assert.match(vm.runInContext("issueLocation({category:'Stock / Pre-Made Looms',row:0})",ctx),/^Row 3 · Zulu/);
  assert.equal(vm.runInContext("issueLocation({category:'Vendor',row:null})",ctx),'');
 });
+
+function rowSelectionGrid(){const rows=[{id:'c',name:'Charlie',value:'C'},{id:'a',name:'Alpha',value:'A'},{id:'b',name:'Bravo',value:'B'}],g=editable(rows);g.o.columns=[{key:'name'},{key:'value'}];g.o.rowKey=r=>r.id;g.o.key='rows';g.sort={key:'name',dir:1};g.ids=g.indices();g.paint=()=>{};g.renderBody=()=>{g.ids=g.indices();};g.o.notice=message=>g.notice=message;g.o.remove=ids=>g.removed=ids;return g;}
+test('# selection covers whole rows in sorted order with Shift range and Ctrl toggle',()=>{
+ const g=rowSelectionGrid();g.selectRow(0);assert.deepEqual(g.selectedRows(),[0]);assert.equal(g.selectionText(),'Alpha\tA');
+ g.selectRow(2,true);assert.deepEqual(g.selectedRows(),[0,1,2]);assert.equal(g.selectionText(),'Alpha\tA\nBravo\tB\nCharlie\tC');
+ g.selectRow(1,false,true);assert.deepEqual(g.selectedRows(),[0,2]);g.remove();assert.deepEqual(g.removed,[1,0]);
+ g.selectRow(2,false,true);assert.equal(g.selectionText(),'Alpha\tA');g.paste('Adjusted\tUpdated');assert.equal(g.o.rows()[1].name,'Adjusted');assert.equal(g.o.rows()[0].name,'Charlie');
+});
+test('disjoint row paste and fill touch only selected rows, and mismatched paste is rejected',()=>{
+ const g=rowSelectionGrid();g.selectRow(0);g.selectRow(2,false,true);g.paste('One\t1');assert.match(g.notice,/one clipboard row/);assert.equal(g.o.rows()[1].name,'Alpha');
+ g.paste('One\t1\nTwo\t2');assert.equal(g.o.rows()[1].name,'One');assert.equal(g.o.rows()[0].name,'Two');assert.equal(g.o.rows()[2].name,'Bravo');
+ g.fill();assert.equal(g.o.rows()[0].name,'One');assert.equal(g.o.rows()[2].name,'Bravo');
+});
+test('row selection survives sorting/rebuild by identity and normal cell selection clears it',()=>{
+ const g=rowSelectionGrid();g.selectRow(0);g.selectRow(2,false,true);const view=g.captureView(),next=rowSelectionGrid();next.o.rows().reverse();next.restoreView(view);
+ assert.deepEqual(next.selectedRows().map(r=>next.o.rows()[next.ids[r]].id),['a','c']);next.select(1,0);assert.equal(next.rowSelection,null);assert.deepEqual(next.selectedRows(),[1]);
+});
+test('filtered row selection and Delete rows exclude hidden records and empty entry slots',()=>{
+ const g=rowSelectionGrid();g.filter='charlie';g.renderBody();g.selectRow(0);assert.equal(g.selectionText(),'Charlie\tC');g.remove();assert.deepEqual(g.removed,[0]);
+ g.filter='';g.renderBody();g.selectRow(3);g.selectRow(4,true);g.removed=null;g.remove();assert.equal(g.removed,null);assert.equal(g.o.rows().length,3);
+});
+test('invalid edits block # selection; deselecting every row makes copy, clear and delete empty',()=>{
+ const g=rowSelectionGrid();g.editing=true;g.commitEditor=()=>false;assert.equal(g.selectRow(2),false);assert.equal(g.rowSelection,undefined);
+ g.editing=false;g.selectRow(0);g.selectRow(0,false,true);assert.equal(g.selectionText(),'');g.remove();assert.equal(g.removed,undefined);
+ let patch;g.apply=values=>patch=values;g.key({key:'Delete',target:{closest:()=>null},preventDefault(){}});assert.deepEqual(patch,[]);
+});
+test('Shift+Space and Shift+arrows select and extend whole rows without opening cell editors',()=>{
+ const g=rowSelectionGrid(),event=key=>({key,shiftKey:true,target:{closest:()=>null},preventDefault(){}});g.key(event(' '));assert.deepEqual(g.selectedRows(),[0]);g.key(event('ArrowDown'));assert.deepEqual(g.selectedRows(),[0,1]);
+ g.key({key:'a',ctrlKey:true,target:{closest:()=>null},preventDefault(){}});assert.equal(g.rowSelection,null);assert.equal(g.selectedRows().length,5);
+});
+test('whole-row selection follows stable identity when expanded rows change displayed indices',()=>{
+ const g=rowSelectionGrid();g.selectRow(1);g.o.rows().unshift({id:'new',name:'A new row',value:'New'});g.renderBody();assert.equal(g.selectionText(),'Bravo\tB');g.remove();assert.deepEqual(g.removed,[3]);
+});

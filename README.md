@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.46.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.47.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
@@ -72,11 +72,13 @@ Plain cable-stock JSON import previews compare against your current draft by mat
 
 | Output | Purpose | Contents |
 | --- | --- | --- |
-| Lampy cable-stock JSON | Vendor cable and pre-made loom catalogue | `vendor`, `cables`, retained imported custom fields, and optional `looms` using the agreed stock structure. Loom IDs are exported; editor component IDs and preferences are not. Lampy Paperwork requires its planned update to use stock looms. |
+| Lampy cable-stock JSON | Vendor cable and pre-made loom catalogue | `vendor`, `cables` containing separate ordinary cable and loom category arrays, and retained imported custom fields. Loom IDs are exported; editor component IDs and preferences are not. Lampy Paperwork requires its planned update to use stock looms. |
 | `*.lampy-project.json` | Reopen vendor work | Cable stock, composite looms, adaptor markers, generator vendor version, filename, row identities and imported baseline. **Not** a Lampy Paperwork input. |
 | `.xlsx` | Spreadsheet editing and backup | Cable categories, adaptor markers, looms/components, vendor metadata, custom fields and stable row keys. |
 
-Cable-stock JSON exports pre-made looms using `id`, `name`, available `lengths` and a `cables` array of `cableType` / `quantity` entries. Cable-only files remain unchanged when no looms are present. Generator vendor version, adaptor markers, loom category grouping, descriptions, connector overrides and component-specific lengths remain in project/Excel backups. The agreed cable-stock JSON has one combined `looms` array without category fields; reopening that export places all entries under Stock / Pre-Made Looms. Use a project JSON or Excel backup to retain the separate FOH Snake tab. Imported custom fields stay preserved. Lampy Paperwork needs its planned update before it can use the stock-loom definitions; exporting them does not update Paperwork.
+Cable-stock JSON stores pre-made looms in `cables["Stock / Pre-Made Looms"]` and FOH snakes in `cables["FOH Snake"]`, alongside the other category arrays. Each loom keeps `id`, `name`, available `lengths` and a `cables` array of `cableType` / `quantity` entries. Import restores each group to its own tab, including empty selected categories. Ordinary cable rows retain their existing structure. Older files with a root `looms` array still import into Stock / Pre-Made Looms; their next export uses the category structure. Old combined files cannot identify which entries were FOH snakes; reopen your project/Excel backup to retain that distinction.
+
+Generator vendor version, adaptor markers, descriptions, connector overrides and component-specific lengths remain in project/Excel backups. Imported custom fields stay preserved. Lampy Paperwork needs its planned update before it can use these stock-loom categories; exporting them does not update Paperwork.
 
 New projects start at vendor version **v1**, including an empty project started when no saved vendor project exists. Saved and imported project versions remain unchanged. Vendor versions such as `v2` and `v2.1` are independent of the app version. Major/minor buttons require confirmation. A category JSON preview/download is a labelled fragment, not a complete vendor file.
 
@@ -94,6 +96,7 @@ Click a cell to select it. Type to replace its contents, or double-click or pres
 
 Every cable table, Settings table and the main loom table has **Save table** buttons at the far right above and below the rows. Either button commits the cell currently being edited and saves the workspace in this browser. A successful save clears that table’s yellow edit highlights, including rows hidden by its search. Other tables keep their highlights. Later edits highlight again; the saved visual baseline survives reload. Cell selection remains visible and is separate from yellow change highlighting. The original import baseline remains intact for export reviews. Invalid cell input prevents that save and displays a message. Save does not upload or rewrite the hosted files. Download project/Excel backups for vendor work and separate JSON files for Settings data.
 
+- Click a **#** row number to select the whole row. **Shift-click** selects a range; **Ctrl/⌘-click** adds or removes individual rows. **Shift+Space** selects the active row; **Shift+Up/Down** extends a row selection. Copy, Fill down, clearing cells and Delete rows act only on selected rows in the current table view. For multiple selected rows, paste one clipboard row per selected row. Click a data cell to return to cell selection.
 - Arrows, Enter, Tab and Shift+Tab move between cells. Shift+arrows or Shift+click extends a range. Ctrl/⌘ A selects the table.
 - Ctrl/⌘ C and Ctrl/⌘ V copy/paste rectangular Excel-compatible TSV. Quoted multiline cells are supported. Toolbar Copy/Paste uses clipboard permission when available.
 - Drag the green selection corner to repeat values into a rectangle. Fill down repeats the first selected row. Invalid paste/fill operations apply no cells.
@@ -120,21 +123,23 @@ Example loom fragment:
 
 ```json
 {
-  "looms": [
-    {
-      "id": "loom_example",
-      "name": "2-Way Socapex",
-      "lengths": [10, 20, 30],
-      "cables": [
-        { "cableType": "Socapex 19-Pin", "quantity": 2 },
-        { "cableType": "XLR-5", "quantity": 4 }
-      ]
-    }
-  ]
+  "cables": {
+    "Stock / Pre-Made Looms": [
+      {
+        "id": "loom_example",
+        "name": "2-Way Socapex",
+        "lengths": [10, 20, 30],
+        "cables": [
+          { "cableType": "Socapex 19-Pin", "quantity": 2 },
+          { "cableType": "XLR-5", "quantity": 4 }
+        ]
+      }
+    ]
+  }
 }
 ```
 
-Lengths are positive numbers in `vendor.lengthUnit` (`m` or `ft`) and describe available lengths of the complete loom. Quantity is a positive whole number describing cables inside one loom. Loom IDs must be unique, non-empty strings; the editor generates them for new looms. Importing complete cable-stock JSON restores these definitions into the loom table and establishes a fresh baseline. Unknown imported loom/cable fields remain preserved in exports and backups. Structural errors are rejected before replacing your draft; invalid lengths or quantities appear in Errors and remain exportable for review.
+Lengths are positive numbers in `vendor.lengthUnit` (`m` or `ft`) and describe available lengths of the complete loom. Quantity is a positive whole number describing cables inside one loom. Loom IDs must be unique, non-empty strings; the editor generates them for new looms. Importing complete cable-stock JSON restores these definitions into their respective loom tables and establishes a fresh baseline. Unknown imported loom/cable fields remain preserved in exports and backups. Structural errors are rejected before replacing your draft; invalid lengths or quantities appear in Errors and remain exportable for review.
 
 ## Excel format
 
