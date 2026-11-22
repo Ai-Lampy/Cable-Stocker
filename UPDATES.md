@@ -2,11 +2,10 @@
 
 ## Pending
 
-- Awaiting exact-model/source clarification for remaining motor/hardware dimensions . The item-by-item evidence gaps are recorded in `remainingSpecificationAudit` in the existing research JSON. No measurements were inferred from similar equipment.
+- Awaiting exact-model/source clarification for remaining motor/hardware dimensions. The item-by-item evidence gaps are recorded in `remainingSpecificationAudit` in the existing research JSON. No measurements were inferred from similar equipment.
 
-- Local v2.0.2 is prepared with additional measurements for eight Christie items; dataset v0.3.0. 295 automated tests passed. User explicitly approved v2.0.2 browser testing and deployment. Local browser checks passed catalogue loading, review warnings, dual-unit specifications, editing/saving and JSON download preservation. Deployment/live verification is in progress. Continue resolving missing specifications before final catalogue completion.
 
-- Christie data review: the expanded catalogue contains 81 parent items and configuration variants. Every parent has a sourced weight or variant weights; The 9-foot GAC FLEX and 36-inch fixture-ladder rung also lack confirmed variant weights. 24 parents still have no published dimensions in the reviewed material. The eight newly enriched items have body/component/report dimensions only; full assembly envelopes and other dimensions remain partial/configuration-specific. Resolve motor lift contradictions, GACFLEX length/weight ambiguity, steel-pipe availability, Doughty weight, bracket weights/ratings and exact hardware models with the vendor. Do not invent missing values or clear review flags automatically.
+- Christie data review: the expanded catalogue contains 81 parent items and configuration variants. Every parent has a sourced weight or variant weights; the 9-foot GAC FLEX and 36-inch fixture-ladder rung also lack confirmed variant weights. 24 parents still have no published dimensions in the reviewed material. The eight newly enriched items have body/component/report dimensions only; full assembly envelopes and other dimensions remain partial/configuration-specific. Resolve motor lift contradictions, GACFLEX length/weight ambiguity, steel-pipe availability, Doughty weight, bracket weights/ratings and exact hardware models with the vendor. Do not invent missing values or clear review flags automatically.
 - Future load-table work: A/B/F single-span research and source index are saved in `reference/rigging/christie_lites_load_tables.research.json`. No load calculator is implemented. Resolve report identity/revision, regional/configuration differences and obtain engineering review before any calculation feature. F Type has no generic cantilever table.
 - Lampy Paperwork rigging integration: agree its runtime schema/manifest separately. Cable Stocker’s rigging source format is proposed; no compatibility is claimed. Do not change Lampy Paperwork for this task.
 
@@ -19,6 +18,8 @@
 
 
 ## Completed
+
+- v2.0.2 — 2026-11-22: deployed with explicit user approval. GitHub Pages run 45042640467 succeeded for release commit 374ca5b93c1ee6e5dd40306547a834908a2ced83. Live v2.0.2 verified at ailampy.com/cable. Approved local edit/save/conversion/export checks and live catalogue/measurement/review-warning checks passed. Persistent browser storage compared byte-for-byte unchanged, including Siyan LTD’s 21 cable types/two looms. 295 automated tests passed. Missing specifications remain flagged; see CHANGELOG.md and research audit.
 
 - v2.0.1 — 2026-11-22: shared Vendor selection, tailored Rigging Settings, 81-item Christie source catalogue, dual-unit editing and research JSON completed. 292 automated tests and approved local/live browser checks passed. Published with explicit release-specific user approval; GitHub Pages run 45004624518 succeeded for commit b493a6c208ffd4fde965f9af5f7f3e851691b521. App v2.0.1 verified at ailampy.com/cable; live JSON/Excel round trip and cable-data preservation passed. Full files, tests, cleanup and remaining data limitations are in CHANGELOG.md. The normal manual-upload/no-deploy rule remains in force for future releases.
 

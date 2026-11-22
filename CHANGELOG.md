@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.0.2 — 2026-11-22 (approved for deployment)
+## v2.0.2 — 2026-11-22
 
 Previous app version: v2.0.1. Christie source dataset: v0.2.0 → v0.3.0.
 
@@ -10,7 +10,7 @@ Previous app version: v2.0.1. Christie source dataset: v0.2.0 → v0.3.0.
 - Keep manufacturer weight differences separate from Christie rental weights. Flag the F-Type end-gate conflict between its non-load-bearing product description and the linked report's specific load cases; remove the unrelated brace-weight note. Do not treat component measurements as complete assembly envelopes or clear review flags.
 - Files to upload when approved: `js/version.js`, `reference/rigging/christie_lites_uk_rigging.source.json`, `reference/rigging/christie_lites_load_tables.research.json`, `data/rigging_types.json`, `tests/rigging.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`.
 - New/deleted project files: none. Temporary drawing PDFs, renders, test log and preservation-hash scratch file removed after verification.
-- Tests passed: 295 automated tests, including component scope, reference parity, retained source weights and complete JSON/Excel round trips; all project JSON parses; project and backup file hashes unchanged. Bracket drawings visually inspected. Approved local browser checks passed 81-item loading, 81 retained warnings, dual-unit specification display, a 112 kg edit/save and conversion to 246.917733647 lb, and JSON download preserving the edit, source dimensions and all review flags. Deployment/live verification pending.
+- Tests passed: 295 automated tests, including component scope, reference parity, retained source weights and complete JSON/Excel round trips; all project JSON parses; project and backup file hashes unchanged. Bracket drawings visually inspected. Approved local browser checks passed 81-item loading, 81 retained warnings, dual-unit specification display, a 112 kg edit/save and conversion to 246.917733647 lb, and JSON download preserving the edit, source dimensions and all review flags. Published with explicit approval: commit 374ca5b93c1ee6e5dd40306547a834908a2ced83, successful Pages run 45042640467. Live v2.0.2 verified at ailampy.com/cable. Live Rigging loaded 81 items/eight categories, dataset v0.3.0 and all 81 review warnings. Link-bar pin-to-pin measurements displayed in both units. Persistent browser storage compared byte-for-byte unchanged before/after deployment and isolated live checks; Siyan LTD retained 21 cable types/two looms. Local project/backups/non-rigging reference hashes and remote tree comparison confirmed cable files unchanged. Live test edits used a temporary in-memory copy, discarded on tab close. Test JSON download deleted; no Lampy Paperwork changes.
 - Known issues: the 9-foot GAC FLEX and 36-inch fixture-ladder rung lack confirmed variant weights. 24 items still lack published dimensions in reviewed sources. Other dimensions remain partial or model-dependent; manufacturer/rental weights and load guidance conflicts require confirmation. Full specification completion is not claimed. Lampy Paperwork unchanged.
 
 ## Christie specification follow-up — 2026-11-22 (local research only)
