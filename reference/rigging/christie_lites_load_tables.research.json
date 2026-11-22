@@ -1377,7 +1377,7 @@
   ],
   "equipmentFollowup": {
     "date": "2026-11-22",
-    "status": "Measurements merged into local source dataset v0.3.0 and matching Rigging reference types. Not deployed. Model/generation and source conflicts remain flagged.",
+    "status": "Measurements merged into source dataset v0.3.0 and matching Rigging reference types, deployed with approved app release v2.0.2 on 2026-11-22. Model/generation and source conflicts remain flagged.",
     "findings": [
       {
         "sourceProductId": "368",
