@@ -27,9 +27,17 @@ export function riggingFilename(name,backup=false){return `${String(name||'vendo
 export function newRiggingItem(){return {id:uid(),name:'',kind:'',reviewRequired:true};}
 export function getRiggingCell(row,key){return Object.hasOwn(MEASURES,key)?row.properties?.[key]?.value??'':row[key]??'';}
 export function imperialMeasure(value,unit){return {value:Number((unit==='kg'?value/0.45359237:unit==='m'?value/0.3048:value).toFixed(9)),unit:unit==='kg'?'lb':unit==='m'?'ft':unit};}
-export function riggingDisplayCell(row,key,units='metric'){const value=getRiggingCell(row,key);return units==='imperial'&&Object.hasOwn(MEASURES,key)&&value!==''?imperialMeasure(value,MEASURES[key][1]).value:value;}
-export function riggingDisplayLabel(key,units='metric'){const [label,unit]=MEASURES[key];return units==='imperial'?label.replace(`(${unit})`,`(${imperialMeasure(1,unit).unit})`):label;}
-export function setRiggingDisplayCell(row,key,value,units='metric'){if(units==='imperial'&&Object.hasOwn(MEASURES,key)&&value!==''){const unit=MEASURES[key][1];value=Number((value*(unit==='kg'?0.45359237:unit==='m'?0.3048:1)).toFixed(9));}setRiggingCell(row,key,value);}
+const UNIT_FACTORS={m:1,mm:0.001,cm:0.01,ft:0.3048,in:0.0254,kg:1,lb:0.45359237,deg:1};
+export function riggingMeasureUnit(row,key,units='source'){
+  const canonical=MEASURES[key]?.[1];
+  if(units==='imperial')return imperialMeasure(1,canonical).unit;
+  const source=row.properties?.[key]?.sourceUnit;
+  const allowed=canonical==='m'?['m','mm','cm','ft','in']:canonical==='kg'?['kg','lb']:['deg'];
+  return units==='source'&&allowed.includes(source)?source:canonical;
+}
+export function riggingDisplayCell(row,key,units='metric'){const value=getRiggingCell(row,key);return Object.hasOwn(MEASURES,key)&&value!==''?Number((value/UNIT_FACTORS[riggingMeasureUnit(row,key,units)]).toFixed(9)):value;}
+export function riggingDisplayLabel(key,units='metric'){const [label,unit]=MEASURES[key];return units==='source'?label.replace(/\([^)]*\)/,'(source unit)'):units==='imperial'?label.replace(`(${unit})`,`(${imperialMeasure(1,unit).unit})`):label;}
+export function setRiggingDisplayCell(row,key,value,units='metric'){if(Object.hasOwn(MEASURES,key)&&value!=='')value=Number((value*UNIT_FACTORS[riggingMeasureUnit(row,key,units)]).toFixed(9));setRiggingCell(row,key,value);}
 export function setRiggingCell(row,key,value){
   if(Object.hasOwn(MEASURES,key)){
     if(value===''){if(row.properties)delete row.properties[key];}

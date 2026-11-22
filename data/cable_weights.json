@@ -1,0 +1,814 @@
+{
+  "format": "lampy-generator-cable-weights",
+  "formatVersion": 1,
+  "researchedOn": "2026-11-22",
+  "purpose": "Generator-only vendor-specific weights per cable and length. No inferred weights; not part of Lampy runtime stock JSON.",
+  "items": [
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Data",
+      "name": "XLR-3",
+      "sourceUrl": "https://www.christielites.com/xlr-3-24-4-cable/230w4w36w135w569",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 4,
+          "lengthUnit": "ft",
+          "weight": 0.3,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 8,
+          "lengthUnit": "ft",
+          "weight": 0.5,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 16,
+          "lengthUnit": "ft",
+          "weight": 0.7,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 1.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 1.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 72,
+          "lengthUnit": "ft",
+          "weight": 2.6,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 3.3,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 144,
+          "lengthUnit": "ft",
+          "weight": 4.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 304,
+          "lengthUnit": "ft",
+          "weight": 8.0,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Data",
+      "name": "XLR-4",
+      "sourceUrl": "https://www.christielites.com/xlr-4-16-4-cable/230w4w36w136w589",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 4,
+          "lengthUnit": "ft",
+          "weight": 0.4,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 8,
+          "lengthUnit": "ft",
+          "weight": 0.7,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 16,
+          "lengthUnit": "ft",
+          "weight": 1.1,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 1.6,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 32,
+          "lengthUnit": "ft",
+          "weight": 2.1,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 40,
+          "lengthUnit": "ft",
+          "weight": 2.6,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 3.1,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 72,
+          "lengthUnit": "ft",
+          "weight": 4.5,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 5.9,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 144,
+          "lengthUnit": "ft",
+          "weight": 8.7,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Data",
+      "name": "XLR-5",
+      "sourceUrl": "https://www.christielites.com/xlr-5-24-4-cable/230w4w36w137w602",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 4,
+          "lengthUnit": "ft",
+          "weight": 0.3,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 8,
+          "lengthUnit": "ft",
+          "weight": 0.5,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 16,
+          "lengthUnit": "ft",
+          "weight": 0.7,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 1.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 32,
+          "lengthUnit": "ft",
+          "weight": 1.3,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 40,
+          "lengthUnit": "ft",
+          "weight": 1.5,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 1.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 72,
+          "lengthUnit": "ft",
+          "weight": 2.6,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 3.4,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 144,
+          "lengthUnit": "ft",
+          "weight": 5.1,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Data",
+      "name": "XLR-5 Black",
+      "sourceUrl": "",
+      "reviewNote": "Published XLR-5 cable is green. Confirm the black cable specification and weights.",
+      "weights": []
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Data",
+      "name": "XLR-7",
+      "sourceUrl": "",
+      "reviewNote": "No matching standalone cable weight found in the supplied Christie cable catalogue. Confirm exact product/model and weight per length.",
+      "weights": []
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Data",
+      "name": "Ethernet",
+      "sourceUrl": "https://www.christielites.com/rj-45-ethernet-cable/230w4w36w140w520",
+      "reviewNote": "4 ft and 16 ft explicitly use RJ45. The published 8 ft connector configuration is unspecified; confirm before applying its weight.",
+      "weights": [
+        {
+          "length": 4,
+          "lengthUnit": "ft",
+          "weight": 0.2,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 16,
+          "lengthUnit": "ft",
+          "weight": 0.7,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Data",
+      "name": "Ethercon",
+      "sourceUrl": "https://www.christielites.com/rj-45-ethernet-cable/230w4w36w140w520",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 0.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 1.4,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 2.7,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 144,
+          "lengthUnit": "ft",
+          "weight": 4.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 304,
+          "lengthUnit": "ft",
+          "weight": 8.2,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Data",
+      "name": "OpticalCON Quad Fiber",
+      "sourceUrl": "https://www.christielites.com/opticalcon-cable/230w4w36w141w699",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 304,
+          "lengthUnit": "ft",
+          "weight": 17.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 504,
+          "lengthUnit": "ft",
+          "weight": 34.0,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Data",
+      "name": "Whirlwind 12-Pair",
+      "sourceUrl": "",
+      "reviewNote": "No matching standalone cable weight found in the supplied Christie cable catalogue. Confirm exact product/model and weight per length.",
+      "weights": []
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "TRS",
+      "name": "TRUE 1",
+      "sourceUrl": "https://www.christielites.com/true1-cable/230w4w36w158w640",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 4,
+          "lengthUnit": "ft",
+          "weight": 0.6,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 8,
+          "lengthUnit": "ft",
+          "weight": 1.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 16,
+          "lengthUnit": "ft",
+          "weight": 1.6,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 2.4,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 32,
+          "lengthUnit": "ft",
+          "weight": 3.2,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 40,
+          "lengthUnit": "ft",
+          "weight": 4.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 4.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 72,
+          "lengthUnit": "ft",
+          "weight": 7.4,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 9.4,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 144,
+          "lengthUnit": "ft",
+          "weight": 14.2,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "TRS",
+      "name": "13A",
+      "sourceUrl": "https://www.christielites.com/13a-cable/230w4w36w149w709",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 8,
+          "lengthUnit": "ft",
+          "weight": 1.1,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 16,
+          "lengthUnit": "ft",
+          "weight": 1.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 2.4,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 4.9,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 72,
+          "lengthUnit": "ft",
+          "weight": 7.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 9.2,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "TRS",
+      "name": "Schuko",
+      "sourceUrl": "https://www.christielites.com/schuko-cable/230w4w36w175w1204",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 8,
+          "lengthUnit": "ft",
+          "weight": 1.1,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 16,
+          "lengthUnit": "ft",
+          "weight": 1.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 2.4,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 4.9,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 72,
+          "lengthUnit": "ft",
+          "weight": 7.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 9.2,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "TRS",
+      "name": "IEC",
+      "sourceUrl": "https://www.christielites.com/iec-male-to-iec-female-6ft-cable/230w4w36w153w748",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 6,
+          "lengthUnit": "ft",
+          "weight": 0.4,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Multi",
+      "name": "Socapex 19-Pin",
+      "sourceUrl": "https://www.christielites.com/socapex-19-pin-cable/230w4w36w155w657",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 8,
+          "lengthUnit": "ft",
+          "weight": 3.3,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 16,
+          "lengthUnit": "ft",
+          "weight": 6.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 8.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 32,
+          "lengthUnit": "ft",
+          "weight": 10.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 40,
+          "lengthUnit": "ft",
+          "weight": 12.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 13.23,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 56,
+          "lengthUnit": "ft",
+          "weight": 16.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 64,
+          "lengthUnit": "ft",
+          "weight": 18.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 72,
+          "lengthUnit": "ft",
+          "weight": 20.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 80,
+          "lengthUnit": "ft",
+          "weight": 22.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 88,
+          "lengthUnit": "ft",
+          "weight": 24.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 26.5,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 144,
+          "lengthUnit": "ft",
+          "weight": 38.0,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Mains",
+      "name": "32A 3\u00f8",
+      "sourceUrl": "https://www.christielites.com/cee-32a-3ph-cable/230w4w36w151w733",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 8,
+          "lengthUnit": "ft",
+          "weight": 4.2,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 9.9,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 19.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 72,
+          "lengthUnit": "ft",
+          "weight": 29.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 37.5,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 144,
+          "lengthUnit": "ft",
+          "weight": 57.3,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Mains",
+      "name": "63A 3\u00f8",
+      "sourceUrl": "https://www.christielites.com/cee-63a-3ph-cable/230w4w36w152w740",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 8,
+          "lengthUnit": "ft",
+          "weight": 11.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 28.7,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 46.3,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 81.6,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Mains",
+      "name": "125A 3\u00f8",
+      "sourceUrl": "https://www.christielites.com/cee-125a-3ph-cable/230w4w36w150w726",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 8,
+          "lengthUnit": "ft",
+          "weight": 19.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 47.4,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 106.9,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 177.5,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Mains",
+      "name": "Powerlock - 140mm",
+      "sourceUrl": "https://www.christielites.com/powerlock-cable-5wire/230w4w36w154w762",
+      "reviewNote": "Stock specifies 140 mm\u00b2. Christie publishes a 120 mm\u00b2 five-wire set; confirm conductor size and whether weight is per cable or complete set.",
+      "weights": []
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Motor",
+      "name": "Socapex 7-Pin",
+      "sourceUrl": "https://www.christielites.com/socapex-7-pin-motor-cable/230w4w36w156w671",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 8,
+          "lengthUnit": "ft",
+          "weight": 2.7,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 16,
+          "lengthUnit": "ft",
+          "weight": 4.4,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 6.2,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 32,
+          "lengthUnit": "ft",
+          "weight": 7.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 40,
+          "lengthUnit": "ft",
+          "weight": 9.6,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 11.3,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 56,
+          "lengthUnit": "ft",
+          "weight": 13.1,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 64,
+          "lengthUnit": "ft",
+          "weight": 14.8,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 72,
+          "lengthUnit": "ft",
+          "weight": 16.6,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 80,
+          "lengthUnit": "ft",
+          "weight": 18.4,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 88,
+          "lengthUnit": "ft",
+          "weight": 20.1,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 22.1,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 144,
+          "lengthUnit": "ft",
+          "weight": 32.4,
+          "weightUnit": "lb"
+        }
+      ]
+    },
+    {
+      "vendor": "Christie Lites UK",
+      "category": "Motor",
+      "name": "Tajimi Motor Control",
+      "sourceUrl": "https://www.christielites.com/tajimi-22-20-motor-control-cable/230w4w36w145w705",
+      "reviewNote": "Only exact published lengths are matched; missing weights require review.",
+      "weights": [
+        {
+          "length": 24,
+          "lengthUnit": "ft",
+          "weight": 4.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 48,
+          "lengthUnit": "ft",
+          "weight": 8.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 96,
+          "lengthUnit": "ft",
+          "weight": 15.0,
+          "weightUnit": "lb"
+        },
+        {
+          "length": 144,
+          "lengthUnit": "ft",
+          "weight": 23.0,
+          "weightUnit": "lb"
+        }
+      ]
+    }
+  ]
+}

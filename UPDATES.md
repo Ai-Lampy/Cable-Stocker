@@ -2,6 +2,9 @@
 
 ## Pending
 
+- v2.0.3 is prepared locally for manual upload; not deployed. Upload the files listed in CHANGELOG.md, including `js/version.js`, the new cable-weight module and reference. Verify the live release after uploading.
+- Complete `outputs/christie-specifications-2026-11-22/Christie_Lites_Missing_Information.xlsx`: 26 missing-specification entries, 57 partial-specification entries and 41 unmatched cable lengths. Enter literal N/A for unnecessary fields. Review completed answers before changing catalogue data; the workbook is not an app import template.
+
 - Awaiting exact-model/source clarification for remaining motor/hardware dimensions. The item-by-item evidence gaps are recorded in `remainingSpecificationAudit` in the existing research JSON. No measurements were inferred from similar equipment.
 
 
@@ -18,6 +21,8 @@
 
 
 ## Completed
+
+- v2.0.3 — Source-unit defaults and vendor-specific cable weights implemented locally. Missing-information workbook created. 298 automated tests and approved local browser checks passed; stock/example files preserved. See CHANGELOG.md for files, evidence and limitations. Awaiting user upload.
 
 - v2.0.2 — 2026-11-22: deployed with explicit user approval. GitHub Pages run 45042640467 succeeded for release commit 374ca5b93c1ee6e5dd40306547a834908a2ced83. Live v2.0.2 verified at ailampy.com/cable. Approved local edit/save/conversion/export checks and live catalogue/measurement/review-warning checks passed. Persistent browser storage compared byte-for-byte unchanged, including Siyan LTD’s 21 cable types/two looms. 295 automated tests passed. Missing specifications remain flagged; see CHANGELOG.md and research audit.
 
