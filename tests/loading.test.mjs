@@ -5,11 +5,11 @@ import vm from 'node:vm';
 import {freshDocumentURL} from '../js/updates.js';
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const bootstrap=html.match(/<script>\s*([\s\S]*?)<\/script>/)[1].replaceAll('await import(', 'await loadModule(');
-async function run({base='https://ailampy.com/cable/',source="export const APP_VERSION = 'v1.1.7';",moduleVersion='v1.1.7',offline=false,supports=true}={}) {
+async function run({base='https://ailampy.com/cable/',source="export const APP_VERSION = 'v1.1.7';",moduleVersion='v1.1.7',offline=false,supports=true,workspace=''}={}) {
   const nodes=Object.fromEntries(['#app-style','#save-status','#main'].map(k=>[k,{replaceChildren(...children){this.children=children;}}]));
   const scripts=[],loads=[],requests=[],addresses=[];
   const doc={baseURI:base,querySelector:k=>nodes[k],createElement:tag=>({tag}),head:{append(script){scripts.push(script);if(script.onload)script.onload();}}};
-  await vm.runInNewContext(bootstrap,{document:doc,HTMLScriptElement:{supports:()=>supports},URL,Date,Math,AbortSignal,location:{href:base+'?_lampy_update=123&keep=yes#vendor'},history:{replaceState:(_s,_t,url)=>addresses.push(url)},fetch:async(url,options)=>{requests.push({url:String(url),options});if(offline)throw Error('Offline');return {ok:true,text:async()=>source};},loadModule:async url=>{loads.push(url);return {APP_VERSION:moduleVersion};}});
+  await vm.runInNewContext(bootstrap,{document:doc,HTMLScriptElement:{supports:()=>supports},URL,Date,Math,AbortSignal,location:{href:base+'?_lampy_update=123&keep=yes'+(workspace?'&workspace='+workspace:'')+'#vendor'},history:{replaceState:(_s,_t,url)=>addresses.push(url)},fetch:async(url,options)=>{requests.push({url:String(url),options});if(offline)throw Error('Offline');return {ok:true,text:async()=>source};},loadModule:async url=>{loads.push(url);return {APP_VERSION:moduleVersion};}});
   return {nodes,scripts,loads,requests,addresses};
 }
 test('fresh navigation bypasses the document URL cache without changing origin/path',()=>{
@@ -39,3 +39,5 @@ test('offline or malformed metadata offers retry without loading app or clearing
 test('unsupported browsers stop clearly instead of importing unversioned dependencies',async()=>{
  const r=await run({supports:false});assert.equal(r.loads.length,0);assert.equal(r.requests.length,0);assert.match(r.nodes['#main'].children[0].textContent,/import map support/);
 });
+
+test('Rigging routing uses release-versioned modules and preserves its workspace query',async()=>{const r=await run({workspace:'rigging'});assert.equal(r.loads.at(-1),'https://ailampy.com/cable/js/rigging-app.js?release=v1.1.7');const map=JSON.parse(r.scripts.find(s=>s.type==='importmap').textContent).imports;for(const name of ['rigging','rigging-app']){assert(map['https://ailampy.com/cable/js/'+name+'.js']);const source=fs.readFileSync(new URL('../js/'+name+'.js',import.meta.url),'utf8');for(const dep of source.matchAll(/from\s+['"](.+?)['"]/g))assert(map[new URL(dep[1],'https://ailampy.com/cable/js/'+name+'.js').href]);}assert(r.addresses[0].includes('workspace=rigging'));});

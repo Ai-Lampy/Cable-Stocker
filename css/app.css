@@ -72,3 +72,9 @@
 .tabs .project-category-tab .delete-category:hover{background:#fff0ec;color:#a12922}
 
 .sheet .row-selector{cursor:pointer;user-select:none}.sheet .row-selector.selected{background:#dbe8d4;color:var(--deep);outline:1px solid #527e59;outline-offset:-1px}
+
+/* Catalogue workspaces share the table UI but keep separate drafts. */
+.workspace-switch{display:flex;gap:1rem;padding:.65rem 2rem;border-bottom:1px solid var(--line,#d9ddd7);background:#fff}.workspace-switch a{font-weight:600;color:inherit;text-decoration:underline;text-underline-offset:4px}
+.rigging-fields{display:grid;grid-template-columns:2fr 1fr 2fr;gap:1rem;margin-bottom:1rem}.rigging-fields label{display:flex;flex-direction:column;gap:.4rem}.rigging-fields input{width:100%;min-width:0}
+@media(max-width:700px){.rigging-fields{grid-template-columns:1fr}.workspace-switch{padding:.65rem 1rem}}
+.workspace-switch a[aria-current="page"]{background:#26372c;color:#fff;border-radius:6px;padding:4px 12px;text-decoration:none}.workspace-switch{align-items:center}

@@ -2,6 +2,8 @@
 
 ## Pending
 
+- Rigging data review: confirm details for the 42 Christie source items (weights, connections, curved dimensions and supporting capacity documentation). V2 now edits/imports/exports this proposed catalogue format. Agree Lampy Paperwork’s rigging runtime schema/manifest separately before integration; no compatibility is claimed.
+
 - Import limitation: mixed individual cable and loom records within one category are rejected safely. Keep separate cable and loom category arrays; broader mixed-category editing remains unresolved.
 
 - Reference-data review: confirm remaining missing connector defaults where needed. Missing stock endpoints now remain errors; Cable Stocker does not guess connectors. Do not overwrite supplied data.
@@ -11,6 +13,12 @@
 
 
 ## Completed
+
+- v2.0.0 (local release for manual upload) — 2026-11-22: built the separate Rigging catalogue workspace with Christie source loading, shared tables, review validation, independent autosave, safe workspace switching, JSON/project/Excel import/export and version-refresh protection. Upload `index.html`, `css/app.css`, `js/app.js`, `js/version.js`, `js/rigging.js`, `js/rigging-app.js`, `tests/core.test.mjs`, `tests/loading.test.mjs`, `tests/rigging.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; also include the unchanged `reference/rigging/christie_lites_uk_rigging.source.json`. 276 automated tests and approved local browser checks passed; details and limitations in CHANGELOG.md. Existing user stock, backups, reference data and cable schemas preserved. No Lampy Paperwork changes or deployment.
+
+- Rigging source JSON — 2026-11-22: created reference/rigging/christie_lites_uk_rigging.source.json (dataset v0.1.0), containing 42 Christie Lites catalogue items from the four supplied pages. Existing app remains v1.1.49. Source links, metric conversions and review limitations included. No app integration or deployment; see CHANGELOG.md.
+
+- v1.1.49 live verification — 2026-11-22: confirmed the live footer and passed approved alias, loom-only length and JSON import/export browser checks at ailampy.com/cable using disposable test stock. Round-trip preview showed 0 changes, 0 errors and 0 warnings. Final screenshot/log/storage-comparison checks were interrupted when the temporary tab became unavailable; details in CHANGELOG.md. App version unchanged. Updated/upload UPDATES.md and CHANGELOG.md only. Generated import and download files removed. No app, stock or Lampy Paperwork changes; no upload/deployment.
 
 - v1.1.49 (local release for manual upload) — 2026-10-17: applied the updated V51.20 handoff; removed the obsolete alias warning, deduplicated exported aliases, omitted empty loom-only arrays, broadened custom loom recognition and validated connector field types. Upload: `js/app.js`, `js/model.js`, `js/version.js`, `tests/handoff.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. All 254 non-browser automated tests passed. Browser testing not run, as requested. New/deleted files: none. Stock data and backups preserved; no Lampy Paperwork changes, upload or deployment. Details in CHANGELOG.md.
 
@@ -221,4 +229,4 @@
 
 ## Future
 
-- No future-release implementation or scaffolding is included. Record user-approved follow-up requests here after V1 use.
+- Rigging catalogue editing is implemented in v2.0.0. Further rigging product coverage and downstream runtime integration require confirmed source data and a receiving schema. No Fixtures or other inventory modules are included.

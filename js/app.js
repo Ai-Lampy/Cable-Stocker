@@ -569,6 +569,15 @@ async function start(){
       const banner=$('#update-notice');banner.hidden=false;
       $('#update-message').textContent=`${version} is available. Save your work and refresh to update.`;
     });
+    document.querySelectorAll('.workspace-switch a').forEach(link=>link.onclick=e=>{
+      e.preventDefault();
+      try{safeRefresh({
+        blocked:()=>importPending||$('#dialog').open||$('#loom-pane')?.open?'Finish or close the open import/dialog before switching workspaces.':saveBlocked?saveError:[...document.querySelectorAll('#main [data-draft-value]')].some(input=>input.value!==input.dataset.draftValue)?'Finish the current field before switching workspaces.':'',
+        editors:()=>[...document.querySelectorAll('[data-lampy-grid]')].map(host=>host.lampyGrid),
+        persist:()=>{save();if(saveError||saveBlocked)throw Error(saveError||'Saving is paused.');},
+        reload:()=>{updateReload=true;window.location.assign(link.href);}
+      });}catch(error){notice(error.message,true);}
+    });
     $('#refresh-update').onpointerdown=e=>e.preventDefault();
     $('#refresh-update').onclick=()=>{
       try{

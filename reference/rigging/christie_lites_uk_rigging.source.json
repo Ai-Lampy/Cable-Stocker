@@ -1,0 +1,686 @@
+{
+  "format": "lampy-rigging-source-catalogue",
+  "formatVersion": 1,
+  "catalogueVersion": "v0.1.0",
+  "status": "proposed-source-dataset",
+  "createdDate": "2026-11-22",
+  "vendor": {
+    "name": "Christie Lites UK",
+    "sourceRegion": "UK and EU"
+  },
+  "compatibility": {
+    "cableStockerV1Import": false,
+    "lampyPaperworkSchemaVerified": false,
+    "note": "New V2 source dataset. Not a cable-stock JSON, generator project backup or approved Lampy Paperwork export."
+  },
+  "provenance": {
+    "sourceUrls": [
+      "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+      "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+      "https://www.christielites.com/f-type-track/230w4w34w124w",
+      "https://www.christielites.com/motors/230w4w35w126w"
+    ],
+    "accessedDate": "2026-11-22",
+    "method": "Product names and stated dimensions/capacities transcribed from supplied category listings. Grouping, kinds and stable internal IDs newly created for this dataset. Product detail sheets have not been verified.",
+    "measurementPolicy": "Original product names retained. Numeric dimensions use metres; capacities use kilograms. Source dimensions retained alongside exact unit conversions. Unstated specifications omitted."
+  },
+  "reviewNotes": [
+    "Confirm product details, weights, connection systems and capacity documentation before enriching this dataset.",
+    "Availability at a particular depot and owned stock quantities are not established by category listings.",
+    "Curved truss descriptions are preserved verbatim; diameter conventions and per-piece versus complete-circle dimensions need confirmation.",
+    "Source wording Double Break is preserved without interpreting or certifying a brake configuration.",
+    "F Type Truss System is retained as a reference listing pending clarification, rather than treated as another stock product.",
+    "Define the receiving rigging JSON schema and manifest before runtime export integration."
+  ],
+  "categories": {
+    "Truss — A Type": [
+      {
+        "id": "christie-a-straight-8ft",
+        "name": "A Type (12\") Blk 8' Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type",
+        "properties": {
+          "length": {
+            "value": 2.4384,
+            "unit": "m",
+            "sourceValue": 8,
+            "sourceUnit": "ft"
+          },
+          "nominalSectionSize": {
+            "value": 0.3048,
+            "unit": "m",
+            "sourceValue": 12,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-a-straight-6ft",
+        "name": "A Type (12\") Blk 6' Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type",
+        "properties": {
+          "length": {
+            "value": 1.8288,
+            "unit": "m",
+            "sourceValue": 6,
+            "sourceUnit": "ft"
+          },
+          "nominalSectionSize": {
+            "value": 0.3048,
+            "unit": "m",
+            "sourceValue": 12,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-a-straight-4ft",
+        "name": "A Type (12\") Blk 4' Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type",
+        "properties": {
+          "length": {
+            "value": 1.2192,
+            "unit": "m",
+            "sourceValue": 4,
+            "sourceUnit": "ft"
+          },
+          "nominalSectionSize": {
+            "value": 0.3048,
+            "unit": "m",
+            "sourceValue": 12,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-a-straight-3ft",
+        "name": "A Type (12\") Blk 3' Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type",
+        "properties": {
+          "length": {
+            "value": 0.9144,
+            "unit": "m",
+            "sourceValue": 3,
+            "sourceUnit": "ft"
+          },
+          "nominalSectionSize": {
+            "value": 0.3048,
+            "unit": "m",
+            "sourceValue": 12,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-a-straight-2ft",
+        "name": "A Type (12\") Blk 2' Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type",
+        "properties": {
+          "length": {
+            "value": 0.6096,
+            "unit": "m",
+            "sourceValue": 2,
+            "sourceUnit": "ft"
+          },
+          "nominalSectionSize": {
+            "value": 0.3048,
+            "unit": "m",
+            "sourceValue": 12,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-a-straight-1ft",
+        "name": "A Type (12\") Blk 1' Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type",
+        "properties": {
+          "length": {
+            "value": 0.3048,
+            "unit": "m",
+            "sourceValue": 1,
+            "sourceUnit": "ft"
+          },
+          "nominalSectionSize": {
+            "value": 0.3048,
+            "unit": "m",
+            "sourceValue": 12,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-a-corner-90-6way",
+        "name": "A Type (12\") Corner 90 Deg 6-Way",
+        "kind": "corner",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type"
+      },
+      {
+        "id": "christie-a-corner-45",
+        "name": "A Type (12\") Corner 45 Deg",
+        "kind": "corner",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type"
+      },
+      {
+        "id": "christie-a-curve-45",
+        "name": "A Type (12\") Curve Truss 45Deg, 18' 3/4\" Diam (8Pc)",
+        "kind": "curve",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type"
+      },
+      {
+        "id": "christie-a-curve-90",
+        "name": "A Type (12) Curve Truss 90Deg, 12' 3/4\" Diam (4Pc)",
+        "kind": "curve",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type"
+      }
+    ],
+    "Truss — B Type": [
+      {
+        "id": "christie-b-straight-8ft",
+        "name": "B Type (16\") Blk 8' Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type",
+        "properties": {
+          "length": {
+            "value": 2.4384,
+            "unit": "m",
+            "sourceValue": 8,
+            "sourceUnit": "ft"
+          },
+          "nominalSectionSize": {
+            "value": 0.4064,
+            "unit": "m",
+            "sourceValue": 16,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-b-straight-6ft",
+        "name": "B Type (16\") Blk 6' Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type",
+        "properties": {
+          "length": {
+            "value": 1.8288,
+            "unit": "m",
+            "sourceValue": 6,
+            "sourceUnit": "ft"
+          },
+          "nominalSectionSize": {
+            "value": 0.4064,
+            "unit": "m",
+            "sourceValue": 16,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-b-straight-4ft",
+        "name": "B Type (16\") Blk 4' Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type",
+        "properties": {
+          "length": {
+            "value": 1.2192,
+            "unit": "m",
+            "sourceValue": 4,
+            "sourceUnit": "ft"
+          },
+          "nominalSectionSize": {
+            "value": 0.4064,
+            "unit": "m",
+            "sourceValue": 16,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-b-straight-34in",
+        "name": "B Type (16\") Blk 34\" Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type",
+        "properties": {
+          "length": {
+            "value": 0.8636,
+            "unit": "m",
+            "sourceValue": 34,
+            "sourceUnit": "in"
+          },
+          "nominalSectionSize": {
+            "value": 0.4064,
+            "unit": "m",
+            "sourceValue": 16,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-b-straight-2ft",
+        "name": "B Type (16\") Blk 2' Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type",
+        "properties": {
+          "length": {
+            "value": 0.6096,
+            "unit": "m",
+            "sourceValue": 2,
+            "sourceUnit": "ft"
+          },
+          "nominalSectionSize": {
+            "value": 0.4064,
+            "unit": "m",
+            "sourceValue": 16,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-b-straight-14in",
+        "name": "B Type (16\") Blk 14\" Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type",
+        "properties": {
+          "length": {
+            "value": 0.3556,
+            "unit": "m",
+            "sourceValue": 14,
+            "sourceUnit": "in"
+          },
+          "nominalSectionSize": {
+            "value": 0.4064,
+            "unit": "m",
+            "sourceValue": 16,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-b-corner-6way",
+        "name": "B Type (16\") Blk Corner 6-Way",
+        "kind": "corner",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type"
+      },
+      {
+        "id": "christie-b-curve-32",
+        "name": "B Type (16\") Curve Truss 30Deg, 32' 2 1/4\" Diam (12Pc)",
+        "kind": "curve",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type"
+      },
+      {
+        "id": "christie-b-curve-24",
+        "name": "B Type (16\") Curve Truss 30Deg, 24' 2 1/4\" Diam (12Pc)",
+        "kind": "curve",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type"
+      }
+    ],
+    "Truss — F Type": [
+      {
+        "id": "christie-f-straight-7ft10in",
+        "name": "F Type (Track) Blk 7' 10\" Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/f-type-track/230w4w34w124w",
+        "reviewRequired": true,
+        "series": "F Type",
+        "properties": {
+          "length": {
+            "value": 2.3876,
+            "unit": "m",
+            "sourceValue": 94,
+            "sourceUnit": "in"
+          }
+        }
+      },
+      {
+        "id": "christie-f-straight-3ft10in",
+        "name": "F Type (Track) Blk 3' 10\" Truss",
+        "kind": "straight",
+        "sourceUrl": "https://www.christielites.com/f-type-track/230w4w34w124w",
+        "reviewRequired": true,
+        "series": "F Type",
+        "properties": {
+          "length": {
+            "value": 1.1684,
+            "unit": "m",
+            "sourceValue": 46,
+            "sourceUnit": "in"
+          }
+        }
+      }
+    ],
+    "Truss accessories": [
+      {
+        "id": "christie-a-plate-hinge",
+        "name": "A Type (12\") Plate Hinge",
+        "kind": "accessory",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type"
+      },
+      {
+        "id": "christie-a-border",
+        "name": "A Type (12\") Black Border 16\"H x 27' L",
+        "kind": "accessory",
+        "sourceUrl": "https://www.christielites.com/a-type-12-inch-box/230w4w34w119w",
+        "reviewRequired": true,
+        "series": "A Type"
+      },
+      {
+        "id": "christie-b-end-face-plate",
+        "name": "B Type (16\") Blk End/Face Plate",
+        "kind": "accessory",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type"
+      },
+      {
+        "id": "christie-b-link-bars",
+        "name": "B Type (16\") Link Bars",
+        "kind": "accessory",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type"
+      },
+      {
+        "id": "christie-b-border",
+        "name": "B Type (16\") Black Border 20\"H x 27'L",
+        "kind": "accessory",
+        "sourceUrl": "https://www.christielites.com/b-type-16-inch-box/230w4w34w120w",
+        "reviewRequired": true,
+        "series": "B Type"
+      },
+      {
+        "id": "christie-f-end-gate",
+        "name": "F Type (Track) End Gate",
+        "kind": "accessory",
+        "sourceUrl": "https://www.christielites.com/f-type-track/230w4w34w124w",
+        "reviewRequired": true,
+        "series": "F Type"
+      },
+      {
+        "id": "christie-f-braces",
+        "name": "E Type/F Type (Track) Braces",
+        "kind": "accessory",
+        "sourceUrl": "https://www.christielites.com/f-type-track/230w4w34w124w",
+        "reviewRequired": true,
+        "series": "F Type"
+      }
+    ],
+    "Motors": [
+      {
+        "id": "christie-motors-2t-d8plus-80ft",
+        "name": "2 Tonne D8+ Motor 80' Lift",
+        "kind": "hoist",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true,
+        "properties": {
+          "listedCapacity": {
+            "value": 2000,
+            "unit": "kg",
+            "basis": "Product listing name; not independently certified"
+          },
+          "lift": {
+            "value": 24.384,
+            "unit": "m",
+            "sourceValue": 80,
+            "sourceUnit": "ft"
+          }
+        }
+      },
+      {
+        "id": "christie-motors-1t-d8-60ft",
+        "name": "1 Tonne Liftket D8 Double Break Motor 60' Lift",
+        "kind": "hoist",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true,
+        "properties": {
+          "listedCapacity": {
+            "value": 1000,
+            "unit": "kg",
+            "basis": "Product listing name; not independently certified"
+          },
+          "lift": {
+            "value": 18.288,
+            "unit": "m",
+            "sourceValue": 60,
+            "sourceUnit": "ft"
+          }
+        }
+      },
+      {
+        "id": "christie-motors-1t-d8-125ft",
+        "name": "1 Tonne Liftket D8 Double Break Motor 125' Lift",
+        "kind": "hoist",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true,
+        "properties": {
+          "listedCapacity": {
+            "value": 1000,
+            "unit": "kg",
+            "basis": "Product listing name; not independently certified"
+          },
+          "lift": {
+            "value": 38.1,
+            "unit": "m",
+            "sourceValue": 125,
+            "sourceUnit": "ft"
+          }
+        }
+      },
+      {
+        "id": "christie-motors-1t-d8plus-80ft",
+        "name": "1 Tonne Liftket D8+ Double Break Motor 80' Lift",
+        "kind": "hoist",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true,
+        "properties": {
+          "listedCapacity": {
+            "value": 1000,
+            "unit": "kg",
+            "basis": "Product listing name; not independently certified"
+          },
+          "lift": {
+            "value": 24.384,
+            "unit": "m",
+            "sourceValue": 80,
+            "sourceUnit": "ft"
+          }
+        }
+      },
+      {
+        "id": "christie-motors-half-t-d8-60ft",
+        "name": "1/2 Tonne Liftket D8 Double Break Motor 60' Lift",
+        "kind": "hoist",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true,
+        "properties": {
+          "listedCapacity": {
+            "value": 500,
+            "unit": "kg",
+            "basis": "Product listing name; not independently certified"
+          },
+          "lift": {
+            "value": 18.288,
+            "unit": "m",
+            "sourceValue": 60,
+            "sourceUnit": "ft"
+          }
+        }
+      },
+      {
+        "id": "christie-motors-half-t-d8plus-80ft",
+        "name": "1/2 Tonne Liftket D8+ Double Break Motor 80' Lift",
+        "kind": "hoist",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true,
+        "properties": {
+          "listedCapacity": {
+            "value": 500,
+            "unit": "kg",
+            "basis": "Product listing name; not independently certified"
+          },
+          "lift": {
+            "value": 24.384,
+            "unit": "m",
+            "sourceValue": 80,
+            "sourceUnit": "ft"
+          }
+        }
+      },
+      {
+        "id": "christie-motors-226kg-cm-60ft",
+        "name": "226kg CM Single Brake Motor 60' lift",
+        "kind": "hoist",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true,
+        "properties": {
+          "listedCapacity": {
+            "value": 226,
+            "unit": "kg",
+            "basis": "Product listing name; not independently certified"
+          },
+          "lift": {
+            "value": 18.288,
+            "unit": "m",
+            "sourceValue": 60,
+            "sourceUnit": "ft"
+          }
+        }
+      },
+      {
+        "id": "christie-motors-1t-kinesys-80ft",
+        "name": "1 Tonne Liftket Kinesys Motor 80' Lift",
+        "kind": "hoist",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true,
+        "properties": {
+          "listedCapacity": {
+            "value": 1000,
+            "unit": "kg",
+            "basis": "Product listing name; not independently certified"
+          },
+          "lift": {
+            "value": 24.384,
+            "unit": "m",
+            "sourceValue": 80,
+            "sourceUnit": "ft"
+          }
+        }
+      },
+      {
+        "id": "christie-motors-half-t-kinesys-80ft",
+        "name": "1/2 Metric Ton Liftket Kinesys D8 Motor 80' Lift",
+        "kind": "hoist",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true,
+        "properties": {
+          "listedCapacity": {
+            "value": 500,
+            "unit": "kg",
+            "basis": "Product listing name; not independently certified"
+          },
+          "lift": {
+            "value": 24.384,
+            "unit": "m",
+            "sourceValue": 80,
+            "sourceUnit": "ft"
+          }
+        }
+      }
+    ],
+    "Motor controls": [
+      {
+        "id": "christie-motors-cs800",
+        "name": "Motor Distro 8-Way CS-800",
+        "kind": "control",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true
+      },
+      {
+        "id": "christie-motors-digihoist",
+        "name": "Motor Distro 8-Way DigiHoist",
+        "kind": "control",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true
+      },
+      {
+        "id": "christie-motors-elevation",
+        "name": "Motor Drive Elevation 1+",
+        "kind": "control",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true
+      },
+      {
+        "id": "christie-motors-array",
+        "name": "Motor Distro Array PD-ES",
+        "kind": "control",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true
+      },
+      {
+        "id": "christie-motors-mentor",
+        "name": "Mentor Series 4",
+        "kind": "control",
+        "sourceUrl": "https://www.christielites.com/motors/230w4w35w126w",
+        "reviewRequired": true
+      }
+    ]
+  },
+  "referenceListings": [
+    {
+      "name": "F Type Truss System",
+      "sourceUrl": "https://www.christielites.com/f-type-track/230w4w34w124w",
+      "reason": "System overview or package; stock interpretation unconfirmed."
+    }
+  ],
+  "excludedListings": {
+    "reason": "CAD symbols are documentation, not stock.",
+    "types": [
+      "Vectorworks CAD Symbols",
+      "AutoCAD DWG CAD Symbols"
+    ]
+  }
+}

@@ -105,7 +105,7 @@ test('merge never drops duplicate-named incoming rows',()=>{const p=M.newProject
 test('manifest filename mismatch is reported without rewriting it',()=>{const p=fresh();p.filename='changed.json';assert(M.validate(p,refs).some(i=>i.message.includes('manifest expects')));assert.equal(p.filename,'changed.json');});
 test('grid rejects duplicate lengths and non-object JSON cells atomically',()=>{assert.throws(()=>parseCell('1,1',{type:'lengths'}),/Duplicate/);assert.throws(()=>parseCell('[]',{type:'json'}),/JSON object/);});
 test('non-finite JSON values are rejected instead of becoming null on export',()=>assert.throws(()=>M.parseJSON('{"length":1e400}'),/finite/));
-test('all HTML script, stylesheet and documentation paths resolve locally',()=>{const html=fs.readFileSync(`${root}index.html`,'utf8');for(const match of html.matchAll(/(?:src|href)="([^"]+)"/g)){const path=match[1];if(!/^(?:[a-z]+:|#)/i.test(path))assert(fs.existsSync(`${root}${path}`),path);}for(const name of ['app','excel','grid','model','version']){const js=fs.readFileSync(`${root}js/${name}.js`,'utf8');for(const m of js.matchAll(/from '(.+?)'/g))assert(fs.existsSync(`${root}js/${m[1]}`),m[1]);}});
+test('all HTML script, stylesheet and documentation paths resolve locally',()=>{const html=fs.readFileSync(`${root}index.html`,'utf8');for(const match of html.matchAll(/(?:src|href)="([^"]+)"/g)){const path=match[1];if(!/^(?:[a-z]+:|#)/i.test(path))assert(fs.existsSync(new URL(path,new URL('../index.html',import.meta.url))),path);}for(const name of ['app','excel','grid','model','version']){const js=fs.readFileSync(`${root}js/${name}.js`,'utf8');for(const m of js.matchAll(/from '(.+?)'/g))assert(fs.existsSync(`${root}js/${m[1]}`),m[1]);}});
 test('vendor manifest sync includes every vendor and preserves original entries',()=>{
   const r=M.clone(refs),first=M.clone(r.manifest.catalogues[0]);M.syncVendorManifest(r);
   assert.equal(r.manifest.catalogues.length,15);assert.deepEqual(r.manifest.catalogues[0],first);
@@ -317,7 +317,8 @@ test('deleting the project loom tab removes its export category without affectin
  assert.deepEqual(M.runtimeJSON(roundtrip(p).project),M.runtimeJSON(p));assert.deepEqual(M.restoreProject(M.clone(p)),p);
 });
 
-test('supplied reference looms load into stock with independent IDs, quantities and matching lengths',()=>{
+test('reference looms load into stock with independent IDs, quantities and matching lengths',()=>{
+ const refs=loomReferenceFixture();
  const p=newProjectFixture('ft'),before=M.clone(refs);
  const supplied=refs.cable_types.items.filter(r=>M.isLoomCategory(r.category,refs));assert(supplied.length>0);
  const categories=[...new Set(supplied.map(r=>r.category))];

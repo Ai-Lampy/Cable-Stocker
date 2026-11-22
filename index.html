@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Create, edit and export Lampy vendor cable stock locally in your browser.">
+  <meta name="description" content="Create, edit and export vendor cable stock and rigging catalogues locally in your browser.">
   <title>Lampy · Cable Stock Generator</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2326372c'/%3E%3Cpath d='M20 14v36h27v-9H30V14' fill='%23a6c96a'/%3E%3C/svg%3E">
   <link id="app-style" rel="stylesheet" href="css/app.css">
@@ -20,6 +20,7 @@
     </div>
   </header>
   <aside id="update-notice" class="update-notice" aria-label="Application update" hidden><span id="update-message" role="status"></span><button id="refresh-update" class="primary">Save &amp; refresh</button><small>Your draft and reference edits stay in this browser.</small></aside>
+  <nav class="workspace-switch" aria-label="Catalogue workspace"><a href="?workspace=cable" aria-current="page">Cable stock</a><a href="?workspace=rigging">Rigging</a></nav>
   <section class="vendor-strip" aria-label="Selected vendor"><div id="vendor-logo"></div><div><strong id="vendor-name">Your cable stock</strong><span id="vendor-summary">Choose a vendor to begin</span></div><span class="local-pill">LOCAL WORKSPACE</span></section>
   <nav id="category-nav" class="tabs" aria-label="Vendor and cable categories"></nav>
   <main id="main"><p>Loading your workspace…</p></main>
@@ -46,7 +47,7 @@
       if (!match) throw new Error('The published version file is incomplete. Please try again shortly.');
       const version = match[1];
       const asset = path => {const url = new URL(path, base);url.searchParams.set('release', version);return url.href;};
-      const imports = Object.fromEntries(['app', 'model', 'grid', 'excel', 'updates', 'version', 'vendor-projects'].map(name => {
+      const imports = Object.fromEntries(['app', 'model', 'grid', 'excel', 'updates', 'version', 'vendor-projects', 'rigging', 'rigging-app'].map(name => {
         const path = 'js/' + name + '.js';return [new URL(path, base).href, asset(path)];
       }));
       const map = document.createElement('script');map.type = 'importmap';map.textContent = JSON.stringify({imports});document.head.append(map);
@@ -60,7 +61,8 @@
       // Remove only our temporary document-cache key, preserving other URL state.
       const address = new URL(location.href);
       if (address.searchParams.has('_lampy_update')) {address.searchParams.delete('_lampy_update');history.replaceState(null, '', address.href);}
-      await import(imports[new URL('js/app.js', base).href]);
+      const workspace = new URL(location.href).searchParams.get('workspace');
+      await import(imports[new URL(workspace === 'rigging' ? 'js/rigging-app.js' : 'js/app.js', base).href]);
     } catch (error) {
       document.querySelector('#save-status').textContent = 'App could not load';
       const message = document.createElement('p');message.textContent = error.message + ' Your saved draft has not been cleared.';

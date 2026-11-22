@@ -1,12 +1,35 @@
-# Lampy Cable Stock JSON Generator
+# Lampy Cable Stock and Rigging Catalogue Generator
 
-Static, local-first cable-stock editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` remains the authoritative specification.
+Static, local-first cable-stock and rigging catalogue editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` defines the original cable scope; Rigging is the user-authorised V2 extension.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v1.1.49.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v2.0.0.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
-## Saved vendor projects — generator only
+## Choose a workspace
+
+Use **Cable stock** or **Rigging** above the vendor strip. Cable stock is the default; `?workspace=rigging` opens Rigging directly at the same static site path. Workspace switching commits a valid table edit and verifies autosave before navigation. Invalid edits, open dialogs/imports, unfinished fields and storage conflicts prevent switching. Each workspace restores its own draft; neither converts nor replaces the other's data.
+
+## Work with Rigging
+
+1. Choose **Rigging → Load Christie Lites catalogue** and confirm to copy the supplied 42-item catalogue into your rigging draft. The source file stays unchanged. Alternatively, choose **New rigging project** or **Import rigging JSON / Excel**. Import previews the item/error/review counts before replacement; Cancel preserves the draft.
+2. Edit the vendor name, catalogue version and JSON filename. Vendor suggestions use the existing vendor list. Rigging has one active local draft; changing its vendor name relabels that draft rather than loading another vendor. Save separate project backups for separate vendors. Hosted cable `.lampy-project.json` loading remains specific to Cable stock.
+3. Open A Type, B Type, F Type, Truss accessories, Motors or Motor controls. **+ Category**, **Rename category** and **Delete category** manage your project categories. Deletion requires confirmation. Use Undo/Redo in a table, or Ctrl/⌘+Z outside input fields, during the current session.
+4. Edit ordinary table cells: Name, Type, Series, relevant dimensions/capacities, Review required, Source URL and ID. Dimensions/lift use metres; capacities/weights use kilograms; angles use degrees. Blank means not supplied. Enter positive numbers or clear optional fields. Existing source measurements and unknown properties stay in the data; edited measurements retain their original source values and gain an `edited` marker. Do not change stable IDs when renaming products.
+5. Use the shared table controls for Tab/Enter editing, row selection, paste/fill, search, default Name sorting, resizing, zoom and yellow change highlights. **Save table** appears at the top and directly below the rows. It saves locally and clears that table's highlights; export review still compares against the imported baseline.
+6. The supplied items start with **Review required = Yes**. Confirm product details against your documents before clearing it. Editing an item marks it for review again. Errors shows red errors and yellow review counts; select an issue to open its item. Clearing a review is an editorial acknowledgement, not load certification.
+7. Choose **Review & export** for catalogue JSON, Excel or a project backup. Errors remain visible and Download anyway is available. Category JSON is a fragment; use the complete catalogue JSON for re-import.
+
+**Rigging files and compatibility**
+
+- Catalogue JSON keeps the proposed `lampy-rigging-source-catalogue` format, category arrays, stable IDs, measurements, provenance and unknown fields. Default filename: `christie_lites_uk_rigging.json`.
+- Project backups use `lampy-rigging-generator-project`, retaining the catalogue, original baseline and filename. Default: `christie_lites_uk.rigging-project.json`. Use Import to reopen; these are separate from cable backups. The browser downloads them; it does not automatically write into this project folder or upload them.
+- Excel exports one numbered sheet per category plus `_Rigging` metadata. Keep the metadata sheet and headings unchanged. Normal columns edit item fields; IDs identify existing records so source/custom metadata survives. Blank IDs create new records. Delete worksheet rows to remove items, but keep mapped sheets; the app rejects missing sheets. Unknown fields and the original baseline remain in the metadata, which is split into cell-sized chunks. Import replaces the rigging draft after review.
+- **Source reference** shows the read-only Christie source notes and links. Loading a new source copy always requires confirmation; a published source change does not overwrite your saved rigging edits.
+- Autosave uses `lampy-rigging:draft:1`, separate from cable storage. Damaged drafts and competing tabs pause saving rather than overwrite stored work. Download a backup before recovery/reload. Rigging supports the same version notification and **Save & refresh** protection.
+- This is a catalogue editor, not stock quantities, serial-number tracking, inspections or load calculation. The rigging schema/manifest required by Lampy Paperwork has not been confirmed; do not treat these exports as compatible runtime files. Cable exports retain their existing format.
+
+## Saved cable vendor projects — generator only
 
 1. Build or import your vendor’s project, then choose **Vendor → Save vendor project**.
 2. Use **Choose save location** where supported, or **Download project JSON**. Save/move the file into this project’s **`projects/`** folder using the exact generated filename. For example: `projects/christie_lites_uk.lampy-project.json`.
@@ -244,7 +267,7 @@ Bundled library: SheetJS CE 0.20.3 from its official CDN, with Apache 2.0 licenc
 
 ## Upload inventory
 
-For a complete upload, include the root HTML/docs/package files and `.nojekyll`, plus `css/`, `js/`, `data/`, `reference/`, `images/vendor/`, `vendor/`, `tests/` and `projects/`, retaining every filename and subfolder. Exclude Finder `.DS_Store` files, locally downloaded test outputs and private backups. No V2 modules or placeholders are included.
+For a complete upload, include the root HTML/docs/package files and `.nojekyll`, plus `css/`, `js/`, `data/`, `reference/`, `images/vendor/`, `vendor/`, `tests/` and `projects/`, retaining every filename and subfolder. Exclude Finder `.DS_Store` files, locally downloaded test outputs and private backups. Include `js/rigging.js`, `js/rigging-app.js` and `reference/rigging/christie_lites_uk_rigging.source.json` for the Rigging workspace. Keep the existing cable datasets, manifest and `projects/` files in place.
 
 Include `projects/README.md` and the vendor project JSON files you intend to make available in the generator, including `projects/siyan_ltd.lampy-project.json` for Siyan LTD. Keep their exact generated filenames. Hosted projects are readable by site visitors; keep private backups locally. These generator project files do not belong in Lampy’s cable-stock manifest.
 
