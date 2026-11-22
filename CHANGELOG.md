@@ -1,5 +1,24 @@
 # Changelog
 
+## v2.0.2 — 2026-11-22 (approved for deployment)
+
+Previous app version: v2.0.1. Christie source dataset: v0.2.0 → v0.3.0.
+
+- Add sourced dual-unit body/component measurements for the A-Type lifting bracket, LibraCELL, Broadweigh BW-S325 and E-Type lifting bracket, plus the engineering report's F-Type end-gate width/depth and TBM TS3P-20S labelled drawing parameters. Keep the motor body-only weight separate from its rental configuration weight. Preserve IDs, stock weights and all existing user projects/backups. Synchronise Rigging reference types.
+- Record an item-by-item missing-specification audit and visually reviewed B-Type corner/end-plate load-condition research. The load sheet supplies no physical end-plate dimensions; no calculation feature added.
+- Add pin-to-pin lengths for all seven B-Type link-bar and five F-Type brace variants, preserve the source inch declarations, and retain separate B/F angle mappings. Do not treat pin-centre distances as overall dimensions.
+- Keep manufacturer weight differences separate from Christie rental weights. Flag the F-Type end-gate conflict between its non-load-bearing product description and the linked report's specific load cases; remove the unrelated brace-weight note. Do not treat component measurements as complete assembly envelopes or clear review flags.
+- Files to upload when approved: `js/version.js`, `reference/rigging/christie_lites_uk_rigging.source.json`, `reference/rigging/christie_lites_load_tables.research.json`, `data/rigging_types.json`, `tests/rigging.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`.
+- New/deleted project files: none. Temporary drawing PDFs, renders, test log and preservation-hash scratch file removed after verification.
+- Tests passed: 295 automated tests, including component scope, reference parity, retained source weights and complete JSON/Excel round trips; all project JSON parses; project and backup file hashes unchanged. Bracket drawings visually inspected. Approved local browser checks passed 81-item loading, 81 retained warnings, dual-unit specification display, a 112 kg edit/save and conversion to 246.917733647 lb, and JSON download preserving the edit, source dimensions and all review flags. Deployment/live verification pending.
+- Known issues: the 9-foot GAC FLEX and 36-inch fixture-ladder rung lack confirmed variant weights. 24 items still lack published dimensions in reviewed sources. Other dimensions remain partial or model-dependent; manufacturer/rental weights and load guidance conflicts require confirmation. Full specification completion is not claimed. Lampy Paperwork unchanged.
+
+## Christie specification follow-up — 2026-11-22 (local research only)
+
+- Recorded sourced metric/imperial measurements for the A-Type lifting bracket, LibraCELL components and Broadweigh BW-S325, with model/generation and weight conflicts retained. Visually checked bracket and Broadweigh drawings. These findings are staged research, not runtime stock changes.
+- Updated `reference/rigging/christie_lites_load_tables.research.json`, `UPDATES.md` and `CHANGELOG.md`. No new project files. App remains v2.0.1; no further upload or deployment. User stock/backups unchanged.
+- Validation: research JSON parses; dimension conversions checked. Browser tests not run for this research-only follow-up. Temporary downloaded PDFs and renders removed after recording findings and source identity.
+
 ## v2.0.1 — 2026-11-22
 
 Previous app version: v2.0.0. Christie source dataset: v0.1.0 → v0.2.0. Published to Ai-Lampy/Cable-Stocker and deployed successfully by GitHub Pages. Release commit: b493a6c208ffd4fde965f9af5f7f3e851691b521. Pages run: 45004624518. Live App v2.0.1 verified at https://ailampy.com/cable/.

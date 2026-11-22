@@ -610,7 +610,7 @@
     },
     {
       "url": "https://www.christielites.com/file_uploads/Christie%20Lites%20A%20Type%20Truss%20-%20System_Analysis%20CONDENSED%20REV%201.pdf",
-      "label": "12\" Truss Report UK/EU",
+      "label": "12\" Truss Report\u00a0UK/EU",
       "products": [
         "413",
         "414",
@@ -1277,7 +1277,7 @@
     },
     {
       "url": "https://www.christielites.com/file_uploads/BW-S475-S325-Product-Sheet.pdf",
-      "label": "Broadweigh Load Cell Datasheet",
+      "label": "Broadweigh Load Cell\u00a0Datasheet",
       "products": [
         "1159"
       ],
@@ -1374,5 +1374,893 @@
       "pages": 4,
       "sha256": "2a6d27d8924853b99bb884ea773782151b70331d6c79e95cc78d6e5e9b82d82b"
     }
-  ]
+  ],
+  "equipmentFollowup": {
+    "date": "2026-11-22",
+    "status": "Measurements merged into local source dataset v0.3.0 and matching Rigging reference types. Not deployed. Model/generation and source conflicts remain flagged.",
+    "findings": [
+      {
+        "sourceProductId": "368",
+        "name": "A Type lifting bracket",
+        "sourceUrl": "https://www.christielites.com/file_uploads/spec_574_12-inch-mega-truss-pick-1-ton-34.pdf",
+        "page": 1,
+        "verification": "Rendered page visually inspected",
+        "measurements": {
+          "publishedLength": {
+            "value": 339.725,
+            "unit": "mm",
+            "imperial": {
+              "value": 13.375,
+              "unit": "in"
+            }
+          },
+          "publishedHeight": {
+            "value": 152.4,
+            "unit": "mm",
+            "imperial": {
+              "value": 6.0,
+              "unit": "in"
+            }
+          },
+          "publishedThickness": {
+            "value": 25.4,
+            "unit": "mm",
+            "imperial": {
+              "value": 1.0,
+              "unit": "in"
+            }
+          }
+        },
+        "basis": "Published Mega Truss Pick body dimensions, not an independently verified envelope including projecting hardware.",
+        "review": [
+          "Datasheet weight table states 4.15 lb; prose says less than 4 lb. Christie lists 3.9 lb. Keep declarations separate.",
+          "Single-hole and multi-hole models differ. Confirm stocked order code before applying hole dimensions.",
+          "Published ton load rating has configuration conditions and unspecified ton convention; do not use as a generic calculated capacity."
+        ]
+      },
+      {
+        "sourceProductId": "1053",
+        "name": "LibraCELL",
+        "sourceUrl": "https://support.taittowers.com/s/article/5596939001883-kinesys-libra-cell-spec-sheet",
+        "sourceIssueDate": "2024-12-17",
+        "verification": "Manufacturer specifications indexed by search; direct page returns CSS error.",
+        "variants": [
+          {
+            "ratedLoadTonnes": 3.25,
+            "shackleHeightMax": {
+              "value": 106,
+              "unit": "mm",
+              "imperial": {
+                "value": 4.17322835,
+                "unit": "in"
+              }
+            },
+            "shackleWidthMax": {
+              "value": 74.5,
+              "unit": "mm",
+              "imperial": {
+                "value": 2.93307087,
+                "unit": "in"
+              }
+            },
+            "shackleThickness": {
+              "value": 17.5,
+              "unit": "mm",
+              "imperial": {
+                "value": 0.68897638,
+                "unit": "in"
+              }
+            },
+            "manufacturerWeight": {
+              "value": 1,
+              "unit": "kg",
+              "imperial": {
+                "value": 2.20462262,
+                "unit": "lb"
+              }
+            }
+          },
+          {
+            "ratedLoadTonnes": 4.75,
+            "shackleHeightMax": {
+              "value": 126,
+              "unit": "mm",
+              "imperial": {
+                "value": 4.96062992,
+                "unit": "in"
+              }
+            },
+            "shackleWidthMax": {
+              "value": 89,
+              "unit": "mm",
+              "imperial": {
+                "value": 3.50393701,
+                "unit": "in"
+              }
+            },
+            "shackleThickness": {
+              "value": 20.6,
+              "unit": "mm",
+              "imperial": {
+                "value": 0.81102362,
+                "unit": "in"
+              }
+            },
+            "manufacturerWeight": {
+              "value": 1.5,
+              "unit": "kg",
+              "imperial": {
+                "value": 3.30693393,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "electronicsCase": {
+          "length": {
+            "value": 92.5,
+            "unit": "mm",
+            "imperial": {
+              "value": 3.64173228,
+              "unit": "in"
+            }
+          },
+          "width": {
+            "value": 38.5,
+            "unit": "mm",
+            "imperial": {
+              "value": 1.51574803,
+              "unit": "in"
+            }
+          },
+          "height": {
+            "value": 27,
+            "unit": "mm",
+            "imperial": {
+              "value": 1.06299213,
+              "unit": "in"
+            }
+          }
+        },
+        "review": [
+          "Shackle and electronics case measurements are separate component dimensions, not a combined assembly envelope.",
+          "Manufacturer weights differ from Christie 2 lb / 3.2 lb declarations. Do not overwrite rental-stock weights."
+        ]
+      },
+      {
+        "sourceProductId": "1159",
+        "name": "Broadweigh BW-S325",
+        "sourceUrl": "https://www.broadweigh.com/wp-admin/admin-ajax.php?action=wpfd&juwpfisadmin=false&preview=1&task=file.download&token=&wpfd_category_id=90&wpfd_file_id=16870",
+        "sourceProductUrl": "https://www.broadweigh.com/product/wireless-load-cell-shackles/",
+        "manualVersionListed": "03.14",
+        "printedPage": 50,
+        "pdfPage": 51,
+        "sha256": "fb5349b32752cf5087b0c921095d3e04878388df00e9b8813a6820a734cc7678",
+        "verification": "Current product-page manual downloaded; dimension drawing visually inspected.",
+        "measurements": {
+          "axialExtent": {
+            "value": 116,
+            "unit": "mm",
+            "imperial": {
+              "value": 4.56692913,
+              "unit": "in"
+            }
+          },
+          "bowHeight": {
+            "value": 106,
+            "unit": "mm",
+            "imperial": {
+              "value": 4.17322835,
+              "unit": "in"
+            }
+          },
+          "bowWidth": {
+            "value": 74.4,
+            "unit": "mm",
+            "imperial": {
+              "value": 2.92913386,
+              "unit": "in"
+            }
+          },
+          "electronicsCaseHeight": {
+            "value": 80,
+            "unit": "mm",
+            "imperial": {
+              "value": 3.1496063,
+              "unit": "in"
+            }
+          },
+          "electronicsCaseWidth": {
+            "value": 62,
+            "unit": "mm",
+            "imperial": {
+              "value": 2.44094488,
+              "unit": "in"
+            }
+          },
+          "jawOpening": {
+            "value": 43,
+            "unit": "mm",
+            "imperial": {
+              "value": 1.69291339,
+              "unit": "in"
+            }
+          }
+        },
+        "basis": "Nominal dimension lines on BW-S325 drawing. Bow height excludes lower projecting parts; do not label as full assembly height.",
+        "review": [
+          "Earlier manual drawings differ (114 mm axial extent, 74.6 mm bow width, 77 by 59 mm enclosure). Use the correct generation.",
+          "Confirm Christie stock matches current Generation 3 drawing before applying."
+        ]
+      },
+      {
+        "sourceProductId": "472",
+        "sourceUrl": "https://www.christielites.com/file_uploads/22_915_04%20-%20Type%20F%20End%20Gate%20Christie%20Lites%20r00-2022_09_08.pdf",
+        "verification": "E bracket component drawings visually inspected; F gate measurements stated in engineering cover letter.",
+        "measurements": {
+          "reportedWidth": {
+            "value": 0.6096,
+            "unit": "m",
+            "imperial": {
+              "value": 2.0,
+              "unit": "ft"
+            },
+            "sourceValue": 24,
+            "sourceUnit": "in",
+            "basis": "Engineering report cover letter describes gate width/depth; full hardware envelope not stated.",
+            "sourceUrl": "https://www.christielites.com/file_uploads/22_915_04%20-%20Type%20F%20End%20Gate%20Christie%20Lites%20r00-2022_09_08.pdf"
+          },
+          "reportedDepth": {
+            "value": 0.3556,
+            "unit": "m",
+            "imperial": {
+              "value": 1.166666667,
+              "unit": "ft"
+            },
+            "sourceValue": 14,
+            "sourceUnit": "in",
+            "basis": "Engineering report cover letter describes gate width/depth; full hardware envelope not stated.",
+            "sourceUrl": "https://www.christielites.com/file_uploads/22_915_04%20-%20Type%20F%20End%20Gate%20Christie%20Lites%20r00-2022_09_08.pdf"
+          }
+        },
+        "review": [
+          "Source conflict: product page calls the gate non-load-bearing; linked 2022 engineering report studies separate top/bottom point-load cases. Do not infer general load permission from this report.",
+          "Published 17.5 lb weight includes all required pins."
+        ]
+      },
+      {
+        "sourceProductId": "1097",
+        "sourceUrl": "https://www.christielites.com/file_uploads/ELB-01%20DWG%20PKG%20V0.pdf",
+        "verification": "E bracket component drawings visually inspected; F gate measurements stated in engineering cover letter.",
+        "measurements": {
+          "topPartLength": {
+            "value": 0.60325,
+            "unit": "m",
+            "imperial": {
+              "value": 1.979166667,
+              "unit": "ft"
+            },
+            "sourceValue": 23.75,
+            "sourceUnit": "in",
+            "basis": "ELB-02 / ELB-03 component drawings, PDF pages 2 / 3; not assembled bracket envelope.",
+            "sourceUrl": "https://www.christielites.com/file_uploads/ELB-01%20DWG%20PKG%20V0.pdf"
+          },
+          "topPartHeight": {
+            "value": 0.08128,
+            "unit": "m",
+            "imperial": {
+              "value": 0.266666667,
+              "unit": "ft"
+            },
+            "sourceValue": 3.2,
+            "sourceUnit": "in",
+            "basis": "ELB-02 / ELB-03 component drawings, PDF pages 2 / 3; not assembled bracket envelope.",
+            "sourceUrl": "https://www.christielites.com/file_uploads/ELB-01%20DWG%20PKG%20V0.pdf"
+          },
+          "topPartThickness": {
+            "value": 0.0254,
+            "unit": "m",
+            "imperial": {
+              "value": 0.083333333,
+              "unit": "ft"
+            },
+            "sourceValue": 1,
+            "sourceUnit": "in",
+            "basis": "ELB-02 / ELB-03 component drawings, PDF pages 2 / 3; not assembled bracket envelope.",
+            "sourceUrl": "https://www.christielites.com/file_uploads/ELB-01%20DWG%20PKG%20V0.pdf"
+          },
+          "bottomPartLength": {
+            "value": 0.591312,
+            "unit": "m",
+            "imperial": {
+              "value": 1.94,
+              "unit": "ft"
+            },
+            "sourceValue": 23.28,
+            "sourceUnit": "in",
+            "basis": "ELB-02 / ELB-03 component drawings, PDF pages 2 / 3; not assembled bracket envelope.",
+            "sourceUrl": "https://www.christielites.com/file_uploads/ELB-01%20DWG%20PKG%20V0.pdf"
+          },
+          "bottomPartHeight": {
+            "value": 0.16383,
+            "unit": "m",
+            "imperial": {
+              "value": 0.5375,
+              "unit": "ft"
+            },
+            "sourceValue": 6.45,
+            "sourceUnit": "in",
+            "basis": "ELB-02 / ELB-03 component drawings, PDF pages 2 / 3; not assembled bracket envelope.",
+            "sourceUrl": "https://www.christielites.com/file_uploads/ELB-01%20DWG%20PKG%20V0.pdf"
+          },
+          "bottomPartThickness": {
+            "value": 0.0254,
+            "unit": "m",
+            "imperial": {
+              "value": 0.083333333,
+              "unit": "ft"
+            },
+            "sourceValue": 1,
+            "sourceUnit": "in",
+            "basis": "ELB-02 / ELB-03 component drawings, PDF pages 2 / 3; not assembled bracket envelope.",
+            "sourceUrl": "https://www.christielites.com/file_uploads/ELB-01%20DWG%20PKG%20V0.pdf"
+          }
+        },
+        "review": [
+          "Nominal compatible truss size is not the bracket envelope. Confirm bracket model, orientation and assembly-specific rating.",
+          "Source lists 22 lb for top/bottom bracket; whether per component or set is unresolved.",
+          "Drawing component dimensions exclude assembly hardware; do not label them as overall assembled dimensions.",
+          "Drawing weights are 4.684 lb top and 6.598 lb bottom, excluding other assembly parts; retain Christie 22 lb declaration."
+        ]
+      },
+      {
+        "sourceProductId": "1200",
+        "sourceUrl": "https://www.tbmhoist.com/static/upload/image/20250222/2025022285872533.png",
+        "manufacturerPage": "https://www.tbmhoist.com/stage-hoist/708.html",
+        "linkedFrom": "https://www.christielites.com/2-tonne-d8--motor-80-lift/230w4w35w126w1200",
+        "model": "TS3P-20S",
+        "verification": "Both manufacturer product/specification images visually inspected. Public manufacturer page succeeded via curl after web-reader errors.",
+        "sha256": "1e4618782edc16647ff9374c6945c1f745cb06f9402c5d8df273b56a887e1e9d",
+        "drawingDimensionsMm": {
+          "Hmin": 410,
+          "A": 239,
+          "B": 266,
+          "C": 169,
+          "D": 166,
+          "E": 150,
+          "F": 44,
+          "G": 78,
+          "K": 39
+        },
+        "bodyWeightKg": 50,
+        "review": [
+          "Christie links the TBM TS D8 Plus family. Measurements above are the TS3P-20S 2000 kg single-fall row, not a measured rental assembly; confirm the stocked model and options.",
+          "Manufacturer chart is for 380\u2013415 V / 50 Hz / 3-phase standard motor. Standard manufacturer lift is 25 m; Christie lists 80 ft (26 m). These declarations are not equivalent.",
+          "Diagram dimensions retain manufacturer letter labels; chain bag and suspended chain change the complete envelope. Original Christie motor/chain/bag weight is retained."
+        ]
+      },
+      {
+        "sourceProductIds": [
+          "437",
+          "471"
+        ],
+        "sourceUrl": "https://www.christielites.com/file_uploads/Truss%20Spacers%20v3.pdf",
+        "verification": "Single-page table visually inspected; printed V2 revised 06-Mar-2024 despite filename v3.",
+        "measurements": [
+          {
+            "bTypeAngleDeg": 7.5,
+            "fTypeAngleDeg": 4.77,
+            "pinToPinMm": 46,
+            "sourcePinToPinInches": 1.83,
+            "equipmentCode": "TRUBA-07"
+          },
+          {
+            "bTypeAngleDeg": 15,
+            "fTypeAngleDeg": 9.52,
+            "pinToPinMm": 92,
+            "sourcePinToPinInches": 3.65,
+            "equipmentCode": "TRUBA-15"
+          },
+          {
+            "bTypeAngleDeg": 22.5,
+            "fTypeAngleDeg": 14.26,
+            "pinToPinMm": 138,
+            "sourcePinToPinInches": 5.46,
+            "equipmentCode": "TRUBA-22"
+          },
+          {
+            "bTypeAngleDeg": 30,
+            "fTypeAngleDeg": 18.97,
+            "pinToPinMm": 184,
+            "sourcePinToPinInches": 7.25,
+            "equipmentCode": "TRUBA-30"
+          },
+          {
+            "bTypeAngleDeg": 36,
+            "fTypeAngleDeg": 22.5,
+            "pinToPinMm": 218,
+            "sourcePinToPinInches": 8.58,
+            "equipmentCode": "TRUFA-22"
+          },
+          {
+            "bTypeAngleDeg": 45,
+            "fTypeAngleDeg": 28.2,
+            "pinToPinMm": 272,
+            "sourcePinToPinInches": 10.72,
+            "equipmentCode": "TRUBA-45"
+          },
+          {
+            "bTypeAngleDeg": 48,
+            "fTypeAngleDeg": 30,
+            "pinToPinMm": 289,
+            "sourcePinToPinInches": 11.39,
+            "equipmentCode": "TRUFA-30"
+          },
+          {
+            "bTypeAngleDeg": 60,
+            "fTypeAngleDeg": 37.1,
+            "pinToPinMm": 356,
+            "sourcePinToPinInches": 14,
+            "equipmentCode": "TRUBA-60"
+          },
+          {
+            "bTypeAngleDeg": 84,
+            "fTypeAngleDeg": 45,
+            "pinToPinMm": 428,
+            "sourcePinToPinInches": 16.84,
+            "equipmentCode": "TRUFA-45"
+          },
+          {
+            "bTypeAngleDeg": 90,
+            "fTypeAngleDeg": 53.49,
+            "pinToPinMm": 503,
+            "sourcePinToPinInches": 19.8,
+            "equipmentCode": "TRUBA-90"
+          },
+          {
+            "bTypeAngleDeg": null,
+            "fTypeAngleDeg": 60,
+            "pinToPinMm": 559,
+            "sourcePinToPinInches": 22,
+            "equipmentCode": "TRUFA-60"
+          },
+          {
+            "bTypeAngleDeg": null,
+            "fTypeAngleDeg": 90,
+            "pinToPinMm": 790,
+            "sourcePinToPinInches": 31.11,
+            "equipmentCode": "TRUFA-90"
+          }
+        ],
+        "limitations": [
+          "Pin-centre distances only; complete envelope missing.",
+          "Published unit pairs are not exact conversions; preserve source declarations.",
+          "F-Type angles require end gates and relate to lateral positioning.",
+          "Current spacer sheet says not load-bearing; historical load tables do not override its restriction without vendor/engineering resolution."
+        ],
+        "cadArchiveReview": {
+          "url": "https://www.christielites.com/file_uploads/cad_365_Cad_Files_All_Link_Bars.zip",
+          "result": "Seven DWG files, no dimensioned PDF. CAD geometry not measured; no inferred dimensions."
+        }
+      }
+    ],
+    "unresolvedLeads": [
+      {
+        "sourceProductId": "1086",
+        "reason": "CM Prostar sheet describes double brakes, Christie listing single brake. A/B/C dimensions are clearances rather than generic envelope dimensions. Confirm model/generation.",
+        "sourceUrl": "https://www.christielites.com/file_uploads/spec_626_CM-ET%20ProStar%20Product%20Sheet-ET-PS-0114v5.pdf"
+      },
+      {
+        "sourceProductId": "1051",
+        "reason": "Array PD-ES official page describes 6U 19-inch mounting, not full physical envelope. Detailed downloads require contact details. Do not infer depth or substitute new 2026 generation.",
+        "sourceUrl": "https://kinesys.com/product/array_pd-es/"
+      },
+      {
+        "sourceProductId": "1122",
+        "reason": "City Theatrical 210 and 210M differ in tubing/load declaration; do not substitute model 210M dimensions or ratings for Christie 210.",
+        "sourceUrl": "https://www.citytheatrical.com/docs/default-source/Cut-Sheets/210"
+      }
+    ]
+  },
+  "remainingSpecificationAudit": {
+    "date": "2026-11-22",
+    "catalogueVersion": "v0.3.0",
+    "appVersion": "v2.0.2",
+    "summary": {
+      "parentItems": 81,
+      "noPublishedDimensions": 24,
+      "partialDimensions": 57,
+      "unconfirmedVariantWeights": 2
+    },
+    "completionStatus": "Incomplete. Partial dimensions do not prove full assembled envelopes. Exact rental models/configurations and remaining physical dimensions require additional evidence.",
+    "items": [
+      {
+        "sourceProductId": "421",
+        "name": "A Type (12\") Corner 45 Deg",
+        "sourceUrl": "https://www.christielites.com/a-type-12inch-corner-45-deg/230w4w34w119w421",
+        "availableDocuments": [
+          {
+            "url": "https://www.christielites.com/file_uploads/Spec_288_Load Table - Corner Blocks - CL.pdf",
+            "label": "Load Table-Corner Blocks"
+          },
+          {
+            "url": "https://www.christielites.com/file_uploads/Christie Lites A Type Truss - System_Analysis CONDENSED REV 1.pdf",
+            "label": "12\" Truss Report\u00a0UK/EU"
+          }
+        ],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "424",
+        "name": "A Type (12\") Plate Hinge",
+        "sourceUrl": "https://www.christielites.com/a-type-12inch-plate-hinge/230w4w34w119w424",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "444",
+        "name": "B Type (16\") Blk End/Face Plate",
+        "sourceUrl": "https://www.christielites.com/b-type-16-blk-end-face-plate/230w4w34w120w444",
+        "availableDocuments": [
+          {
+            "url": "https://www.christielites.com/file_uploads/spec3_298_16 inch truss corner blocks.pdf",
+            "label": "16\" Corner Block & End/Face plate Load Data"
+          }
+        ],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1173",
+        "name": "1 Tonne Liftket D8 Double Break Motor 60' Lift",
+        "sourceUrl": "https://www.christielites.com/1-tonne-liftket-d8-double-break-motor-60-lift/230w4w35w126w1173",
+        "availableDocuments": [
+          {
+            "url": "https://www.christielites.com/file_uploads/spec_629_Tour_Rig_Ratings.pdf",
+            "label": "Datasheet"
+          },
+          {
+            "url": "https://www.christielites.com/file_uploads/manual_629_Christie_Lites_Motor_Pinout.pdf",
+            "label": "Christie Lites Motor Pinout"
+          }
+        ],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Weight includes motor, chain and chain bag. Exact model and chain configuration need confirmation before using manufacturer envelope dimensions.",
+          "Power/control connection listed as Socapex 7; pickle uses XLR-4.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1174",
+        "name": "1 Tonne Liftket D8 Double Break Motor 125' Lift",
+        "sourceUrl": "https://www.christielites.com/1-tonne-liftket-d8-double-break-motor-125-lift/230w4w35w126w1174",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Weight includes motor, chain and chain bag. Exact model and chain configuration need confirmation before using manufacturer envelope dimensions.",
+          "Power/control connection listed as Socapex 7; pickle uses XLR-4.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1165",
+        "name": "1 Tonne Liftket D8+ Double Break Motor 80' Lift",
+        "sourceUrl": "https://www.christielites.com/1-tonne-liftket-d8--double-break-motor-80-lift/230w4w35w126w1165",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Weight includes motor, chain and chain bag. Exact model and chain configuration need confirmation before using manufacturer envelope dimensions.",
+          "Source conflict: product title specifies 80 ft (24.384 m), body says 26 m. Catalogue retains title length pending vendor confirmation.",
+          "Power/control connection listed as Socapex 7; pickle uses XLR-4.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1175",
+        "name": "1/2 Tonne Liftket D8 Double Break Motor 60' Lift",
+        "sourceUrl": "https://www.christielites.com/1-2-tonne-liftket-d8-double-break-motor-60-lift/230w4w35w126w1175",
+        "availableDocuments": [
+          {
+            "url": "https://www.christielites.com/file_uploads/manual_709_Christie_Lites_Motor_Pinout.pdf",
+            "label": "Christie Lites Motor Pinout"
+          }
+        ],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Weight includes motor, chain and chain bag. Exact model and chain configuration need confirmation before using manufacturer envelope dimensions.",
+          "Power/control connection listed as Socapex 7; pickle uses XLR-4.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1166",
+        "name": "1/2 Tonne Liftket D8+ Double Break Motor 80' Lift",
+        "sourceUrl": "https://www.christielites.com/1-2-tonne-liftket-d8--double-break-motor-80-lift/230w4w35w126w1166",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Weight includes motor, chain and chain bag. Exact model and chain configuration need confirmation before using manufacturer envelope dimensions.",
+          "Source conflict: product title specifies 80 ft (24.384 m), body says 26 m. Catalogue retains title length pending vendor confirmation.",
+          "Power/control connection listed as Socapex 7; pickle uses XLR-4.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1086",
+        "name": "226kg CM Single Brake Motor 60' lift",
+        "sourceUrl": "https://www.christielites.com/226kg-cm-single-brake-motor-60-lift/230w4w35w126w1086",
+        "availableDocuments": [
+          {
+            "url": "https://www.christielites.com/file_uploads/spec_626_CM-ET%20ProStar%20Product%20Sheet-ET-PS-0114v5.pdf",
+            "label": "Datasheet"
+          },
+          {
+            "url": "https://www.christielites.com/file_uploads/manual_626_ProStar%20Maintinence%20Manual.pdf",
+            "label": "Manual"
+          },
+          {
+            "url": "https://www.christielites.com/file_uploads/manual2_626_Christie_Lites_Motor_Pinout.pdf",
+            "label": "Christie Lites Motor Pinout"
+          }
+        ],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Weight includes motor, chain and chain bag. Exact model and chain configuration need confirmation before using manufacturer envelope dimensions.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1061",
+        "name": "1 Tonne Liftket Kinesys Motor 80' Lift",
+        "sourceUrl": "https://www.christielites.com/1-tonne-liftket-kinesys-motor-80-lift/230w4w35w126w1061",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Weight includes motor, chain and chain bag. Exact model and chain configuration need confirmation before using manufacturer envelope dimensions.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1050",
+        "name": "1/2 Metric Ton Liftket Kinesys D8 Motor 80' Lift",
+        "sourceUrl": "https://www.christielites.com/1-2-metric-ton-liftket-kinesys-d8-motor-80-lift/230w4w35w126w1050",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Weight includes motor, chain and chain bag. Exact model and chain configuration need confirmation before using manufacturer envelope dimensions.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1051",
+        "name": "Motor Distro Array PD-ES",
+        "sourceUrl": "https://www.christielites.com/motor-distro-array-pd-es/230w4w35w126w1051",
+        "availableDocuments": [
+          {
+            "url": "https://www.christielites.com/file_uploads/Setting-The-IP-Address-for-an-Array-PD-ES.pdf",
+            "label": "Setting IP address for Array PD-ES"
+          },
+          {
+            "url": "https://www.christielites.com/file_uploads/Kinesys-Rigger-Technical-Specification.pdf",
+            "label": "Rigger Remote Data Sheet"
+          },
+          {
+            "url": "https://www.christielites.com/file_uploads/Rigger-Manual.pdf",
+            "label": "Rigger Remote Manual"
+          }
+        ],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "232",
+        "name": "Double Dance Tower Base-Top",
+        "sourceUrl": "https://www.christielites.com/double-dance-tower-base-top-/230w4w35w129w232",
+        "availableDocuments": [
+          {
+            "url": "https://www.christielites.com/file_uploads/GRODT-D4.dwg",
+            "label": "CAD Drawing 3-D"
+          }
+        ],
+        "requiredEvidence": "Dimensioned drawing or correctly scaled/unit-defined CAD geometry with assembly configuration confirmed.",
+        "reviewNotes": [
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "247",
+        "name": "Sandbag",
+        "sourceUrl": "https://www.christielites.com/sandbag/230w4w35w129w247",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "367",
+        "name": "Beam Clamp 2 Ton",
+        "sourceUrl": "https://www.christielites.com/beam-clamp-2-ton/230w4w35w127w367",
+        "availableDocuments": [
+          {
+            "url": "https://www.christielites.com/file_uploads/BeamClamp.pdf",
+            "label": "Datasheet"
+          }
+        ],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Christie lists 3\u20139-inch flange fit and 10.5 lb. Linked CM table has different fit/weights; exact model is unresolved. Do not select a load rating from the generic table.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "363",
+        "name": "Cheeseborough 90 Degree Fixed",
+        "sourceUrl": "https://www.christielites.com/cheeseborough-90-degree-fixed/230w4w35w127w363",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Fits 2-inch pipe; nominal pipe compatibility is not the product envelope.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "362",
+        "name": "Cheeseborough Swivel",
+        "sourceUrl": "https://www.christielites.com/cheeseborough-swivel/230w4w35w127w362",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Fits 2-inch pipe; nominal pipe compatibility is not the product envelope.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "364",
+        "name": "Cheeseborough 1/2 to Eyebolt",
+        "sourceUrl": "https://www.christielites.com/cheeseborough-1-2-to-eyebolt/230w4w35w127w364",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Fits 2-inch pipe; nominal pipe compatibility is not the product envelope.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "360",
+        "name": "Taildown Attachment CL Style",
+        "sourceUrl": "https://www.christielites.com/taildown-attachment-cl-style/230w4w35w127w360",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1122",
+        "name": "Steel Safer Sidearm",
+        "sourceUrl": "https://www.christielites.com/steel-safer-sidearm/230w4w35w127w1122",
+        "availableDocuments": [
+          {
+            "url": "https://www.christielites.com/file_uploads/210.pdf",
+            "label": "Steel Safer Sidearm Datasheet"
+          }
+        ],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Bare side-arm is 4.5 lb; optional 3 ft pipe weighs 7.5 lb separately. Published 200 lb limit applies to maximum 3 ft arm configuration, not arbitrary assemblies.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "369",
+        "name": "Lifting Bracket B Type (16\") Truss",
+        "sourceUrl": "https://www.christielites.com/lifting-bracket-b-type-16-truss/230w4w35w127w369",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Nominal compatible truss size is not the bracket envelope. Confirm bracket model, orientation and assembly-specific rating.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "371",
+        "name": "Lifting Bracket G Type (24\") & F Type (Track) Truss",
+        "sourceUrl": "https://www.christielites.com/lifting-bracket-g-type-24-and-f-type-track-truss/230w4w35w127w371",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Nominal compatible truss size is not the bracket envelope. Confirm bracket model, orientation and assembly-specific rating.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1158",
+        "name": "Lifting Bracket H Type (24\"x36\") Truss",
+        "sourceUrl": "https://www.christielites.com/lifting-bracket-h-type-24x36-truss/230w4w35w127w1158",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Nominal compatible truss size is not the bracket envelope. Confirm bracket model, orientation and assembly-specific rating.",
+          "Source lists 81 lb and 2 Ton. Weight and ton convention need vendor confirmation; no guessed decimal correction or kg capacity applied.",
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      },
+      {
+        "sourceProductId": "1066",
+        "name": "Fixture Replacement Bracket",
+        "sourceUrl": "https://www.christielites.com/fixture-replacement-bracket/230w4w35w127w1066",
+        "availableDocuments": [],
+        "requiredEvidence": "Exact manufacturer/model and dimensioned specification, or Christie-confirmed physical measurements for the stocked configuration.",
+        "reviewNotes": [
+          "Overall dimensions were not confirmed in the reviewed source material; no estimated dimensions supplied."
+        ]
+      }
+    ],
+    "missingVariantWeights": [
+      {
+        "sourceProductId": "340",
+        "name": "GAC FLEX",
+        "variant": "9 ft (weight unconfirmed)",
+        "sourceUrl": "https://www.christielites.com/gac-flex/230w4w35w127w340",
+        "requiredEvidence": "Vendor-confirmed weight for this exact configuration; do not derive from neighbouring lengths or components."
+      },
+      {
+        "sourceProductId": "974",
+        "name": "Fixture Ladder",
+        "variant": "36-inch rung (weight unconfirmed)",
+        "sourceUrl": "https://www.christielites.com/fixture-ladder/230w4w35w127w974",
+        "requiredEvidence": "Vendor-confirmed weight for this exact configuration; do not derive from neighbouring lengths or components."
+      }
+    ]
+  },
+  "cornerConnectionStudy": {
+    "sourceUrl": "https://www.christielites.com/file_uploads/spec3_298_16%20inch%20truss%20corner%20blocks.pdf",
+    "verification": "Single-page source visually inspected; not a dimension drawing.",
+    "scope": "B-Type 16-inch corner block with or without end plate; research only, no calculator or load approval.",
+    "conditions": [
+      {
+        "support": "directly at corner block",
+        "connections": "any number of truss sections",
+        "basis": "Applicable span-table capacity without the corner reduction described by this sheet."
+      },
+      {
+        "support": "offset from corner block",
+        "connections": "one or two horizontal sections",
+        "straightSpanFactor": 0.5,
+        "curvedSpanFactor": 1
+      },
+      {
+        "support": "offset from corner block",
+        "connections": "three or four horizontal sections",
+        "straightSpanFactor": 0.25,
+        "curvedSpanFactor": 0.5
+      }
+    ],
+    "maximumCornerDistanceFromSupport": {
+      "value": 2.4384,
+      "unit": "m",
+      "imperial": {
+        "value": 8,
+        "unit": "ft"
+      }
+    },
+    "limitations": [
+      "No dimensions for the end plate are specified.",
+      "Supporting structure/bracing capacity is excluded.",
+      "Support ends are assumed to provide no fixity or moment resistance.",
+      "Apply only after confirming exact product/report identity and obtaining appropriate engineering review; do not combine this with unrelated truss reports."
+    ]
+  }
 }

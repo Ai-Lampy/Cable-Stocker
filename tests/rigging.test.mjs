@@ -36,3 +36,47 @@ test('previous Rigging workbook headings still import without losing data',()=>{
 
 test('metric and imperial editing agree and never leave stale converted values',()=>{const row={properties:{weight:{value:1,unit:'kg',sourceValue:5,sourceUnit:'lb',imperial:{value:999,unit:'lb'}}}};R.setRiggingDisplayCell(row,'weight',10,'imperial');assert.equal(row.properties.weight.value,4.5359237);assert.equal(row.properties.weight.imperial.value,10);assert.equal(row.properties.weight.sourceValue,5);assert.equal(R.riggingDisplayCell(row,'weight','imperial'),10);R.setRiggingDisplayCell(row,'length',8,'imperial');assert.equal(row.properties.length.value,2.4384);assert.equal(R.riggingDisplayLabel('length','imperial'),'Length (ft)');R.setRiggingCell(row,'length',3);assert.equal(row.properties.length.imperial.value,R.imperialMeasure(3,'m').value);R.setRiggingDisplayCell(row,'length','','imperial');assert.equal(R.riggingDisplayCell(row,'length','imperial'),'');});
 test('expanded catalogue preserves variants, source conflicts and dual units through Excel',()=>{const p=R.createRigging(source);p.displayUnits='imperial';assert.deepEqual(roundtrip(p),p);const rows=Object.values(source.categories).flat();assert.equal(new Set(rows.map(r=>r.sourceProductId)).size,81);for(const row of rows){assert(row.kind);assert(row.specificationStatus);assert(row.sourceUrl.startsWith('https://www.christielites.com/'));for(const props of [row.properties,...(row.variants||[]).map(v=>v.properties)])for(const m of Object.values(props||{})){if(!['kg','m','deg'].includes(m.unit))continue;assert.deepEqual(m.imperial,R.imperialMeasure(m.value,m.unit));}}assert(rows.find(r=>r.sourceProductId==='1151').reviewNotes.some(n=>n.includes('conflict')));assert.equal(rows.find(r=>r.sourceProductId==='340').variants.find(v=>v.name.startsWith('9 ft')).properties.weight,undefined);});
+test('follow-up measurements preserve component scope, conflicting weights and reference parity',()=>{
+ const rows=Object.values(source.categories).flat(), find=id=>rows.find(r=>r.sourceProductId===id);
+ const types=JSON.parse(fs.readFileSync(new URL('../data/rigging_types.json',import.meta.url),'utf8')).items;
+ for(const id of ['368','1053','1159','472','1097']){
+  const row=find(id),reference=types.find(r=>r.id===row.id);
+  assert.deepEqual(reference.properties,row.properties);
+  assert.deepEqual(reference.reviewNotes,row.reviewNotes);
+  assert.equal(row.reviewRequired,true);
+  assert.equal(row.specificationStatus.dimensions,'partial');
+ }
+ assert.equal(find('368').properties.weight.sourceValue,3.9);
+ assert.equal(find('368').properties.bodyLength.value,0.339725);
+ assert.equal(find('1053').variants[0].properties.weight.sourceValue,2);
+ assert.equal(find('1053').variants[0].properties.shackleHeightMax.value,0.106);
+ assert.equal(find('1159').properties.axialExtent.value,0.116);
+ assert.equal(find('1159').properties.height,undefined);
+ assert(find('472').reviewNotes.some(n=>n.startsWith('Source conflict:')));
+ assert.equal(find('1097').properties.topPartLength.value,0.60325);
+ assert.equal(find('1097').properties.weight.sourceValue,22);
+ assert.deepEqual(roundtrip(R.createRigging(source)).catalogue,source);
+});
+test('TBM drawing dimensions and body weight do not overwrite rental motor measurements',()=>{
+ const row=source.categories.Motors.find(r=>r.sourceProductId==='1200');
+ assert.equal(row.properties.weight.sourceValue,245);
+ assert.equal(row.properties.manufacturerBodyWeight.value,50);
+ assert.equal(row.properties.manufacturerDrawingHmin.value,0.410);
+ assert.equal(row.properties.manufacturerDrawingA.value,0.239);
+ assert.equal(row.properties.length,undefined);
+ assert(row.reviewNotes.some(n=>n.includes('confirm the stocked model')));
+ assert.equal(row.reviewRequired,true);
+});
+test('link bars preserve pin-centre dimensions and distinct B/F angle declarations',()=>{
+ const rows=Object.values(source.categories).flat();
+ const b=rows.find(r=>r.sourceProductId==='437'), f=rows.find(r=>r.sourceProductId==='471');
+ assert.equal(b.variants.length,7);assert.equal(f.variants.length,5);
+ const b30=b.variants.find(v=>v.properties.angle.value===30),f30=f.variants.find(v=>v.properties.angle.value===30);
+ assert.equal(b30.properties.pinToPinLength.value,0.184);
+ assert.equal(f30.properties.pinToPinLength.value,0.289);
+ assert.equal(b30.trussAngleDeclarations['F Type'],18.97);
+ assert.equal(f30.trussAngleDeclarations['B Type'],48);
+ assert.equal(b30.properties.pinToPinLength.sourceImperialDeclaration.value,7.25);
+ for(const row of [b,f])for(const v of row.variants){assert.equal(v.properties.length,undefined);assert(v.equipmentCode);}
+ assert.deepEqual(roundtrip(R.createRigging(source)).catalogue,source);
+});

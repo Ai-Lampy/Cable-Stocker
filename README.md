@@ -2,7 +2,7 @@
 
 Static, local-first cable-stock and rigging catalogue editor. The application version has one source of truth: `js/version.js`. `BUILD_BRIEF.md` defines the original cable scope; Rigging is the user-authorised V2 extension.
 
-**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v2.0.1.
+**Live app:** [ailampy.com/cable](https://ailampy.com/cable/). **Project app version:** v2.0.2.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and test history, and [UPDATES.md](UPDATES.md) for pending work and maintenance rules.
 
