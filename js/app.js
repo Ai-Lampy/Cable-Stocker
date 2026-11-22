@@ -1,3 +1,5 @@
+import {vendorSelector as sharedVendorSelector} from './vendor-selector.js';
+import {VendorWorkspace} from './vendor-workspace.js';
 import {vendorProjectFilename,loadVendorProject} from './vendor-projects.js';
 import {watchUpdates, safeRefresh, freshDocumentURL} from './updates.js';
 import {APP_VERSION} from './version.js';
@@ -16,6 +18,7 @@ const KEYS={draft:'lampy-cable:draft:1',prefs:'lampy-cable:references:1'};
 const LOOMS='Stock / Pre-Made Looms';
 const REF_NAMES={categories:'Categories',cable_types:'Cable Types',connector_types:'Connectors',lighting_vendors:'Lighting Vendors',manifest:'Vendor Manifest',length_colours:'Length colour'};
 let colourPalette={},project=newProject(),refs={},referenceBaseline={},referenceExports={},publishedReferences={},dirty=false,refDirty=false,page='vendor',settingsTab='categories',cableTypesSheet=null,connectorTypesSheet=null,grid=null,history=[],future=[],copiedLengths=null,toastTimer,loaded=false,saveError='',saveBlocked=false,sessionIssues=[];
+let vendorWorkspace;
 let lastSavedDraft='',lastSavedRefs='',updateReload=false,importPending=false,vendorLoadSequence=0;
 const tableViews=new Map();
 const issueTimes=new Map();let issueSequence=0;
@@ -23,7 +26,7 @@ function notice(message,error=false){const t=$('#toast');t.textContent=message;t
 function capture(){return {project:clone(project),refs:clone(refs),dirty,refDirty};}
 function change(fn,{references=false,renderPage=true}={}){
   const before=capture();
-  try{fn();syncVendorManifest(refs);}catch(e){project=before.project;refs=before.refs;notice(e.message,true);throw e;}
+  try{vendorWorkspace?.archive('cable',project,dirty);fn();syncVendorManifest(refs);}catch(e){project=before.project;refs=before.refs;notice(e.message,true);throw e;}
   history.push(before);if(history.length>100)history.shift();future=[];dirty=references?dirty:true;refDirty=references?true:refDirty;save();renderShell();if(renderPage)render();
 }
 function undo(){if(!history.length)return;future.push(capture());const s=history.pop();({project,refs,dirty,refDirty}=s);save();renderAll();notice('Edit undone.');}
@@ -33,6 +36,7 @@ function save(){try{
   const existing=localStorage.getItem(KEYS.draft);
   if((lastSavedDraft&&existing!==lastSavedDraft)||(lastSavedRefs&&localStorage.getItem(KEYS.prefs)!==lastSavedRefs)){saveBlocked=true;saveError='Another tab changed this workspace. Download your backups, then reload.';notice(saveError,true);status();return;}
   refDirty=!same(refs,referenceExports);
+  vendorWorkspace?.save('cable',project,dirty);
   localStorage.setItem(KEYS.draft,JSON.stringify({project,dirty}));localStorage.setItem(KEYS.prefs,JSON.stringify({refs,refDirty,referenceExports,publishedReferences}));lastSavedDraft=localStorage.getItem(KEYS.draft);lastSavedRefs=localStorage.getItem(KEYS.prefs);saveError='';
 }catch(e){saveError='Autosave failed. Download a project backup now.';notice(saveError,true);}status();}
 function status(){$('#save-status').textContent=saveError||(!loaded?'Loading references…':dirty||refDirty?'Draft saved · unexported edits':'Draft saved locally');}
@@ -75,41 +79,8 @@ function openDialog(title,build,actions=[]){const dialog=$('#dialog');if(dialog.
 function confirmAction(title,message,onConfirm,label='Continue'){openDialog(title,b=>b.append(node('p',message)),[{label:'Cancel',run:d=>d.close()},{label,cls:'primary',run:d=>{d.close();onConfirm();}}]);}
 function requireSafe(message,fn){if(dirty)confirmAction('Protect your draft',message,fn);else fn();}
 function chosenFilename(name){const path=refs.manifest.catalogues.find(v=>v.vendor===name)?.file;return path?path.split('/').at(-1):'';}
-function vendorSelector(){
-  const host=node('div',null,'vendor-field'),label=node('label','Vendor name'),controls=node('div',null,'vendor-controls'),box=node('div',null,'vendor-input-wrap'),input=node('input'),measure=node('span',null,'vendor-input-measure'),list=node('div',null,'vendor-options');
-  input.id='vendor-name-input';input.type='text';input.value=project.stock.vendor.name;input.dataset.draftValue=input.value;input.autocomplete='off';
-  measure.setAttribute('aria-hidden','true');const fit=()=>{measure.textContent=input.value+'\u00a0';};fit();
-  label.htmlFor=input.id;input.setAttribute('role','combobox');input.setAttribute('aria-autocomplete','list');input.setAttribute('aria-controls','vendor-options');input.setAttribute('aria-expanded','false');
-  list.id='vendor-options';list.setAttribute('role','listbox');list.setAttribute('aria-label','Available vendors');list.hidden=true;
-  let active=-1,options=[];
-  const close=()=>{list.hidden=true;input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');active=-1;};
-  const restore=()=>{input.value=project.stock.vendor.name;input.dataset.draftValue=input.value;fit();};
-  const commit=name=>{close();restore();if(String(name).trim())selectVendorProject(name);};
-  const highlight=()=>{options.forEach((option,i)=>option.setAttribute('aria-selected',String(i===active)));if(active>=0){input.setAttribute('aria-activedescendant',options[active].id);options[active].scrollIntoView({block:'nearest'});}else input.removeAttribute('aria-activedescendant');};
-  const show=(query='')=>{
-    fit();list.replaceChildren();options=[];active=-1;
-    const names=[...new Set((refs.lighting_vendors?.vendors||[]).map(v=>v.name))].sort((a,b)=>a.localeCompare(b));
-    for(const name of names.filter(name=>name.toLocaleLowerCase().includes(query.toLocaleLowerCase()))){
-      const option=node('div',name,'vendor-option');option.id=`vendor-option-${options.length}`;option.setAttribute('role','option');option.setAttribute('aria-selected','false');
-      option.onmousedown=e=>e.preventDefault();option.onclick=()=>commit(name);options.push(option);list.append(option);
-    }
-    if(!options.length)list.append(node('p','No matching vendors. Enter a new name to add one.'));
-    list.hidden=false;input.setAttribute('aria-expanded','true');input.removeAttribute('aria-activedescendant');
-  };
-  input.onfocus=()=>{show();input.select();};input.onclick=()=>show();input.oninput=()=>show(input.value);
-  input.onkeydown=e=>{
-    if(e.key==='Escape'){e.preventDefault();close();restore();return;}
-    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
-      e.preventDefault();if(list.hidden)show();if(options.length){active=active<0?(e.key==='ArrowDown'?0:options.length-1):(active+(e.key==='ArrowDown'?1:-1)+options.length)%options.length;highlight();}return;
-    }
-    if(e.key==='Enter'){e.preventDefault();commit(active>=0?options[active].textContent:input.value);}
-    if(e.key==='Tab'&&active>=0)commit(options[active].textContent);
-  };
-  const clear=btn('❌',()=>{input.value='';input.focus();show();},'vendor-clear');clear.setAttribute('aria-label','Clear vendor search');clear.title='Clear vendor search';clear.onmousedown=e=>e.preventDefault();
-  input.onblur=e=>{if(e.relatedTarget===clear){close();return;}const value=input.value;close();restore();if(value.trim()&&value!==project.stock.vendor.name)selectVendorProject(value);};
-  clear.onblur=e=>{if(e.relatedTarget!==input){close();restore();}};
-  box.append(measure,input,list);controls.append(box,clear);host.append(label,controls);return host;
-}
+function vendorSelector(){return sharedVendorSelector({getName:()=>project.stock.vendor.name,getVendors:()=>refs.lighting_vendors?.vendors||[],onSelect:selectVendorProject});}
+
 function renderVendor(){
   heading('Vendor setup','Choose a vendor, set its unit once, then build its cable categories.',[btn('Import JSON / Excel',()=>$('#file-input').click()),btn('New vendor',()=>requireSafe('Start a new vendor? Your current autosaved draft will be replaced. Download a project backup first if you need it.',()=>{change(()=>project=newProject());navigate('vendor');}))]);
   const layout=node('div',null,'vendor-layout'),panel=node('section',null,'panel');panel.append(node('h2','Vendor details'));const form=node('div',null,'form-grid');
@@ -134,7 +105,8 @@ async function selectVendorProject(value,force=false){
   const name=String(value).trim();if(!name||(!force&&name===project.stock.vendor.name))return;
   const sequence=++vendorLoadSequence;let before=JSON.stringify(capture());notice(`Looking for ${name}’s saved project…`);
   try{
-    const incoming=await loadVendorProject(name,refs.lighting_vendors.vendors);
+    const cached=!force&&vendorWorkspace?.get('cable',name);
+    const incoming=cached?restoreProject(cached.project):await loadVendorProject(name,refs.lighting_vendors.vendors);
     if(sequence!==vendorLoadSequence)return;
     if(force&&!incoming){notice(`No saved project found for ${name}. Your draft is unchanged.`,true);return;}
     if($('#dialog').open){notice('Close the current dialog, then select the vendor again.',true);return;}
@@ -145,7 +117,7 @@ async function selectVendorProject(value,force=false){
       if(!refs.lighting_vendors.vendors.some(v=>v.name===name))offerVendor(name);
     };
     const hasWork=dirty||project.stock.vendor.name||Object.keys(project.stock.cables).length||project.looms.length;
-    if(hasWork)openDialog('Switch vendor project',body=>body.append(node('p',`${incoming?'A saved project is available':'No saved project was found'} for ${name}. ${incoming?'Load it':'Start an empty project'} and replace the current workspace? Download a backup first to keep your current work.`)),[{label:'Cancel',run:d=>d.close()},{label:'Save current backup',run:()=>{downloadBackupNow();before=JSON.stringify(capture());}},{label:incoming?'Load saved project':'Start empty project',cls:'primary',run:d=>{d.close();apply();}}]);else apply();
+    if(hasWork)openDialog('Switch vendor project',body=>body.append(node('p',`${incoming?'A saved project is available':'No saved project was found'} for ${name}. ${incoming?'Load it':'Start an empty project'} and switch the shared vendor for Cable and Rigging? The current vendor draft is retained in this browser; download a backup for a permanent copy.`)),[{label:'Cancel',run:d=>d.close()},{label:'Save current backup',run:()=>{downloadBackupNow();before=JSON.stringify(capture());}},{label:incoming?'Load saved project':'Start empty project',cls:'primary',run:d=>{d.close();apply();}}]);else apply();
   }catch(error){if(sequence===vendorLoadSequence)notice(error.message||'Saved project could not be loaded. Your current draft is unchanged.',true);}
 }
 function saveVendorProject(){
@@ -555,13 +527,19 @@ async function start(){
       refDirty=!same(refs,referenceExports);
     }}catch{notice('Saved references could not be read. Original files loaded.',true);}}
     const raw=stored(KEYS.draft);if(raw){try{const saved=parseJSON(raw);project=restoreProject(saved.project);dirty=!!saved.dirty;lastSavedDraft=raw;}catch{notice('Saved draft could not be read. It has not been overwritten. Download backups for new work; clear the damaged site storage only after recovery.',true);saveError='Saved draft needs recovery. Autosave paused.';saveBlocked=true;}}
+    if(!saveBlocked){try{
+      vendorWorkspace=new VendorWorkspace(localStorage);
+      const active=await vendorWorkspace.activate('cable',project,dirty,async name=>{const p=await loadVendorProject(name,refs.lighting_vendors.vendors)||newProject();if(!p.stock.vendor.name){p.stock.vendor.name=name;p.filename=chosenFilename(name);}return p;});
+      project=restoreProject(active.project);dirty=active.dirty;
+    }catch(e){saveBlocked=true;saveError=e.message;notice(saveError,true);}}
+    const requestedSettings=new URL(location.href).searchParams.get('settings');if(Object.hasOwn(REF_NAMES,requestedSettings)){page='settings';settingsTab=requestedSettings;}
     syncVendorManifest(refs);loaded=true;
     if(newCableTypes.length)notice('Reference cable types updated. Your saved stock is unchanged; add confirmed stock explicitly.');
     renderAll();
     $('#settings-button').onclick=()=>navigate('settings');$('#errors-button').onclick=()=>navigate('errors');$('#import-button').onclick=()=>$('#file-input').click();$('#export-button').onclick=()=>reviewExport('json');$('#backup-button').onclick=downloadBackup;
     $('#file-input').onchange=async e=>{const file=e.target.files[0];e.target.value='';importPending=true;try{await importFile(file);}finally{importPending=false;}};document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>navigate(b.dataset.page));$('.brand').onclick=e=>{e.preventDefault();navigate('vendor');};
     window.addEventListener('beforeunload',e=>{if(!updateReload&&(dirty||refDirty||$('#loom-pane')?.open||[...document.querySelectorAll('[data-lampy-grid]')].some(el=>el.lampyGrid.editing&&el.lampyGrid.editor.value!==el.lampyGrid.editorOriginal))){e.preventDefault();e.returnValue='';}});
-    window.addEventListener('storage',e=>{if((e.key===KEYS.draft&&e.newValue!==lastSavedDraft)||(e.key===KEYS.prefs&&e.newValue!==lastSavedRefs)){saveBlocked=true;saveError='Another tab changed this workspace. Save your backups before reloading.';status();notice(saveError,true);}});
+    window.addEventListener('storage',e=>{if((vendorWorkspace&&e.key===vendorWorkspace.key&&e.newValue!==vendorWorkspace.raw)||(e.key===KEYS.draft&&e.newValue!==lastSavedDraft)||(e.key===KEYS.prefs&&e.newValue!==lastSavedRefs)){saveBlocked=true;saveError='Another tab changed this workspace. Save your backups before reloading.';status();notice(saveError,true);}});
     document.addEventListener('click',e=>{for(const host of document.querySelectorAll('[data-lampy-grid]')){const g=host.lampyGrid;if(g.editing&&!g.table.contains(e.target)&&!g.commitEditor()){e.preventDefault();e.stopImmediatePropagation();return;}}},true);
     document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!e.target.closest('input,textarea,table')&&!$('#dialog').open&&!$('#loom-pane')?.open){e.preventDefault();e.shiftKey?redo():undo();}});
     if(!saveError)save();

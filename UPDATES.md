@@ -2,7 +2,10 @@
 
 ## Pending
 
-- Rigging data review: confirm details for the 42 Christie source items (weights, connections, curved dimensions and supporting capacity documentation). V2 now edits/imports/exports this proposed catalogue format. Agree Lampy Paperwork’s rigging runtime schema/manifest separately before integration; no compatibility is claimed.
+- v2.0.1 release verification: implementation and local validation complete; GitHub publication and final live checks pending. User explicitly authorised this task’s upload/deployment in the active overnight goal, overriding the normal manual-upload rule for this task only.
+- Christie data review: the expanded catalogue contains 81 parent items and configuration variants. Every parent has a sourced weight or variant weights; 32 parents still lack confirmed physical dimensions in the reviewed material. Other dimensions are partial/configuration-specific. Resolve motor lift contradictions, GACFLEX length/weight ambiguity, steel-pipe availability, Doughty weight, bracket weights/ratings and exact hardware models with the vendor. Do not invent missing values or clear review flags automatically.
+- Future load-table work: A/B/F single-span research and source index are saved in `reference/rigging/christie_lites_load_tables.research.json`. No load calculator is implemented. Resolve report identity/revision, regional/configuration differences and obtain engineering review before any calculation feature. F Type has no generic cantilever table.
+- Lampy Paperwork rigging integration: agree its runtime schema/manifest separately. Cable Stocker’s rigging source format is proposed; no compatibility is claimed. Do not change Lampy Paperwork for this task.
 
 - Import limitation: mixed individual cable and loom records within one category are rejected safely. Keep separate cable and loom category arrays; broader mixed-category editing remains unresolved.
 

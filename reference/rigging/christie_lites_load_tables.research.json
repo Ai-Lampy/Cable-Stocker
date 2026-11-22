@@ -1,0 +1,1378 @@
+{
+  "format": "lampy-rigging-load-table-research",
+  "formatVersion": 1,
+  "date": "2026-11-22",
+  "status": "research-only-not-an-engineering-approval",
+  "purpose": "Source study for a future feature; not used by the app to calculate allowable loads.",
+  "scope": "A, B and F types supplied by the user; other truss families require their own source review.",
+  "interpretation": {
+    "span": "Distance between supports, not necessarily overall assembly length.",
+    "uniform": "Mass per metre distributed across both chords; not a total mass.",
+    "pointLoads": "Each equal point load at the shown third, quarter or fifth divisions. Preserve positions and number of points; do not interpret as an arbitrary total load.",
+    "selfWeight": "Analysis self-weight; not interchangeable with transport/assembled rental weights.",
+    "deflection": "Associated displacement, not an additional load limit.",
+    "units": "Source mass-equivalent kg values; not force in kN. Do not confuse tonne with US ton."
+  },
+  "requiredBeforeFutureCalculation": [
+    "Confirm exact truss generation, report revision, connections, support positions and orientation.",
+    "Obtain engineering review of interpolation, combined loading, dynamic effects and irregular spans; do not infer approval from a table lookup.",
+    "Resolve source inconsistencies; do not merge regional reports or tables into a universal rating.",
+    "Curves, corners, link bars, spacers, hangers and lifting brackets have separate geometry and connection limits.",
+    "Loads between nodes and supporting structures require their own assessment."
+  ],
+  "tables": [
+    {
+      "series": "A Type",
+      "sourceUrl": "https://www.christielites.com/file_uploads/250123-A-type%20trusses%20load%20table.pdf",
+      "sourceSha256": "b385640e52d23421e94eabc786c00c705a17a21ad9c95a60c94dfe058b6ad937",
+      "sourcePage": 1,
+      "verification": "Visually checked against rendered PDF table; no independent engineering validation.",
+      "conditions": [
+        "Simple single span supported at ends; loads applied in the documented orientation.",
+        "Loads and suspension at panel points; connections to each chord at both ends (four per end).",
+        "Uniform load shared across both chords. Supporting structures/components are outside the table analysis.",
+        "Chart allows 75 kg between nodes subject to its notes; do not use as a general point rating.",
+        "Title prints 15.24 cm for 6 ft, an apparent unit error. End-view 254 mm is chord-axis spacing, not the 305 mm envelope.",
+        "Condensed A report repeatedly labels the project F Type despite identifying A input/system: resolve report identity with supplier."
+      ],
+      "singleSpan": [
+        {
+          "span_m": 2,
+          "uniform_kg_per_m": 939,
+          "uniform_deflection_mm": 2,
+          "centre_kg": 939,
+          "centre_deflection_mm": 2,
+          "third_point_kg": 704,
+          "third_deflection_mm": 2,
+          "quarter_point_kg": 469,
+          "quarter_deflection_mm": 2,
+          "fifth_point_kg": 391,
+          "fifth_deflection_mm": 2,
+          "self_weight_kg": 19
+        },
+        {
+          "span_m": 3,
+          "uniform_kg_per_m": 413,
+          "uniform_deflection_mm": 3,
+          "centre_kg": 619,
+          "centre_deflection_mm": 3,
+          "third_point_kg": 464,
+          "third_deflection_mm": 3,
+          "quarter_point_kg": 309,
+          "quarter_deflection_mm": 3,
+          "fifth_point_kg": 258,
+          "fifth_deflection_mm": 3,
+          "self_weight_kg": 28
+        },
+        {
+          "span_m": 4,
+          "uniform_kg_per_m": 228,
+          "uniform_deflection_mm": 5,
+          "centre_kg": 457,
+          "centre_deflection_mm": 4,
+          "third_point_kg": 343,
+          "third_deflection_mm": 5,
+          "quarter_point_kg": 228,
+          "quarter_deflection_mm": 4,
+          "fifth_point_kg": 190,
+          "fifth_deflection_mm": 5,
+          "self_weight_kg": 37
+        },
+        {
+          "span_m": 5,
+          "uniform_kg_per_m": 143,
+          "uniform_deflection_mm": 7,
+          "centre_kg": 358,
+          "centre_deflection_mm": 6,
+          "third_point_kg": 268,
+          "third_deflection_mm": 7,
+          "quarter_point_kg": 179,
+          "quarter_deflection_mm": 6,
+          "fifth_point_kg": 149,
+          "fifth_deflection_mm": 7,
+          "self_weight_kg": 46
+        },
+        {
+          "span_m": 6,
+          "uniform_kg_per_m": 97,
+          "uniform_deflection_mm": 9,
+          "centre_kg": 291,
+          "centre_deflection_mm": 8,
+          "third_point_kg": 218,
+          "third_deflection_mm": 9,
+          "quarter_point_kg": 145,
+          "quarter_deflection_mm": 9,
+          "fifth_point_kg": 121,
+          "fifth_deflection_mm": 9,
+          "self_weight_kg": 56
+        },
+        {
+          "span_m": 7,
+          "uniform_kg_per_m": 69,
+          "uniform_deflection_mm": 12,
+          "centre_kg": 241,
+          "centre_deflection_mm": 10,
+          "third_point_kg": 181,
+          "third_deflection_mm": 12,
+          "quarter_point_kg": 120,
+          "quarter_deflection_mm": 12,
+          "fifth_point_kg": 100,
+          "fifth_deflection_mm": 12,
+          "self_weight_kg": 65
+        },
+        {
+          "span_m": 8,
+          "uniform_kg_per_m": 50,
+          "uniform_deflection_mm": 16,
+          "centre_kg": 203,
+          "centre_deflection_mm": 13,
+          "third_point_kg": 152,
+          "third_deflection_mm": 16,
+          "quarter_point_kg": 101,
+          "quarter_deflection_mm": 15,
+          "fifth_point_kg": 84,
+          "fifth_deflection_mm": 16,
+          "self_weight_kg": 74
+        },
+        {
+          "span_m": 9,
+          "uniform_kg_per_m": 38,
+          "uniform_deflection_mm": 20,
+          "centre_kg": 173,
+          "centre_deflection_mm": 17,
+          "third_point_kg": 130,
+          "third_deflection_mm": 20,
+          "quarter_point_kg": 86,
+          "quarter_deflection_mm": 19,
+          "fifth_point_kg": 72,
+          "fifth_deflection_mm": 20,
+          "self_weight_kg": 83
+        },
+        {
+          "span_m": 10,
+          "uniform_kg_per_m": 29,
+          "uniform_deflection_mm": 24,
+          "centre_kg": 148,
+          "centre_deflection_mm": 21,
+          "third_point_kg": 111,
+          "third_deflection_mm": 25,
+          "quarter_point_kg": 74,
+          "quarter_deflection_mm": 23,
+          "fifth_point_kg": 61,
+          "fifth_deflection_mm": 24,
+          "self_weight_kg": 92
+        },
+        {
+          "span_m": 11,
+          "uniform_kg_per_m": 23,
+          "uniform_deflection_mm": 29,
+          "centre_kg": 126,
+          "centre_deflection_mm": 25,
+          "third_point_kg": 95,
+          "third_deflection_mm": 30,
+          "quarter_point_kg": 63,
+          "quarter_deflection_mm": 28,
+          "fifth_point_kg": 52,
+          "fifth_deflection_mm": 29,
+          "self_weight_kg": 102
+        },
+        {
+          "span_m": 12,
+          "uniform_kg_per_m": 18,
+          "uniform_deflection_mm": 35,
+          "centre_kg": 108,
+          "centre_deflection_mm": 30,
+          "third_point_kg": 81,
+          "third_deflection_mm": 35,
+          "quarter_point_kg": 54,
+          "quarter_deflection_mm": 34,
+          "fifth_point_kg": 45,
+          "fifth_deflection_mm": 35,
+          "self_weight_kg": 111
+        }
+      ],
+      "cantilever": "Separate A/B source charts exist; not transcribed or enabled for calculation."
+    },
+    {
+      "series": "B Type",
+      "sourceUrl": "https://www.christielites.com/file_uploads/B-Type%20Truss%20Load%20Table%20EU.pdf",
+      "sourceSha256": "80fb6d7daf8bb7ef0b4b31986450d723d80bc5abb73841026a36bbddb1bd6b2f",
+      "sourcePage": 1,
+      "verification": "Visually checked against rendered PDF table; no independent engineering validation.",
+      "conditions": [
+        "Simple single span supported at ends; loads applied in the documented orientation.",
+        "Loads and suspension at panel points; connections to each chord at both ends (four per end).",
+        "Uniform load shared across both chords. Supporting structures/components are outside the table analysis.",
+        "Chart specifies 50 kg maximum between nodes.",
+        "Report extends to 18 m but marketing chart ends at 15 m; this transcription uses only displayed marketing chart rows."
+      ],
+      "singleSpan": [
+        {
+          "span_m": 1,
+          "uniform_kg_per_m": 4122,
+          "uniform_deflection_mm": 1,
+          "centre_kg": 4122,
+          "centre_deflection_mm": 2,
+          "third_point_kg": 2061,
+          "third_deflection_mm": 1,
+          "quarter_point_kg": 1374,
+          "quarter_deflection_mm": 1,
+          "fifth_point_kg": 1030,
+          "fifth_deflection_mm": 1,
+          "self_weight_kg": 11
+        },
+        {
+          "span_m": 2,
+          "uniform_kg_per_m": 2161,
+          "uniform_deflection_mm": 3,
+          "centre_kg": 2837,
+          "centre_deflection_mm": 3,
+          "third_point_kg": 1793,
+          "third_deflection_mm": 3,
+          "quarter_point_kg": 1371,
+          "quarter_deflection_mm": 3,
+          "fifth_point_kg": 1080,
+          "fifth_deflection_mm": 2,
+          "self_weight_kg": 21
+        },
+        {
+          "span_m": 3,
+          "uniform_kg_per_m": 1414,
+          "uniform_deflection_mm": 6,
+          "centre_kg": 2143,
+          "centre_deflection_mm": 5,
+          "third_point_kg": 1414,
+          "third_deflection_mm": 5,
+          "quarter_point_kg": 1119,
+          "quarter_deflection_mm": 6,
+          "fifth_point_kg": 931,
+          "fifth_deflection_mm": 4,
+          "self_weight_kg": 31
+        },
+        {
+          "span_m": 4,
+          "uniform_kg_per_m": 939,
+          "uniform_deflection_mm": 10,
+          "centre_kg": 1714,
+          "centre_deflection_mm": 8,
+          "third_point_kg": 1161,
+          "third_deflection_mm": 9,
+          "quarter_point_kg": 939,
+          "quarter_deflection_mm": 9,
+          "fifth_point_kg": 737,
+          "fifth_deflection_mm": 8,
+          "self_weight_kg": 41
+        },
+        {
+          "span_m": 5,
+          "uniform_kg_per_m": 608,
+          "uniform_deflection_mm": 14,
+          "centre_kg": 1424,
+          "centre_deflection_mm": 11,
+          "third_point_kg": 982,
+          "third_deflection_mm": 13,
+          "quarter_point_kg": 778,
+          "quarter_deflection_mm": 14,
+          "fifth_point_kg": 608,
+          "fifth_deflection_mm": 12,
+          "self_weight_kg": 51
+        },
+        {
+          "span_m": 6,
+          "uniform_kg_per_m": 456,
+          "uniform_deflection_mm": 21,
+          "centre_kg": 1215,
+          "centre_deflection_mm": 16,
+          "third_point_kg": 848,
+          "third_deflection_mm": 18,
+          "quarter_point_kg": 655,
+          "quarter_deflection_mm": 19,
+          "fifth_point_kg": 516,
+          "fifth_deflection_mm": 17,
+          "self_weight_kg": 61
+        },
+        {
+          "span_m": 7,
+          "uniform_kg_per_m": 336,
+          "uniform_deflection_mm": 28,
+          "centre_kg": 1056,
+          "centre_deflection_mm": 21,
+          "third_point_kg": 744,
+          "third_deflection_mm": 25,
+          "quarter_point_kg": 563,
+          "quarter_deflection_mm": 26,
+          "fifth_point_kg": 447,
+          "fifth_deflection_mm": 24,
+          "self_weight_kg": 71
+        },
+        {
+          "span_m": 8,
+          "uniform_kg_per_m": 256,
+          "uniform_deflection_mm": 36,
+          "centre_kg": 931,
+          "centre_deflection_mm": 27,
+          "third_point_kg": 661,
+          "third_deflection_mm": 32,
+          "quarter_point_kg": 493,
+          "quarter_deflection_mm": 33,
+          "fifth_point_kg": 393,
+          "fifth_deflection_mm": 32,
+          "self_weight_kg": 81
+        },
+        {
+          "span_m": 9,
+          "uniform_kg_per_m": 201,
+          "uniform_deflection_mm": 45,
+          "centre_kg": 831,
+          "centre_deflection_mm": 34,
+          "third_point_kg": 594,
+          "third_deflection_mm": 41,
+          "quarter_point_kg": 437,
+          "quarter_deflection_mm": 42,
+          "fifth_point_kg": 349,
+          "fifth_deflection_mm": 40,
+          "self_weight_kg": 91
+        },
+        {
+          "span_m": 10,
+          "uniform_kg_per_m": 162,
+          "uniform_deflection_mm": 55,
+          "centre_kg": 747,
+          "centre_deflection_mm": 42,
+          "third_point_kg": 537,
+          "third_deflection_mm": 51,
+          "quarter_point_kg": 391,
+          "quarter_deflection_mm": 51,
+          "fifth_point_kg": 313,
+          "fifth_deflection_mm": 50,
+          "self_weight_kg": 101
+        },
+        {
+          "span_m": 11,
+          "uniform_kg_per_m": 132,
+          "uniform_deflection_mm": 67,
+          "centre_kg": 677,
+          "centre_deflection_mm": 51,
+          "third_point_kg": 489,
+          "third_deflection_mm": 62,
+          "quarter_point_kg": 353,
+          "quarter_deflection_mm": 62,
+          "fifth_point_kg": 283,
+          "fifth_deflection_mm": 61,
+          "self_weight_kg": 111
+        },
+        {
+          "span_m": 12,
+          "uniform_kg_per_m": 110,
+          "uniform_deflection_mm": 79,
+          "centre_kg": 617,
+          "centre_deflection_mm": 61,
+          "third_point_kg": 447,
+          "third_deflection_mm": 74,
+          "quarter_point_kg": 321,
+          "quarter_deflection_mm": 73,
+          "fifth_point_kg": 258,
+          "fifth_deflection_mm": 73,
+          "self_weight_kg": 121
+        },
+        {
+          "span_m": 13,
+          "uniform_kg_per_m": 92,
+          "uniform_deflection_mm": 93,
+          "centre_kg": 565,
+          "centre_deflection_mm": 72,
+          "third_point_kg": 411,
+          "third_deflection_mm": 87,
+          "quarter_point_kg": 293,
+          "quarter_deflection_mm": 86,
+          "fifth_point_kg": 236,
+          "fifth_deflection_mm": 86,
+          "self_weight_kg": 131
+        },
+        {
+          "span_m": 14,
+          "uniform_kg_per_m": 78,
+          "uniform_deflection_mm": 107,
+          "centre_kg": 519,
+          "centre_deflection_mm": 84,
+          "third_point_kg": 379,
+          "third_deflection_mm": 102,
+          "quarter_point_kg": 268,
+          "quarter_deflection_mm": 100,
+          "fifth_point_kg": 216,
+          "fifth_deflection_mm": 100,
+          "self_weight_kg": 141
+        },
+        {
+          "span_m": 15,
+          "uniform_kg_per_m": 67,
+          "uniform_deflection_mm": 123,
+          "centre_kg": 478,
+          "centre_deflection_mm": 97,
+          "third_point_kg": 351,
+          "third_deflection_mm": 118,
+          "quarter_point_kg": 247,
+          "quarter_deflection_mm": 115,
+          "fifth_point_kg": 199,
+          "fifth_deflection_mm": 116,
+          "self_weight_kg": 151
+        }
+      ],
+      "cantilever": "Separate A/B source charts exist; not transcribed or enabled for calculation."
+    },
+    {
+      "series": "F Type",
+      "sourceUrl": "https://www.christielites.com/file_uploads/Christie%20Lites%20load%20table%20F%20Type%20-%20v1_1.pdf",
+      "sourceSha256": "72ef5190581d68ee90f44f185511e0447854ec0fe04c76fe10544e48c36c5247",
+      "sourcePage": 1,
+      "verification": "Visually checked against rendered PDF table; no independent engineering validation.",
+      "conditions": [
+        "Simple single span supported at ends; loads applied in the documented orientation.",
+        "Loads and suspension at panel points; connections to each chord at both ends (four per end).",
+        "Uniform load shared across both chords. Supporting structures/components are outside the table analysis.",
+        "No cantilever chart: open bottom geometry and compression-chord buckling require individual assessment (condensed report PDF page 11).",
+        "Travel height, bare truss envelope and nominal/overall lengths are separate configurations.",
+        "Condensed report PDF page 10 visually agrees with these single-span numbers."
+      ],
+      "singleSpan": [
+        {
+          "span_m": 2,
+          "uniform_kg_per_m": 971,
+          "uniform_deflection_mm": 2,
+          "centre_kg": 1482,
+          "centre_deflection_mm": 2,
+          "third_point_kg": 971,
+          "third_deflection_mm": 3,
+          "quarter_point_kg": 647,
+          "quarter_deflection_mm": 2,
+          "fifth_point_kg": 485,
+          "fifth_deflection_mm": 1,
+          "self_weight_kg": 21
+        },
+        {
+          "span_m": 3,
+          "uniform_kg_per_m": 630,
+          "uniform_deflection_mm": 3,
+          "centre_kg": 960,
+          "centre_deflection_mm": 3,
+          "third_point_kg": 720,
+          "third_deflection_mm": 3,
+          "quarter_point_kg": 480,
+          "quarter_deflection_mm": 3,
+          "fifth_point_kg": 400,
+          "fifth_deflection_mm": 3,
+          "self_weight_kg": 31
+        },
+        {
+          "span_m": 4,
+          "uniform_kg_per_m": 349,
+          "uniform_deflection_mm": 5,
+          "centre_kg": 699,
+          "centre_deflection_mm": 4,
+          "third_point_kg": 524,
+          "third_deflection_mm": 5,
+          "quarter_point_kg": 349,
+          "quarter_deflection_mm": 5,
+          "fifth_point_kg": 291,
+          "fifth_deflection_mm": 4,
+          "self_weight_kg": 41
+        },
+        {
+          "span_m": 5,
+          "uniform_kg_per_m": 216,
+          "uniform_deflection_mm": 7,
+          "centre_kg": 541,
+          "centre_deflection_mm": 6,
+          "third_point_kg": 406,
+          "third_deflection_mm": 7,
+          "quarter_point_kg": 270,
+          "quarter_deflection_mm": 6,
+          "fifth_point_kg": 225,
+          "fifth_deflection_mm": 6,
+          "self_weight_kg": 51
+        },
+        {
+          "span_m": 6,
+          "uniform_kg_per_m": 145,
+          "uniform_deflection_mm": 9,
+          "centre_kg": 436,
+          "centre_deflection_mm": 8,
+          "third_point_kg": 327,
+          "third_deflection_mm": 10,
+          "quarter_point_kg": 218,
+          "quarter_deflection_mm": 9,
+          "fifth_point_kg": 181,
+          "fifth_deflection_mm": 9,
+          "self_weight_kg": 61
+        },
+        {
+          "span_m": 7,
+          "uniform_kg_per_m": 103,
+          "uniform_deflection_mm": 12,
+          "centre_kg": 360,
+          "centre_deflection_mm": 10,
+          "third_point_kg": 270,
+          "third_deflection_mm": 13,
+          "quarter_point_kg": 180,
+          "quarter_deflection_mm": 12,
+          "fifth_point_kg": 150,
+          "fifth_deflection_mm": 12,
+          "self_weight_kg": 71
+        },
+        {
+          "span_m": 8,
+          "uniform_kg_per_m": 75,
+          "uniform_deflection_mm": 16,
+          "centre_kg": 303,
+          "centre_deflection_mm": 13,
+          "third_point_kg": 227,
+          "third_deflection_mm": 16,
+          "quarter_point_kg": 151,
+          "quarter_deflection_mm": 15,
+          "fifth_point_kg": 126,
+          "fifth_deflection_mm": 15,
+          "self_weight_kg": 81
+        },
+        {
+          "span_m": 9,
+          "uniform_kg_per_m": 57,
+          "uniform_deflection_mm": 20,
+          "centre_kg": 259,
+          "centre_deflection_mm": 16,
+          "third_point_kg": 194,
+          "third_deflection_mm": 20,
+          "quarter_point_kg": 129,
+          "quarter_deflection_mm": 19,
+          "fifth_point_kg": 107,
+          "fifth_deflection_mm": 19,
+          "self_weight_kg": 91
+        },
+        {
+          "span_m": 10,
+          "uniform_kg_per_m": 44,
+          "uniform_deflection_mm": 24,
+          "centre_kg": 223,
+          "centre_deflection_mm": 20,
+          "third_point_kg": 167,
+          "third_deflection_mm": 24,
+          "quarter_point_kg": 111,
+          "quarter_deflection_mm": 23,
+          "fifth_point_kg": 93,
+          "fifth_deflection_mm": 23,
+          "self_weight_kg": 101
+        },
+        {
+          "span_m": 11,
+          "uniform_kg_per_m": 35,
+          "uniform_deflection_mm": 29,
+          "centre_kg": 194,
+          "centre_deflection_mm": 24,
+          "third_point_kg": 145,
+          "third_deflection_mm": 29,
+          "quarter_point_kg": 97,
+          "quarter_deflection_mm": 28,
+          "fifth_point_kg": 80,
+          "fifth_deflection_mm": 28,
+          "self_weight_kg": 111
+        },
+        {
+          "span_m": 12,
+          "uniform_kg_per_m": 28,
+          "uniform_deflection_mm": 34,
+          "centre_kg": 169,
+          "centre_deflection_mm": 29,
+          "third_point_kg": 127,
+          "third_deflection_mm": 35,
+          "quarter_point_kg": 84,
+          "quarter_deflection_mm": 33,
+          "fifth_point_kg": 70,
+          "fifth_deflection_mm": 34,
+          "self_weight_kg": 121
+        }
+      ],
+      "cantilever": "Not provided; individual engineering assessment required."
+    }
+  ],
+  "sourceDocuments": [
+    {
+      "url": "https://www.christielites.com/file_uploads/250123-A-type%20trusses%20load%20table.pdf",
+      "label": "12\" Load Tables",
+      "products": [
+        "413",
+        "414",
+        "415",
+        "416",
+        "417",
+        "418"
+      ],
+      "pages": 1,
+      "sha256": "b385640e52d23421e94eabc786c00c705a17a21ad9c95a60c94dfe058b6ad937"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Christie%20Lites%20A%20Type%20Truss%20-%20System_Analysis%20CONDENSED%20REV%201.pdf",
+      "label": "12\" Truss Report UK/EU",
+      "products": [
+        "413",
+        "414",
+        "415",
+        "416",
+        "417",
+        "418",
+        "422",
+        "421",
+        "425",
+        "426"
+      ],
+      "pages": 9,
+      "sha256": "c8907a9dfba609ddb1729a3ec43b44d9d8964b2dd94e5e070f926c23fa2136df"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Spec_288_Load%20Table%20-%20Corner%20Blocks%20-%20CL.pdf",
+      "label": "Load Table-Corner Blocks",
+      "products": [
+        "422",
+        "421"
+      ],
+      "pages": 1,
+      "sha256": "12f0ef0d363f508e4930e15a07a4279d0d70431de63b67bee66ea062a15e9a60"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Spec_289_Load%20Table%20-%2018%20Foot%20Curved%20Truss%20-%20CL.pdf",
+      "label": "Load Table-18' Curved Truss",
+      "products": [
+        "425"
+      ],
+      "pages": 1,
+      "sha256": "90bfb89b564fdf238bb46bccef140f82fb2db8cc93b457f6d032f1ff2b5b3560"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Spec_290_Load%20Table%20-%2012%20Foot%20Curved%20Truss%20-%20CL.pdf",
+      "label": "Load Table-12' Curved Truss",
+      "products": [
+        "426"
+      ],
+      "pages": 1,
+      "sha256": "63766b26f2e86cd1db3759565659cc168bff1233ce2ea6789008f5d528352b3b"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/B-Type%20Truss%20Load%20Table%20EU.pdf",
+      "label": "Truss Load Tables EU",
+      "products": [
+        "430",
+        "431",
+        "432",
+        "435",
+        "433",
+        "434"
+      ],
+      "pages": 1,
+      "sha256": "80fb6d7daf8bb7ef0b4b31986450d723d80bc5abb73841026a36bbddb1bd6b2f"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/B-Type%20Truss%20Analysis%20EU.pdf",
+      "label": "Truss Analysis EU",
+      "products": [
+        "430",
+        "431",
+        "432",
+        "435",
+        "433",
+        "434"
+      ],
+      "pages": 10,
+      "sha256": "4a4e5fbe62aa149fc0b7bf3ce9a05a457e7751be1b3fafbf8fd5aba0c24530f4"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec2_298_16%20inch%20truss%20with%20link%20bars.pdf",
+      "label": "Truss with Link Bars Load Tables",
+      "products": [
+        "430",
+        "431",
+        "432",
+        "435",
+        "433",
+        "434",
+        "437"
+      ],
+      "pages": 1,
+      "sha256": "54a6b9e3455fb4bd1942de62830d1493593458a4e010c4f668d66aa4e89823f8"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec3_298_16%20inch%20truss%20corner%20blocks.pdf",
+      "label": "Corner Block & Endplate Load Data",
+      "products": [
+        "430",
+        "431",
+        "432",
+        "435",
+        "433",
+        "434",
+        "443",
+        "444"
+      ],
+      "pages": 1,
+      "sha256": "46ee4ce9f6e61d91bcc4074579cee722f1f1db86a399fc01cadfc90ce02eb5de"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec4_300_Cantilever_Loading%20-%20CL.pdf",
+      "label": "Cantilever Basics",
+      "products": [
+        "430",
+        "431",
+        "432",
+        "435",
+        "433",
+        "434"
+      ],
+      "pages": 1,
+      "sha256": "d57982963cc3e11a5a125235dff2ca26c2e9dc5dbd782d6546e884e97fb3658e"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual2_300_16%20inch%20Truss%20Connector%20Orientation.pdf",
+      "label": "Connector Orientation",
+      "products": [
+        "430",
+        "431",
+        "432",
+        "435",
+        "433",
+        "434"
+      ],
+      "pages": 1,
+      "sha256": "6aa5ae4e2f5f5c854fd704d634dfe7690b6e170019b39e409989aedba9f51c7d"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec2_365_7_5%20degree%20Link%20Bar%20Circles.pdf",
+      "label": "7.5 Degree Link Bar Circles",
+      "products": [
+        "437"
+      ],
+      "pages": 1,
+      "sha256": "9e17eacff45b0b921b5a7f1d1790315a4e058cd0a6f9b9c0c5766c8a570bd17a"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec3_365_15%20deg%20Link%20Bar%20Cirlces.pdf",
+      "label": "15 Degree Link Bar Circles",
+      "products": [
+        "437"
+      ],
+      "pages": 1,
+      "sha256": "53b2b6edf8df679007007433a4591a6d2aa728931739d1cafa68689ecb0072e7"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec4_365_22%205%20Degree%20Link%20Bar%20Cirlces%20%282%29.pdf",
+      "label": "22.5 Degree Link Bar Circles",
+      "products": [
+        "437"
+      ],
+      "pages": 1,
+      "sha256": "3cf7fc318e4246377962a22ab340ec6781aa567d473ddc060d30c5be8abdcf67"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual_365_30%20Degree%20Link%20Bar%20Circles.pdf",
+      "label": "30 Degree Link Bar Circles",
+      "products": [
+        "437"
+      ],
+      "pages": 1,
+      "sha256": "153daa661b8525620ab0a2c12b9ce41c9a453f2d9b2f3c5c95b9a071eb7711f9"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual2_365_45%20Degree%20Link%20Bar%20Circles.pdf",
+      "label": "45 Degree Link Bar Circles",
+      "products": [
+        "437"
+      ],
+      "pages": 1,
+      "sha256": "f075b23c549ac5bf6763acca3d868c88bdbe387ab03a358a8689446cddc29af3"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/OT.pdf",
+      "label": "B Type Link Bars on F Type Truss",
+      "products": [
+        "437"
+      ],
+      "pages": 1,
+      "sha256": "3a27a20619f2e97932f341ec426cec613cd77c9d60311623d9682e1bfbfedce4"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_305_16in_Type_B_Curved_32ft_Dia_All_Spans_Loaded%20-%20CL.pdf",
+      "label": "32ft Diameter All Spans Loaded",
+      "products": [
+        "445"
+      ],
+      "pages": 1,
+      "sha256": "8e6b9e61ed47474859815a712ef334059af28c0b0d295546393596aa7a92d466"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec2_305_16in_Type_B_Curved_32ft_Dia_Alternate_Spans_Loaded%20-%20CL.pdf",
+      "label": "32ft Diameter Alternate Spans Loaded",
+      "products": [
+        "445"
+      ],
+      "pages": 1,
+      "sha256": "c45c66a34a6c6271a84f1f02a730f9e380048225fef90df8b452c45a51ce8248"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_464_16in_Type_B_Curved_24ft_Dia_All_Spans_Loaded%20-%20CL.pdf",
+      "label": "24ft Diameter All Spans Loaded",
+      "products": [
+        "446"
+      ],
+      "pages": 1,
+      "sha256": "8df9bee87c6960ec9b7e8fe1010a08a0016c506ae74490e7aa73d2c5e0fd090a"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec2_464_16in_Type_B_Curved_24ft_Dia_Alternate_Spans_Loaded%20-%20CL.pdf",
+      "label": "24ft Diameter Alternate Spans Loaded",
+      "products": [
+        "446"
+      ],
+      "pages": 1,
+      "sha256": "cf6229ec82e76988193c3815f70ea2adfca291d6e7ac45de94605dc26adaacc2"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Christie%20Lites%20load%20table%20F%20Type%20-%20v1_1.pdf",
+      "label": "Truss Load Table EU",
+      "products": [
+        "466",
+        "467"
+      ],
+      "pages": 1,
+      "sha256": "72ef5190581d68ee90f44f185511e0447854ec0fe04c76fe10544e48c36c5247"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/F-Type%20Condensed.pdf",
+      "label": "Truss Load Table Condensed EU",
+      "products": [
+        "466",
+        "467"
+      ],
+      "pages": 11,
+      "sha256": "75bcbfb550145f4b106797c062b3e1b64119d4c2c179b1e32d9d43d815cca0d0"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/24_915_04-Pipe%20Clamp%20Load%20Rating-SUBM-Christie%20Lites-r0.pdf",
+      "label": "Pipe Hanger Load Tables",
+      "products": [
+        "466"
+      ],
+      "pages": 11,
+      "sha256": "cb688fd9ccad2704b143a3b67a6496c81cd220dc556597b894e22f463af4525c"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/22_915_04%20-%20Type%20F%20End%20Gate%20Christie%20Lites%20r00-2022_09_08.pdf",
+      "label": "Engineering Document",
+      "products": [
+        "472"
+      ],
+      "pages": 7,
+      "sha256": "4259cdee1ed8c0107de0c6fa60d51a6be8614cf82b3eb525b759e4bd5810b525"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Truss%20Spacers%20v3.pdf",
+      "label": "B Type Link Bars on F Type Truss",
+      "products": [
+        "471"
+      ],
+      "pages": 1,
+      "sha256": "e43cc0631176d72992f62778f1019fbc7372e583210b6039443482e20340562c"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/F%20Type%20Truss%20Circle%20proposal%20using%20spacers%20-%20Information%20Drawing.pdf",
+      "label": "F Type 22.5 and 30 Degree Link Bar Circles",
+      "products": [
+        "471"
+      ],
+      "pages": 1,
+      "sha256": "9833a7e4ff63d7021dcd6c67e3cb8ed945823f8259bfd3666ae294fad6f110cb"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/EC%20DECLARATION%202026.pdf",
+      "label": "EC Declaration of Conformity",
+      "products": [
+        "1200"
+      ],
+      "pages": 1,
+      "sha256": "392493b154baeaa5b77ed9add151e00f6669817508dca7e4a228510c80ab7074"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/TBM%20STAGE%20HOIST%20CE%20CONFORMITY%28TS%29.pdf",
+      "label": "CE",
+      "products": [
+        "1200",
+        "1200"
+      ],
+      "pages": 8,
+      "sha256": "fc4245bfe99bd724c9329cd51c5a2438305a0cf10317dee4414c87686cb85fed"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_629_Tour_Rig_Ratings.pdf",
+      "label": "Datasheet",
+      "products": [
+        "1173"
+      ],
+      "pages": 1,
+      "sha256": "71645719e0f431b227a360a36d25c715efc86581ffec4474456bdca8ffc3d581"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual_629_Christie_Lites_Motor_Pinout.pdf",
+      "label": "Christie Lites Motor Pinout",
+      "products": [
+        "1173"
+      ],
+      "pages": 1,
+      "sha256": "1c59483d742bbc44584a4b47347c72703f8c93912cfeda1e63146201e61fba65"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual_709_Christie_Lites_Motor_Pinout.pdf",
+      "label": "Christie Lites Motor Pinout",
+      "products": [
+        "1175"
+      ],
+      "pages": 1,
+      "sha256": "1c59483d742bbc44584a4b47347c72703f8c93912cfeda1e63146201e61fba65"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_626_CM-ET%20ProStar%20Product%20Sheet-ET-PS-0114v5.pdf",
+      "label": "Datasheet",
+      "products": [
+        "1086"
+      ],
+      "pages": 2,
+      "sha256": "6df91f5590895a83a47da093ba8593b386a02400cd47b8c13ae3c25c4636a254"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual_626_ProStar%20Maintinence%20Manual.pdf",
+      "label": "Manual",
+      "products": [
+        "1086"
+      ],
+      "pages": 24,
+      "sha256": "4af972610ce55adb6873e59879a6d4ae08069402fb097a9d8a53eb034793104a"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual2_626_Christie_Lites_Motor_Pinout.pdf",
+      "label": "Christie Lites Motor Pinout",
+      "products": [
+        "1086"
+      ],
+      "pages": 1,
+      "sha256": "1c59483d742bbc44584a4b47347c72703f8c93912cfeda1e63146201e61fba65"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual2_275_MotorSystemPinout.pdf",
+      "label": "Christie Lites Motor Pinout",
+      "products": [
+        "926"
+      ],
+      "pages": 1,
+      "sha256": "ab6a1c2991779344038616e239069a1c0261c043ccdc23e802a55990c9a30456"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/CS800CLX%20MANUAL%20AND%20PINOUT.pdf",
+      "label": "User Manual",
+      "products": [
+        "926"
+      ],
+      "pages": 7,
+      "sha256": "630a5ad596ed61f2230b67d910735f6abbc751accf5a7d700c45012530833907"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/DigiHoist-Technical-Specification.pdf",
+      "label": "Motor Distro 8-Way DigiHoist Datasheet",
+      "products": [
+        "1163"
+      ],
+      "pages": 2,
+      "sha256": "2846202a8bd8a3022c40fed625563a73bad1413e3f60777ab2ba6faa0ea9c791"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/DigiHoist_Operating_Manual_V5%20%281%29.pdf",
+      "label": "Motor Distro 8-Way DigiHoist Manual",
+      "products": [
+        "1163"
+      ],
+      "pages": 74,
+      "sha256": "7562f43c475cfd49fc8ce38ded0b8300b39039579c461369e30bc6184a0240bf"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Elevation-1-Product-Manual.pdf",
+      "label": "Elevation 1+ Manual",
+      "products": [
+        "1052"
+      ],
+      "pages": 36,
+      "sha256": "8e041f1f8ad8dc0d305a18da68c6ed987a8d866c9c0f74fc42d884faec41822c"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Vector-User-Manual.pdf",
+      "label": "Vector Manual",
+      "products": [
+        "1052"
+      ],
+      "pages": 79,
+      "sha256": "f7b6cc87c035fb5f6e7bfcb35c7bc69c1b3418367c8ba5a948ef92fbadeb548d"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Vector-Keyboard-Shortcuts.pdf",
+      "label": "Vector Keyboard Shortcuts",
+      "products": [
+        "1052"
+      ],
+      "pages": 1,
+      "sha256": "e5608dbdb17f32bf5ef4df01e21b36a1a62bb6b754088a2972ec00ef873d7f2d"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Setting-The-IP-Address-for-an-Array-PD-ES.pdf",
+      "label": "Setting IP address for Array PD-ES",
+      "products": [
+        "1051"
+      ],
+      "pages": 2,
+      "sha256": "c1d06eeb411077e1edf18c0daef6635f336648db6ba4947f9cfd4ed463144c30"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Kinesys-Rigger-Technical-Specification.pdf",
+      "label": "Rigger Remote Data Sheet",
+      "products": [
+        "1051"
+      ],
+      "pages": 2,
+      "sha256": "df7010adedf697f95a7dfedbfc4cfc65fad8ee0a947c3f08458d2fb35320da92"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Rigger-Manual.pdf",
+      "label": "Rigger Remote Manual",
+      "products": [
+        "1051"
+      ],
+      "pages": 20,
+      "sha256": "9910682f569ff403999f03246b4e9736a3d03c3bd0fe471ac9d2314628bbf932"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Supertower.pdf",
+      "label": "Datasheet",
+      "products": [
+        "248"
+      ],
+      "pages": 2,
+      "sha256": "c26744ddd5e9d3fa50a0a99b7e0037db4e2c6e88c01e2e956861dacac2e28cb9"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual_321_Super%20tower%20operators%20manual%2032950.pdf",
+      "label": "Manual",
+      "products": [
+        "248"
+      ],
+      "pages": 24,
+      "sha256": "32c1dc1c3ab96a164e0779bf0ea5af3a8fc33b18ac3564c6984149d2192642cf"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual_583_Horizontal_Load_Tables.pdf",
+      "label": "Horizontal Load Tables",
+      "products": [
+        "231"
+      ],
+      "pages": 1,
+      "sha256": "252bb0df9a69336378cd8d750747d0801a1207aba941af456788a6cc44d49df3"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual2_583_Vertical_Load%20Tables.pdf",
+      "label": "Vertical Load Tables",
+      "products": [
+        "231"
+      ],
+      "pages": 2,
+      "sha256": "a4c5f1cf4da10b8a3c27e1e4940b7b00b33717f5329ab24a59fdfe7d83edcc81"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual_584_Horizontal_Load_Tables.pdf",
+      "label": "Horizontal Load Tables",
+      "products": [
+        "233"
+      ],
+      "pages": 1,
+      "sha256": "a4e9f302a78f258384fbfbe6525f1459258bf714a25b7f6a97a2c203c5f65488"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual2_584_Vertical_Load_Tables.pdf",
+      "label": "Vertical Load Tables",
+      "products": [
+        "233"
+      ],
+      "pages": 2,
+      "sha256": "a4c5f1cf4da10b8a3c27e1e4940b7b00b33717f5329ab24a59fdfe7d83edcc81"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_496_3Ft_Base_Bolt_Detail.pdf",
+      "label": "Bolt Detail Drawing",
+      "products": [
+        "428"
+      ],
+      "pages": 1,
+      "sha256": "7f7d4c1f01e8e29bef8dd140761c1ca2c56a7615ee86e693db7d296b6dbf4e7c"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_512_cad_512_FixBase2D_CAD.pdf",
+      "label": "Dimension Drawing",
+      "products": [
+        "429"
+      ],
+      "pages": 1,
+      "sha256": "951dd8785bfc8cffc827c35444117f0fdf706fc42843fb4022a65bcf62b5efb1"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec2_512_cad_512_floor%20base%202%20001.pdf",
+      "label": "Dimension Drawing 2",
+      "products": [
+        "429"
+      ],
+      "pages": 1,
+      "sha256": "0f0ce1c6cf4cb73474168ed15e48fd865bc1c28b912f697006ddc307eab166bc"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_452_Crosby.pdf",
+      "label": "Datasheet",
+      "products": [
+        "334"
+      ],
+      "pages": 2,
+      "sha256": "999670e307ce04f9664f6b955722fa4adc2f6d64d5c2f0231e4f76de8bfa3bc1"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_419_pear_ring.pdf",
+      "label": "Datasheet",
+      "products": [
+        "335"
+      ],
+      "pages": 2,
+      "sha256": "3e24279adcdb66d7facfe29da7cc82e8e65bc0570e75aab10d046e5c55c1e890"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/STACChain.pdf",
+      "label": "Datasheet",
+      "products": [
+        "349"
+      ],
+      "pages": 1,
+      "sha256": "bce6ebecbfd5b83a7b872c04d33914b04efadf17a9d15900bc519ebbf1817410"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/colorcodes_453_Rigging_Steel_v2.pdf",
+      "label": "Colour Codes",
+      "products": [
+        "343"
+      ],
+      "pages": 1,
+      "sha256": "db5a61b22d3e2f5530ee6b15dcba02c49e0009ef0004fe53106e9cb5ab271bc4"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_420_Spansets.pdf",
+      "label": "Datasheet",
+      "products": [
+        "336"
+      ],
+      "pages": 2,
+      "sha256": "41c230d458bec9ccdfd19cc8d65c328a62c1326bfb03986a8611ed0dc5ee39dd"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_517_GAC-FLex.pdf",
+      "label": "Details",
+      "products": [
+        "340"
+      ],
+      "pages": 1,
+      "sha256": "82c0b669b0eecc2901eefe2011b0f619e508556a8f0a5ebf8859d86c4b0bea95"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec2_517_Gac_Flex_Ratings.pdf",
+      "label": "Datasheet",
+      "products": [
+        "340"
+      ],
+      "pages": 1,
+      "sha256": "346b2f358a3a3b04e530c30747766d8fece8eb7f9353368d1843a29764021989"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/manual_517_img-Y251024-0001.pdf",
+      "label": "Certificate",
+      "products": [
+        "340"
+      ],
+      "pages": 1,
+      "sha256": "40c9985eee4da2de295a5e9f2e9a96d1b44eef11755e5109859882458cae92cc"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/BeamClamp.pdf",
+      "label": "Datasheet",
+      "products": [
+        "367"
+      ],
+      "pages": 1,
+      "sha256": "5aa968f8d440710e06759667822c30ef42b7cb4397361d83d040644fa75da67b"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_700_77.pdf",
+      "label": "Datasheet",
+      "products": [
+        "372"
+      ],
+      "pages": 1,
+      "sha256": "e8c9817c217e881183f714315a6a84d8f18fffb4cba8907ed8fd95b3e1b50a5b"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_701_Pear%20Ring%20Datasheet.pdf",
+      "label": "Datasheet",
+      "products": [
+        "373"
+      ],
+      "pages": 1,
+      "sha256": "87af4d71640ed2fd2aa0ef2e8c80888a02db5a7e9709b3a738f5bb74c6269e1e"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/LibraCELL-User-Manual.pdf",
+      "label": "LibraCELL Manual",
+      "products": [
+        "1053"
+      ],
+      "pages": 10,
+      "sha256": "3319bbe55b7c3f003bd790ba87a957ad648da8e51c88645bd929fb0e75fe2e7a"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/LibraSPLIT-Product-Information-Sheet.pdf",
+      "label": "LibraSPLIT Datasheet",
+      "products": [
+        "1053"
+      ],
+      "pages": 2,
+      "sha256": "341e0ce759c99c7f19fac169c4684941dabc9583b6c6a3ae5ec713f109b8e887"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/LibraPRO-User-Manual.pdf",
+      "label": "LibraPRO Manual",
+      "products": [
+        "1053"
+      ],
+      "pages": 16,
+      "sha256": "de5c8daae497d307c07e8ef2799839d8160d28c47d3f6e1fefee4496ee1e9420"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/LibraWIFI-Product-Information-Sheet.pdf",
+      "label": "LibraWIFI Datasheet",
+      "products": [
+        "1053"
+      ],
+      "pages": 2,
+      "sha256": "065be933faef15922664d5c5c0c144ebdbcffd600ee0ac5e67011a067a1d0a8d"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Broadweigh-Original-Instructions-Gen-3.pdf",
+      "label": "Broadweigh Load Cell Manual",
+      "products": [
+        "1159"
+      ],
+      "pages": 20,
+      "sha256": "754a0677c3ebb42b920e479b2a3408a82478e7194693372d546ad9b54da54721"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/BW-S475-S325-Product-Sheet.pdf",
+      "label": "Broadweigh Load Cell Datasheet",
+      "products": [
+        "1159"
+      ],
+      "pages": 1,
+      "sha256": "9df2cd72bd3256bcac7e54d1fdece46c76e8d28facf5a71a937754dc7b7eb182"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/210.pdf",
+      "label": "Steel Safer Sidearm Datasheet",
+      "products": [
+        "1122"
+      ],
+      "pages": 1,
+      "sha256": "c2bfa8c5c09286a5ae513a47baaea045983fbb14e43ba0daedb7a6eb40af3e9f"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/BPE-000016%20-%20Fixture%20Ladders%20V2.pdf",
+      "label": "Fixture Ladder Datasheet",
+      "products": [
+        "974"
+      ],
+      "pages": 4,
+      "sha256": "a6f562360e4a8076a30878dd35d3bc6dd6a464ef46f7f6cdcd513f771af3ddc1"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/24CHL02-US%20Ladder%20System%20Analysis-Structural%20Report.pdf",
+      "label": "Fixture Ladder Structural Report",
+      "products": [
+        "974"
+      ],
+      "pages": 25,
+      "sha256": "317123ab0bd603137dab8dda7bc89c8dfcc8ea12d7fbcabea9bbf96e2b1935a5"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/11912-A-004_000.pdf",
+      "label": "Ladder Rail 84\" Drawing",
+      "products": [
+        "974"
+      ],
+      "pages": 1,
+      "sha256": "cf70182f326f35c2ff3a95a69c41c08e4b17bdcc5cac7f460bb23930e168e012"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/11912-A-002_000.pdf",
+      "label": "Ladder Rail 42\" Drawing",
+      "products": [
+        "974"
+      ],
+      "pages": 1,
+      "sha256": "71324811968b6c54d76e4460268b0930fdb0baa637b3133b7190e63348088169"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/Ladder%20Rung%20-%2036in%20V1.pdf",
+      "label": "Ladder Rung 36\" Drawing",
+      "products": [
+        "974"
+      ],
+      "pages": 1,
+      "sha256": "4d107f6a7531315f4f4f04a315c954735ade28374c02892abf202b4e1eda6607"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/11912-A-006_000.pdf",
+      "label": "Ladder Rung 26\" Drawing",
+      "products": [
+        "974"
+      ],
+      "pages": 1,
+      "sha256": "1e3e8f2e8d8980c09b2536f0814d9eb7d9dfae2cf0c40faeffdfa3e8c0ece22e"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/11912-A-007_000.pdf",
+      "label": "Ladder Rung 13\" Drawing",
+      "products": [
+        "974"
+      ],
+      "pages": 1,
+      "sha256": "01d3a6ed8db4a95dc0add588f1911be029b0f2c1f794949af9bc07db078e77ef"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/spec_574_12-inch-mega-truss-pick-1-ton-34.pdf",
+      "label": "Datasheet",
+      "products": [
+        "368"
+      ],
+      "pages": 1,
+      "sha256": "0f1b80b2d42c7732972a038dc94b3efadb4e4756bdc6d9ad014a40661a799ccf"
+    },
+    {
+      "url": "https://www.christielites.com/file_uploads/ELB-01%20DWG%20PKG%20V0.pdf",
+      "label": "Bracket Assembly Drawing",
+      "products": [
+        "1097"
+      ],
+      "pages": 4,
+      "sha256": "2a6d27d8924853b99bb884ea773782151b70331d6c79e95cc78d6e5e9b82d82b"
+    }
+  ]
+}

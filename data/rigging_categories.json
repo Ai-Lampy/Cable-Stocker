@@ -1,0 +1,45 @@
+{
+  "source": "New generator-only Rigging reference dataset derived from the supplied Christie source. Not a confirmed Lampy Paperwork schema.",
+  "items": [
+    {
+      "id": "rigging-category-1",
+      "name": "Truss — A Type",
+      "aliases": []
+    },
+    {
+      "id": "rigging-category-2",
+      "name": "Truss — B Type",
+      "aliases": []
+    },
+    {
+      "id": "rigging-category-3",
+      "name": "Truss — F Type",
+      "aliases": []
+    },
+    {
+      "id": "rigging-category-4",
+      "name": "Truss accessories",
+      "aliases": []
+    },
+    {
+      "id": "rigging-category-5",
+      "name": "Motors",
+      "aliases": []
+    },
+    {
+      "id": "rigging-category-6",
+      "name": "Motor controls",
+      "aliases": []
+    },
+    {
+      "id": "rigging-ground-support",
+      "name": "Ground support",
+      "aliases": []
+    },
+    {
+      "id": "rigging-hardware",
+      "name": "Rigging",
+      "aliases": []
+    }
+  ]
+}

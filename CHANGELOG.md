@@ -1,5 +1,24 @@
 # Changelog
 
+## v2.0.1 — 2026-11-22
+
+Previous app version: v2.0.0. Christie source dataset: v0.1.0 → v0.2.0. Local validation completed; deployment/live verification pending.
+
+- Share the existing Vendor selection and logo across Cable and Rigging. Retain per-vendor drafts independently, restore the selected vendor on workspace switches, and preserve an older differently named Rigging draft during migration. Fix rerender blur reselecting the previous vendor. Keep existing cable project schemas, examples, user project JSON and backups unchanged.
+- Reuse spreadsheet controls for tailored Rigging Settings: Categories, Equipment Types, Connections and a generator-only Vendor Manifest. Provide category sheets, aliases, default categories, reference import/download, shared Lighting Vendors, equipment suggestions and confirmed category templates. Reference refresh preserves vendor stock and local edits. Add category Excel, blank workbook and JSON copy controls.
+- Expand Christie source data from 42 to 81 parent items across eight categories, adding Ground support and Rigging. Preserve original item IDs. Record published weights/configurations, available dimensions, types, source documents, dual units and variant-specific values. Keep conflicts and missing specifications explicit. No load approval or invented dimensions.
+- Add metric/imperial table editing and an Equipment specifications view in stock and Settings. Keep canonical metric JSON measurements and recompute imperial equivalents after edits. Excel remains metric and preserves variants/source metadata; older workbook headings still import.
+- Add research-only A/B/F load-table JSON with 37 visually checked single-span rows, interpretation/conditions, unresolved source issues and an 81-document source index. No calculator, interpolation or engineering approval is implemented. F Type cantilevers require individual assessment.
+- Updated/upload: `index.html`, `js/app.js`, `js/version.js`, `js/rigging.js`, `js/rigging-app.js`, `reference/rigging/christie_lites_uk_rigging.source.json`, `tests/rigging.test.mjs`, `tests/tables.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`.
+- New/upload: `js/vendor-selector.js`, `js/vendor-workspace.js`, `js/rigging-settings.js`, `data/rigging_categories.json`, `data/rigging_types.json`, `data/rigging_connections.json`, `data/rigging_manifest.json`, `reference/rigging/christie_lites_load_tables.research.json`, `tests/vendor-selector.test.mjs`, `tests/vendor-workspace.test.mjs`, `tests/rigging-settings.test.mjs`.
+- Validation: 292 automated tests passed, including shared-vendor migration/recovery, corrupt/concurrent storage, reference reconciliation, metric/imperial conversion, old workbooks, JSON/Excel preservation and existing cable regressions. Local browser checks passed shared Christie/Siyan selection, retained vendor drafts, reference editing/import/download, category seeding, shared Lighting Vendors, invalid-edit protection, top/bottom saving, dual-unit editing, variant/specification display and actual JSON/Excel download comparison. Expanded JSON re-import retained all 81 items and the edited weight. Existing Christie cable stock remained 20 cable types/six looms. No console errors in the checked flows. Browser control interrupted one attempt; the export/import check was resumed successfully.
+- Known issues: 32 parent items still lack confirmed physical dimensions; other dimensions may be partial or configuration-specific. Source conflicts remain flagged. Variant measurements are viewable and preserved, but do not have their own spreadsheet editing UI. Lampy Paperwork’s rigging runtime schema remains unverified. Existing cable review items remain in UPDATES.md. Local testing does not prove deployment.
+
+## v2.0.0 live verification — 2026-11-22
+
+- Confirmed App v2.0.0 at https://ailampy.com/cable/ after the user’s upload. Approved live browser tests loaded 42 Christie Rigging items across six categories, edited a motor lift to 25 m, saved, downloaded catalogue JSON and re-imported it with the edited value intact (0 errors, 42 source-review warnings).
+- Test edits used isolated in-memory storage. The existing Siyan cable workspace and all persistent storage compared unchanged. No console errors or warnings in the checked flow. The generated download was removed. No deployment was performed for this verification.
+
 ## v2.0.0 — 2026-11-22
 
 Previous app version: v1.1.49. Local release for manual upload; not deployed. Dataset version remains v0.1.0.
