@@ -1,8 +1,10 @@
 # Changelog
 
-## v2.0.3 — 2026-11-22 (local release)
+## v2.0.3 — 2026-11-22
 
 Previous app version: v2.0.2.
+
+- Deployment: explicitly authorised by the user. Release commit `858d0fa38be148740e462e84461794d0d6de6201`; GitHub Pages run `45085655726` succeeded. Live footer confirmed v2.0.3 at https://ailampy.com/cable/ with the URL retained. Live assets returned 105 published weight records, XLR-3 at 4 ft matched 0.3 lb, and source-unit conversion displayed 0.3048 m as 12 in. Browser storage remained byte-for-byte unchanged, including Siyan LTD’s 21 cable types/two looms; no console errors observed. Full edit/save UI checks were local, as recorded below. No stock/project/backup files or workbook were published in this release. AGENTS.md now allows upload/deployment when explicitly instructed by the user; no automatic approval for future releases.
 
 - Rigging stock and Settings tables default to each measurement's published source unit. Feet, inches, pounds and metric declarations remain distinguishable. Metric/Imperial overrides and existing explicit preferences are retained. Source-unit edits convert to canonical metric values without replacing source evidence.
 - Add a Cable weights button to each cable category. The generator-only Christie reference contains 105 published length/weight records, matching 101 lengths in the existing stock. 41 current cable-length entries remain unconfirmed and show Review. Keep weights vendor-specific; do not interpolate missing lengths or apply 120 mm² five-wire Powerlock weights to the 140 mm² stock entry. Published XLR-5 Black, XLR-7, Whirlwind and other configuration/length gaps remain unresolved. Cable JSON/Excel schemas and user stock are unchanged.
@@ -10,7 +12,7 @@ Previous app version: v2.0.2.
 - Files to upload: `index.html`, `js/app.js`, `js/rigging.js`, `js/rigging-app.js`, `js/version.js`, `js/cable-weights.js`, `data/cable_weights.json`, `tests/rigging.test.mjs`, `tests/vendor-measurements.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`.
 - New files: `js/cable-weights.js`, `data/cable_weights.json`, `tests/vendor-measurements.test.mjs`, and `outputs/christie-specifications-2026-11-22/Christie_Lites_Missing_Information.xlsx` (local deliverable; not required for hosting). No existing project files deleted. Remove generated inspection output and temporary research/build/test files after verification.
 - Tests: 298 automated tests passed, including JSON/Excel regression round trips, release-versioned module loading on all supported base paths, source-unit editing, exact-length matching and vendor isolation. Approved local browser checks passed published imperial defaults, stock and Settings editing/conversion/saving, cable-weight display and missing-weight review labels. The 2 ft stock edit displayed as 0.6096 m; the 3 ft Settings edit displayed as 0.9144 m. No browser console errors observed. Loaded Christie cable stock matched its project JSON exactly; five protected project/example files retained their hashes. Workbook sheets rendered and inspected; row counts and N/A round trip verified. Disposable local test storage cleared.
-- Known issues: remaining specifications and cable weights require confirmation. Cable weights are read-only generator reference data, not included in runtime stock JSON or Excel exports. Existing stock/handoff review items remain in UPDATES.md. No live-site testing, upload, deployment or Lampy Paperwork changes for this release.
+- Known issues: remaining specifications and cable weights require confirmation. Cable weights are read-only generator reference data, not included in runtime stock JSON or Excel exports. Existing stock/handoff review items remain in UPDATES.md. Live release verification and deployment are recorded above. Lampy Paperwork remains unchanged.
 
 ## v2.0.2 — 2026-11-22
 
