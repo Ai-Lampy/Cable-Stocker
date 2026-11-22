@@ -2,7 +2,6 @@
 
 ## Pending
 
-- v2.0.1 release verification: implementation and local validation complete; GitHub publication and final live checks pending. User explicitly authorised this task’s upload/deployment in the active overnight goal, overriding the normal manual-upload rule for this task only.
 - Christie data review: the expanded catalogue contains 81 parent items and configuration variants. Every parent has a sourced weight or variant weights; 32 parents still lack confirmed physical dimensions in the reviewed material. Other dimensions are partial/configuration-specific. Resolve motor lift contradictions, GACFLEX length/weight ambiguity, steel-pipe availability, Doughty weight, bracket weights/ratings and exact hardware models with the vendor. Do not invent missing values or clear review flags automatically.
 - Future load-table work: A/B/F single-span research and source index are saved in `reference/rigging/christie_lites_load_tables.research.json`. No load calculator is implemented. Resolve report identity/revision, regional/configuration differences and obtain engineering review before any calculation feature. F Type has no generic cantilever table.
 - Lampy Paperwork rigging integration: agree its runtime schema/manifest separately. Cable Stocker’s rigging source format is proposed; no compatibility is claimed. Do not change Lampy Paperwork for this task.
@@ -16,6 +15,8 @@
 
 
 ## Completed
+
+- v2.0.1 — 2026-11-22: shared Vendor selection, tailored Rigging Settings, 81-item Christie source catalogue, dual-unit editing and research JSON completed. 292 automated tests and approved local/live browser checks passed. Published with explicit release-specific user approval; GitHub Pages run 45004624518 succeeded for commit b493a6c208ffd4fde965f9af5f7f3e851691b521. App v2.0.1 verified at ailampy.com/cable; live JSON/Excel round trip and cable-data preservation passed. Full files, tests, cleanup and remaining data limitations are in CHANGELOG.md. The normal manual-upload/no-deploy rule remains in force for future releases.
 
 - v2.0.0 (local release for manual upload) — 2026-11-22: built the separate Rigging catalogue workspace with Christie source loading, shared tables, review validation, independent autosave, safe workspace switching, JSON/project/Excel import/export and version-refresh protection. Upload `index.html`, `css/app.css`, `js/app.js`, `js/version.js`, `js/rigging.js`, `js/rigging-app.js`, `tests/core.test.mjs`, `tests/loading.test.mjs`, `tests/rigging.test.mjs`, `README.md`, `UPDATES.md`, `CHANGELOG.md`; also include the unchanged `reference/rigging/christie_lites_uk_rigging.source.json`. 276 automated tests and approved local browser checks passed; details and limitations in CHANGELOG.md. Existing user stock, backups, reference data and cable schemas preserved. No Lampy Paperwork changes or deployment.
 
