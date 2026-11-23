@@ -2,7 +2,7 @@
 
 ## Pending
 
-- v2.0.5 is prepared locally: Connection appears only in Motor Hoists / Motors stock and Equipment Types tables. Upload/deployment awaits explicit instruction. Browser testing was declined; see CHANGELOG.md for non-browser validation.
+- v2.0.5 live application verification remains pending. Authorised GitHub Pages deployment succeeded (run 45107236435). Connection is restricted to Motor Hoists / Motors stock and Equipment Types tables. Browser testing was declined; see CHANGELOG.md for deployment and non-browser validation evidence.
 
 - v2.0.4 live application verification remains pending. The authorised GitHub Pages deployment succeeded (run 45106480283), but a direct HTTP version check returned 403. Prior local browser testing passed; no live browser checks were run. Deployment and file-preservation evidence are recorded in CHANGELOG.md.
 
