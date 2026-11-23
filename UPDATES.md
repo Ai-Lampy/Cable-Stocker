@@ -2,7 +2,7 @@
 
 ## Pending
 
-- v2.0.4 is prepared locally: one shared Vendor home page for Cable and Rigging. Upload/deployment requires a new explicit instruction. Files and validation are listed in CHANGELOG.md.
+- v2.0.4 live application verification remains pending. The authorised GitHub Pages deployment succeeded (run 45106480283), but a direct HTTP version check returned 403. Prior local browser testing passed; no live browser checks were run. Deployment and file-preservation evidence are recorded in CHANGELOG.md.
 
 - Complete `outputs/christie-specifications-2026-11-22/Christie_Lites_Missing_Information.xlsx`: 26 missing-specification entries, 57 partial-specification entries and 41 unmatched cable lengths. Enter literal N/A for unnecessary fields. Review completed answers before changing catalogue data; the workbook is not an app import template.
 

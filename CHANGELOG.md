@@ -2,7 +2,9 @@
 
 ## v2.0.4 — 2026-11-23
 
-Previous app version: v2.0.3. Prepared locally; not uploaded or deployed.
+Previous app version: v2.0.3. Deployed on 2026-11-23 with explicit user approval.
+
+- Deployment: release commit `ddd7bdbae0fb1fbf524bb4c0311e7d962486e2c6`; GitHub Pages run `45106480283` completed successfully. The commit changes only the 11 release files listed below; no stock JSON, references, backups or workbook were changed. A direct HTTP check of ailampy.com/cable/js/version.js returned 403, so live application behaviour was not verified. Prior approved local browser results remain recorded below.
 
 - Make the shared Vendor page the default Home page. One vendor selector serves Cable stock and Rigging, with separate setup panels and links to each workspace.
 - Move Rigging catalogue version and output filename to Home. Keep Rigging Overview for catalogue actions; remove its duplicate vendor form. Home links return to the shared page.
