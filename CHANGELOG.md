@@ -1,5 +1,19 @@
 # Changelog
 
+## v2.0.4 — 2026-11-23
+
+Previous app version: v2.0.3. Prepared locally; not uploaded or deployed.
+
+- Make the shared Vendor page the default Home page. One vendor selector serves Cable stock and Rigging, with separate setup panels and links to each workspace.
+- Move Rigging catalogue version and output filename to Home. Keep Rigging Overview for catalogue actions; remove its duplicate vendor form. Home links return to the shared page.
+- Preserve separate vendor drafts, filenames, versions, backups and export formats. Reading Rigging setup does not overwrite the active draft; edits check for concurrent changes and retain the previous vendor's draft.
+- Update current usage/upload instructions and correct the stale Christie stock-review item in UPDATES.md. Remove unused former Vendor sidebar styles and Rigging selector code.
+- Files to upload: `index.html`, `css/app.css`, `js/app.js`, `js/rigging-app.js`, `js/vendor-home.js`, `js/version.js`, `tests/vendor-home.test.mjs`, `README.md`, `projects/README.md`, `UPDATES.md`, `CHANGELOG.md`.
+- New files: `js/vendor-home.js`, `tests/vendor-home.test.mjs`. Deleted files: none. User stock JSON, references, backups, workbook and Lampy Paperwork unchanged.
+- Validation: 303 automated tests passed, including five new tests for read-only setup loading, vendor isolation, draft retention, source validation, saved manifest overrides and concurrent-change protection. All 18 JSON files parsed and 14 application JavaScript modules passed syntax checks. Existing JSON/Excel and static-path regression checks passed.
+- Approved local browser checks passed: default Home and v2.0.4 footer, one vendor selector, Cable/Rigging navigation, Rigging setup saving and retention across vendor switching. Christie and Siyan retained cable stock and looms matched their project JSON. The final two-panel layout was visually inspected; no console errors observed. Disposable test storage cleared. No test downloads created.
+- Known issues: existing missing vendor specifications and Siyan stock-review items remain in UPDATES.md. Native Excel, Safari, Firefox and live deployment were not tested for this update.
+
 ## v2.0.3 — 2026-11-22
 
 Previous app version: v2.0.2.

@@ -1,14 +1,13 @@
-import {vendorSelector} from './vendor-selector.js';
 import {VendorWorkspace} from './vendor-workspace.js';
 import {RIGGING_REFS,RIGGING_REF_KEY,RiggingReferences,checkRiggingReference,riggingReferenceIssues,referenceEquipment,equipmentCopy,newRiggingReference} from './rigging-settings.js';
 import {APP_VERSION} from './version.js';
-import {clone,same,parseJSON,safeKey,normaliseVendorVersion,relativePath} from './model.js';
+import {clone,same,parseJSON,safeKey,relativePath} from './model.js';
 import {Grid,captureScroll,restoreScroll} from './grid.js';
 import {watchUpdates,safeRefresh,freshDocumentURL} from './updates.js';
 import {RIGGING_KEY,MEASURES,createRigging,blankRigging,importRigging,riggingFilename,newRiggingItem,getRiggingCell,setRiggingCell,riggingDisplayCell,riggingDisplayLabel,setRiggingDisplayCell,riggingMeasureUnit,imperialMeasure,validateRigging,riggingChanges,RiggingStore,riggingWorkbook,riggingFromWorkbook} from './rigging.js';
 const $=s=>document.querySelector(s),el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;};
 const button=(text,run,cls)=>{const b=el('button',text,cls);b.type='button';b.onclick=run;return b;};
-let project=blankRigging(),vendors=[],store,dirty=false,saveError='',page='vendor',grid=null,past=[],future=[],busy=false,reloading=false;
+let project=blankRigging(),vendors=[],store,dirty=false,saveError='',page='overview',grid=null,past=[],future=[],busy=false,reloading=false;
 let vendorWorkspace,referenceStore,refs={},referenceBaseline={},settingsTab='rigging_categories',settingsSheet=null,referenceImport=false;
 const views=new Map();let toastTimer;
 function notice(message,error=false){$('#toast').textContent=message;$('#toast').className=error?'show error':'show';clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').className='',8000);}
@@ -19,11 +18,11 @@ function undo(){if(!commit()||!past.length)return;future.push({project:clone(pro
 function redo(){if(!commit()||!future.length)return;past.push({project:clone(project),refs:clone(refs)});({project,refs}=future.pop());dirty=true;save();shell();render();}
 function dialog(title,build,actions=[]){const d=$('#dialog');if(d.open)d.close();const content=$('#dialog-content');content.replaceChildren();const head=el('div',null,'dialog-head');head.append(el('h2',title),button('Close',()=>d.close()));const body=el('div',null,'dialog-body'),footer=el('div',null,'dialog-actions');content.append(head,body,footer);build(body);for(const [label,fn] of actions)footer.append(button(label,()=>{try{fn(d);}catch(e){notice(e.message,true);}}));d.showModal();}
 function confirm(title,message,fn){if(!commit())return;dialog(title,b=>b.append(el('p',message)),[['Cancel',d=>d.close()],[title,d=>{d.close();fn();}]]);}
-function navigate(next){if(!commit())return;page=next;shell();render();window.scrollTo({top:0,behavior:'instant'});}
+function navigate(next){if(!commit())return;if(next==='vendor'){document.querySelector('.workspace-switch a[href="?"]').click();return;}page=next;shell();render();window.scrollTo({top:0,behavior:'instant'});}
 function shell(){
   $('#app-version').textContent=`App ${APP_VERSION}`;$('#vendor-name').textContent=project.catalogue.vendor.name||'Choose your rigging vendor';
   const count=Object.values(project.catalogue.categories).reduce((n,r)=>n+r.length,0);$('#vendor-summary').textContent=`Rigging · ${count} items · ${Object.keys(project.catalogue.categories).length} categories`;
-  const logo=$('#vendor-logo');logo.replaceChildren();const record=vendors.find(v=>v.name===project.catalogue.vendor.name);if(record?.logo&&relativePath(record.logo)&&record.logo.startsWith('images/vendor/')){const image=el('img');image.src=record.logo;image.alt=project.catalogue.vendor.name;image.onerror=()=>logo.textContent='R';logo.append(image);}else logo.textContent='R';const nav=$('#category-nav');nav.replaceChildren(button('Vendor',()=>navigate('vendor'),page==='vendor'?'active':''));
+  const logo=$('#vendor-logo');logo.replaceChildren();const record=vendors.find(v=>v.name===project.catalogue.vendor.name);if(record?.logo&&relativePath(record.logo)&&record.logo.startsWith('images/vendor/')){const image=el('img');image.src=record.logo;image.alt=project.catalogue.vendor.name;image.onerror=()=>logo.textContent='R';logo.append(image);}else logo.textContent='R';const nav=$('#category-nav');nav.replaceChildren(button('Home',()=>navigate('vendor')),button('Overview',()=>navigate('overview'),page==='overview'?'active':''));
   for(const category of Object.keys(project.catalogue.categories)){const group=el('div',null,'project-category-tab'),remove=button('×',()=>deleteCategory(category),'delete-category');remove.setAttribute('aria-label',`Delete ${category} category from project`);group.append(button(category,()=>navigate('category:'+category),page==='category:'+category?'active':''),remove);nav.append(group);}nav.append(button('+ Category',addCategory));
   const issues=[...validateRigging(project.catalogue),...(Object.keys(refs).length?riggingReferenceIssues(refs).map(i=>({...i,level:'error',category:'Settings'})):[])],errors=issues.filter(i=>i.level==='error').length,warnings=issues.length-errors;
   $('#error-count').textContent=errors;$('#error-count').classList.toggle('zero',!errors);let badge=$('#warning-count');if(!badge){badge=el('span',null,'warning-badge');badge.id='warning-count';$('#errors-button').append(badge);}badge.textContent=`⚠ ${warnings}`;badge.hidden=!warnings;$('#errors-button').setAttribute('aria-label',`Errors ${errors}, warnings ${warnings}`);
@@ -31,11 +30,10 @@ function shell(){
 }
 function input(label,value,run,options={}){const l=el('label',label),i=el('input');i.value=value??'';i.dataset.draftValue=i.value;i.setAttribute('aria-label',label);Object.assign(i,options);i.onchange=()=>{run(i.value);i.dataset.draftValue=i.value;};l.append(i);return l;}
 function heading(title,text,actions=[]){const h=el('div',null,'page-heading'),copy=el('div');copy.append(el('span','RIGGING CATALOGUE','eyebrow'),el('h1',title),el('p',text));const a=el('div',null,'actions');a.append(...actions);h.append(copy,a);$('#main').append(h);}
-function render(){const position=captureScroll(grid?.scroller),view=grid?.captureView();if(view)views.set(view.key,view);grid=null;$('#main').replaceChildren();if(page==='errors')renderErrors();else if(page==='settings')renderReferences();else if(page.startsWith('category:')&&Object.hasOwn(project.catalogue.categories,page.slice(9)))renderTable(page.slice(9));else{page='vendor';renderVendor();}if(grid&&views.has(grid.o.key))grid.restoreView(views.get(grid.o.key));restoreScroll(grid?.scroller,position);}
-function renderVendor(){
-  heading('Vendor setup','One vendor selection for Cable stock and Rigging. Each vendor keeps its own stock in both workspaces.');
-  const panel=el('section',null,'panel'),form=el('div',null,'rigging-fields');panel.append(el('h2','Vendor details'));
-  form.append(vendorSelector({getName:()=>project.catalogue.vendor.name,getVendors:()=>vendors,onSelect:selectVendor}),input('Catalogue version',project.catalogue.catalogueVersion||'',value=>mutate(()=>{project.catalogue.catalogueVersion=normaliseVendorVersion(value);})),input('Rigging output filename',project.filename,value=>mutate(()=>{project.filename=value;},false)));panel.append(form);
+function render(){const position=captureScroll(grid?.scroller),view=grid?.captureView();if(view)views.set(view.key,view);grid=null;$('#main').replaceChildren();if(page==='errors')renderErrors();else if(page==='settings')renderReferences();else if(page.startsWith('category:')&&Object.hasOwn(project.catalogue.categories,page.slice(9)))renderTable(page.slice(9));else{page='overview';renderOverview();}if(grid&&views.has(grid.o.key))grid.restoreView(views.get(grid.o.key));restoreScroll(grid?.scroller,position);}
+function renderOverview(){
+  heading('Rigging','Choose a category to edit. Change the shared vendor and catalogue setup on Home.');
+  const panel=el('section',null,'panel');
   const actions=el('div',null,'form-actions');actions.append(button('+ Add category',addCategory,'primary'),button('Import rigging JSON / Excel',()=>{referenceImport=false;$('#file-input').click();}),button('Save project backup',backup),button('Load vendor catalogue',loadSource),button('New rigging project',()=>confirm('New rigging project','Start an empty Rigging project for this vendor? Download a backup first. Cable stock is retained.',()=>{mutate(()=>project=blankRigging(project.catalogue.vendor.name));navigate('vendor');})));panel.append(actions);
   panel.append(el('p','Rigging JSON uses the proposed catalogue format. Lampy Paperwork compatibility is not verified.','note'));$('#main').append(panel);
 }
@@ -46,14 +44,6 @@ async function loadVendorCatalogue(name){
   const response=await fetch(entry.file,{cache:'no-cache'});if(!response.ok)throw Error(`Could not load ${entry.file}. Your current draft is unchanged.`);
   const incoming=importRigging(parseJSON(await response.text()));if(incoming.catalogue.vendor.name.toLocaleLowerCase()!==name.toLocaleLowerCase())throw Error('The catalogue vendor does not match the selected vendor.');return incoming;
 }
-async function selectVendor(value){
-  const name=String(value).trim();if(!name||name===project.catalogue.vendor.name||!commit())return;
-  try{const before=JSON.stringify(project),cached=vendorWorkspace.get('rigging',name),incoming=cached?.project||await loadVendorCatalogue(name);
-    if(before!==JSON.stringify(project)||$('#dialog').open)throw Error('Finish your current changes, then select the vendor again.');
-    confirm('Switch vendor project',`Switch Cable and Rigging to ${name}? Your current vendor draft is retained in this browser. Download a backup for a permanent copy.`,()=>{if(before!==JSON.stringify(project))return notice('Your draft changed; select the vendor again.',true);mutate(()=>project=importRigging(incoming));past=[];future=[];navigate('vendor');});
-  }catch(e){notice(e.message,true);}
-}
-
 async function loadSource(){if(!commit())return;try{const name=project.catalogue.vendor.name;if(!name)throw Error('Select a vendor first.');const before=JSON.stringify(project),incoming=await loadVendorCatalogue(name);if(before!==JSON.stringify(project))throw Error('Your draft changed while loading. Try again.');if(!refs.rigging_manifest.catalogues.some(r=>r.vendor.toLocaleLowerCase()===name.toLocaleLowerCase()))throw Error('No Rigging catalogue is listed for this vendor. Add its relative path in Settings → Vendor Manifest.');confirm('Load vendor catalogue','Replace this vendor’s Rigging draft with its published catalogue? Download a backup first. Cable stock is retained.',()=>mutate(()=>project=incoming));}catch(e){notice(e.message,true);}}
 function deleteCategory(category){confirm('Delete category',`Delete ${category} and its items? Undo remains available.`,()=>{mutate(()=>{delete project.catalogue.categories[category];});navigate('vendor');});}
 function addCategory(){if(!commit())return;let name;dialog('Add rigging category',b=>{name=input('Category name','',()=>{});const i=name.querySelector('input');i.setAttribute('list','rigging-category-options');const list=el('datalist');list.id='rigging-category-options';for(const r of refs.rigging_categories.items)for(const n of [r.name,...(r.aliases||[])]){const o=el('option');o.value=n;list.append(o);}b.append(name,list);},[['Cancel',d=>d.close()],['Add category',d=>{const value=name.querySelector('input').value.trim();if(!value||!safeKey(value)||Object.hasOwn(project.catalogue.categories,value))throw Error('Enter a new category name.');const ref=refs.rigging_categories.items.find(r=>[r.name,...(r.aliases||[])].some(n=>n.toLowerCase()===value.toLowerCase()));mutate(()=>{const ids=new Set(Object.values(project.catalogue.categories).flat().map(r=>r.id));project.catalogue.categories[value]=referenceEquipment(refs,ref?.name||value,project.catalogue.vendor.name).map(r=>{const item=equipmentCopy(r);if(ids.has(item.id))item.id=newRiggingItem().id;ids.add(item.id);return item;});});d.close();navigate('category:'+value);}]]);}

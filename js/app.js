@@ -1,5 +1,6 @@
 import {vendorSelector as sharedVendorSelector} from './vendor-selector.js';
 import {VendorWorkspace} from './vendor-workspace.js';
+import {renderHomeRigging} from './vendor-home.js';
 import {cableWeightRows} from './cable-weights.js';
 import {vendorProjectFilename,loadVendorProject} from './vendor-projects.js';
 import {watchUpdates, safeRefresh, freshDocumentURL} from './updates.js';
@@ -52,6 +53,10 @@ function renderIssueCounts(issues,reviews){
   $('#errors-button').setAttribute('aria-label',`Errors ${errors}, warnings ${warnings}, ${reviews} connectors need review`);
 }
 function renderShell(){
+  document.querySelectorAll('.workspace-switch a').forEach(a=>a.setAttribute('aria-current',a.textContent===(page==='vendor'?'Home':'Cable stock')?'page':'false'));
+  document.title=page==='vendor'?'Lampy · Vendor home':'Lampy · Cable Stock Generator';
+  $('.brand small').textContent=page==='vendor'?'CATALOGUE GENERATOR':'CABLE STOCK GENERATOR';
+  $('#settings-button').textContent=page==='vendor'?'Cable settings':'Settings';$('#import-button').textContent=page==='vendor'?'Import cable':'Import';$('#export-button').textContent=page==='vendor'?'Export cable':'Review & export';
   $('#app-version').textContent=`App ${APP_VERSION}`;
   const name=String(project.stock.vendor.name||'Choose your vendor');$('#vendor-name').textContent=name;
   const count=Object.values(project.stock.cables).reduce((n,r)=>n+r.length,0);
@@ -63,7 +68,7 @@ function renderShell(){
     if(dest==='vendor'){nav.append(b);return;}
     const group=node('div',null,`project-category-tab${page===dest?' active':''}`),remove=btn('×',()=>deleteCategory(label,dest),'delete-category');
     remove.setAttribute('aria-label',`Delete ${label} category from project`);remove.title=`Delete ${label} from this project`;group.append(b,remove);nav.append(group);
-  };tab('Vendor','vendor');
+  };tab('Home','vendor');
   for(const cat of Object.keys(project.stock.cables))tab(cat,`category:${cat}`);
   for(const category of projectLoomCategories(project))tab(category,loomPage(category));
   const add=btn('+',addCategory,'add-category');add.setAttribute('aria-label','Add or search category');nav.append(add);
@@ -72,9 +77,9 @@ function renderShell(){
   rebuildLists();status();
 }
 function rebuildLists(){const host=$('#datalists');host.replaceChildren();const colours=node('datalist');colours.id='colours-list';for(const value of [...new Set([colourPalette.noColour.name,...colourPalette.noColour.aliases,...Object.entries(colourPalette.colours).flatMap(([hex,c])=>[...c.names,hex])])]){const option=node('option');option.value=value;colours.append(option);}host.append(colours);const units=node('datalist');units.id='units-list';for(const value of ['m','ft']){const o=node('option');o.value=value;units.append(o);}host.append(units);for(const [id,entries]of [['vendors-list',refs.lighting_vendors?.vendors||[]],['categories-list',refs.categories?.items||[]],['cables-list',refs.cable_types?.items||[]],['stock-cables-list',Object.values(project.stock.cables).flat()],['connectors-list',refs.connector_types?.items||[]]]){const list=node('datalist');list.id=id;for(const item of entries){for(const name of new Set([item.name,...(item.aliases||[])])){const option=node('option');option.value=name;if(name!==item.name)option.label=`${name} · ${item.name}`;list.append(option);}}host.append(list);}}
-function navigate(next){page=next;renderAll();window.scrollTo({top:0,behavior:'instant'});}
+function navigate(next){if([...document.querySelectorAll('#main [data-draft-value]')].some(input=>input.value!==input.dataset.draftValue)){notice('Finish the current field before leaving this page.',true);return;}page=next;const address=new URL(location.href);address.searchParams.delete('settings');if(next==='vendor')address.searchParams.delete('workspace');else address.searchParams.set('workspace','cable');window.history.replaceState(null,'',address.href);renderAll();window.scrollTo({top:0,behavior:'instant'});}
 function renderAll(){renderShell();render();}
-function heading(title,description,actions=[]){const head=node('div',null,'page-heading'),text=node('div');text.append(node('span','CABLE STOCK WORKSPACE','eyebrow'),node('h1',title));if(description)text.append(node('p',description));head.append(text);if(actions.length){const a=node('div',null,'actions');a.append(...actions);head.append(a);}$('#main').append(head);}
+function heading(title,description,actions=[]){const head=node('div',null,'page-heading'),text=node('div');text.append(node('span',page==='vendor'?'VENDOR HOME':'CABLE STOCK WORKSPACE','eyebrow'),node('h1',title));if(description)text.append(node('p',description));head.append(text);if(actions.length){const a=node('div',null,'actions');a.append(...actions);head.append(a);}$('#main').append(head);}
 function loomPage(category){return category===LOOMS?'looms':`looms:${category}`;}
 function render(){const view=grid?.captureView?.(),position=captureScroll(grid?.scroller);if(view)tableViews.set(view.key,view);grid=null;$('#main').replaceChildren();if(page==='settings')renderSettings();else if(page==='errors')renderErrors();else if(page==='looms'||page.startsWith('looms:'))renderLooms();else if(page.startsWith('category:')&&project.stock.cables[page.slice(9)])renderCategory(page.slice(9));else{page='vendor';renderVendor();}if(grid&&tableViews.has(grid.o.key))grid.restoreView(tableViews.get(grid.o.key));restoreScroll(grid?.scroller,position);}
 function openDialog(title,build,actions=[]){const dialog=$('#dialog');if(dialog.open)dialog.close();const content=$('#dialog-content');content.replaceChildren();const head=node('div',null,'dialog-head'),close=btn('×',()=>dialog.close(),'dialog-close');close.setAttribute('aria-label','Close dialog');head.append(node('h2',title),close);const body=node('div',null,'dialog-body');content.append(head,body);build(body);const footer=node('div',null,'dialog-actions');for(const action of actions)footer.append(btn(action.label,()=>action.run?.(dialog),action.cls));if(!actions.length)footer.append(btn('Close',()=>dialog.close()));content.append(footer);dialog.showModal();return body;}
@@ -84,9 +89,9 @@ function chosenFilename(name){const path=refs.manifest.catalogues.find(v=>v.vend
 function vendorSelector(){return sharedVendorSelector({getName:()=>project.stock.vendor.name,getVendors:()=>refs.lighting_vendors?.vendors||[],onSelect:selectVendorProject});}
 
 function renderVendor(){
-  heading('Vendor setup','Choose a vendor, set its unit once, then build its cable categories.',[btn('Import JSON / Excel',()=>$('#file-input').click()),btn('New vendor',()=>requireSafe('Start a new vendor? Your current autosaved draft will be replaced. Download a project backup first if you need it.',()=>{change(()=>project=newProject());navigate('vendor');}))]);
-  const layout=node('div',null,'vendor-layout'),panel=node('section',null,'panel');panel.append(node('h2','Vendor details'));const form=node('div',null,'form-grid');
-  form.append(vendorSelector());
+  heading('Vendor home','Choose one vendor for Cable stock and Rigging. Each catalogue keeps its own saved data.',[btn('Import cable JSON / Excel',()=>$('#file-input').click()),btn('New vendor',()=>requireSafe('Start a new vendor? Your current autosaved draft will be replaced. Download a project backup first if you need it.',()=>{change(()=>project=newProject());navigate('vendor');}))]);
+  const shared=node('section',null,'panel home-vendor');shared.append(vendorSelector());$('#main').append(shared);
+  const layout=node('div',null,'vendor-layout home-layout'),panel=node('section',null,'panel');panel.append(node('h2','Cable stock'),node('p',`${Object.values(project.stock.cables).reduce((n,r)=>n+r.length,0)} cable types · ${project.looms.length} looms · ${Object.keys(project.stock.cables).length} categories`));const form=node('div',null,'form-grid');
   const unit=node('label','Length unit'),select=node('select');select.setAttribute('aria-label','Length unit');for(const [value,text]of [['m','Metric (m)'],['ft','Imperial (ft)']]){const o=node('option',text);o.value=value;select.append(o);}select.value=project.stock.vendor.lengthUnit;select.onchange=()=>{const value=select.value;select.value=project.stock.vendor.lengthUnit;confirmAction('Change length unit',`Switch to ${value}? All length numbers will stay exactly the same. Review them manually; this does not convert lengths.`,()=>change(()=>project.stock.vendor.lengthUnit=value),'Change unit');};unit.append(select);
   const unitDisplay=node('label','Length display'),displayInput=node('input');displayInput.readOnly=true;displayInput.value=project.stock.vendor.lengthUnit==='ft'?"24'":'24m';displayInput.setAttribute('aria-label','Length display');unitDisplay.append(displayInput);
   const unitFields=node('div',null,'unit-fields');unitFields.append(unit,unitDisplay);form.append(unitFields);
@@ -97,11 +102,9 @@ function renderVendor(){
   const meta=node('details');meta.append(node('summary','Custom metadata · preserved on import'));
   meta.append(metadataForm('vendor','Additional vendor fields'),metadataForm('root','Additional document fields'));panel.append(meta);
   const actions=node('div',null,'form-actions');actions.append(btn('+ Add category',addCategory,'primary'),btn('Save project backup',downloadBackup),btn('Save vendor project',saveVendorProject),btn('Load saved vendor project',()=>selectVendorProject(project.stock.vendor.name,true)));panel.append(actions);layout.append(panel);
-  const side=node('aside',null,'panel');side.append(node('h2','Your workspace'));
-  const stats=node('div',null,'stat-row');for(const [n,t]of [[Object.keys(project.stock.cables).length,'categories'],[Object.values(project.stock.cables).reduce((s,r)=>s+r.length,0),'cable types'],[project.looms.length,'looms']]){const d=node('div',null,'stat');d.append(node('strong',n),node('span',t));stats.append(d);}side.append(stats);
-  for(const [number,title,desc]of [[1,'Choose your vendor','Select its unit and confirm the cable-stock filename.'],[2,'Build cable stock','Add categories, choose cable types and enter available lengths.'],[3,'Review & download','Check changes and issues, then download JSON or Excel.']]){const d=node('div',null,'step'),text=node('div');text.append(node('strong',title),node('p',desc));d.append(node('span',number,'step-number'),text);side.append(d);}
-  side.append(node('p','Your files stay in this browser. Local drafts are not permanent backups.','note'));
-  side.append(node('p','Cable-stock JSON includes loom names, IDs, available lengths and cable quantities. The supplied handoff states that Lampy Paperwork V51.20 supports categorized looms, declared aliases in loom members and loom-only lengths. Save project JSON or Excel to also retain the vendor version, loom descriptions, connector overrides and component lengths.','note warning'));layout.append(side);$('#main').append(layout);
+  actions.prepend(btn('Open Cable stock',()=>{const first=Object.keys(project.stock.cables)[0];if(first)navigate('category:'+first);else addCategory();},'primary'));
+  const rigging=node('section',null,'panel home-rigging');layout.append(rigging);$('#main').append(layout);
+  renderHomeRigging(rigging,{workspace:vendorWorkspace,storage:localStorage,name:project.stock.vendor.name,read,notice,open:()=>document.querySelector('.workspace-switch a[href="?workspace=rigging"]').click()});
 }
 async function selectVendorProject(value,force=false){
   const name=String(value).trim();if(!name||(!force&&name===project.stock.vendor.name))return;
@@ -548,6 +551,7 @@ async function start(){
       const active=await vendorWorkspace.activate('cable',project,dirty,async name=>{const p=await loadVendorProject(name,refs.lighting_vendors.vendors)||newProject();if(!p.stock.vendor.name){p.stock.vendor.name=name;p.filename=chosenFilename(name);}return p;});
       project=restoreProject(active.project);dirty=active.dirty;
     }catch(e){saveBlocked=true;saveError=e.message;notice(saveError,true);}}
+    if(new URL(location.href).searchParams.get('workspace')==='cable'){const first=Object.keys(project.stock.cables)[0];if(first)page='category:'+first;}
     const requestedSettings=new URL(location.href).searchParams.get('settings');if(Object.hasOwn(REF_NAMES,requestedSettings)){page='settings';settingsTab=requestedSettings;}
     syncVendorManifest(refs);loaded=true;
     if(newCableTypes.length)notice('Reference cable types updated. Your saved stock is unchanged; add confirmed stock explicitly.');

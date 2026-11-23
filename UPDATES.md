@@ -2,6 +2,8 @@
 
 ## Pending
 
+- v2.0.4 is prepared locally: one shared Vendor home page for Cable and Rigging. Upload/deployment requires a new explicit instruction. Files and validation are listed in CHANGELOG.md.
+
 - Complete `outputs/christie-specifications-2026-11-22/Christie_Lites_Missing_Information.xlsx`: 26 missing-specification entries, 57 partial-specification entries and 41 unmatched cable lengths. Enter literal N/A for unnecessary fields. Review completed answers before changing catalogue data; the workbook is not an app import template.
 
 - Awaiting exact-model/source clarification for remaining motor/hardware dimensions. The item-by-item evidence gaps are recorded in `remainingSpecificationAudit` in the existing research JSON. No measurements were inferred from similar equipment.
@@ -14,7 +16,7 @@
 - Import limitation: mixed individual cable and loom records within one category are rejected safely. Keep separate cable and loom category arrays; broader mixed-category editing remains unresolved.
 
 - Reference-data review: confirm remaining missing connector defaults where needed. Missing stock endpoints now remain errors; Cable Stocker does not guess connectors. Do not overwrite supplied data.
-- Stock review under the handoff rules: Christie Lites UK project has three unresolved `32A 3Ph` member references and missing Whirlwind 12-Pair loom-only availability at 504 feet. Siyan LTD has seven cables without individually available lengths, a missing Socapex 19-Pin member reference and missing XLR-5 availability for its advertised loom lengths. Confirm declarations before editing; project JSON and backups are unchanged.
+- Stock review under the handoff rules: Siyan LTD has seven cables without individually available lengths, a missing Socapex 19-Pin member reference and missing XLR-5 availability for its advertised loom lengths. Confirm declarations before editing; project JSON and backups are unchanged. The current Christie Lites UK saved project has no validation issues; its earlier pending warning was outdated.
 - Lampy Paperwork integration: the updated handoff states V51.20 supports categorized looms, declared aliases in loom members and loom-only lengths. Only exclusively loom-only cables with an empty individual lengths array still need a loader update. No Paperwork inspection, change or deployment was performed for this update.
 - User acceptance of the initial release in day-to-day cable-stock editing.
 

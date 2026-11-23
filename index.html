@@ -20,12 +20,12 @@
     </div>
   </header>
   <aside id="update-notice" class="update-notice" aria-label="Application update" hidden><span id="update-message" role="status"></span><button id="refresh-update" class="primary">Save &amp; refresh</button><small>Your draft and reference edits stay in this browser.</small></aside>
-  <nav class="workspace-switch" aria-label="Catalogue workspace"><a href="?workspace=cable" aria-current="page">Cable stock</a><a href="?workspace=rigging">Rigging</a></nav>
+  <nav class="workspace-switch" aria-label="Catalogue workspace"><a href="?" aria-current="page">Home</a><a href="?workspace=cable">Cable stock</a><a href="?workspace=rigging">Rigging</a></nav>
   <section class="vendor-strip" aria-label="Selected vendor"><div id="vendor-logo"></div><div><strong id="vendor-name">Your cable stock</strong><span id="vendor-summary">Choose a vendor to begin</span></div><span class="local-pill">LOCAL WORKSPACE</span></section>
   <nav id="category-nav" class="tabs" aria-label="Vendor and cable categories"></nav>
   <main id="main"><p>Loading your workspace…</p></main>
   <footer class="site-footer">
-    <div class="footer-columns"><div><strong class="footer-brand">AI-Lampy</strong><p>Your vendor cable stock.<br>Organised in one place.</p><a href="mailto:info@ailampy.com">info@ailampy.com</a></div><div><h2>WORKSPACE</h2><button data-page="vendor">Vendor</button><button data-page="settings">Reference settings</button><button data-page="errors">Errors & warnings</button></div><div><h2>YOUR FILES</h2><p>Drafts stay in this browser.<br>Download a backup to keep them.</p><button id="backup-button">Save project backup</button></div><div><h2>INFORMATION</h2><a href="README.md" target="_blank" rel="noopener">User guide</a><a href="CHANGELOG.md" target="_blank" rel="noopener">Change history</a><span id="app-version"></span></div></div>
+    <div class="footer-columns"><div><strong class="footer-brand">AI-Lampy</strong><p>Your vendor cable stock.<br>Organised in one place.</p><a href="mailto:info@ailampy.com">info@ailampy.com</a></div><div><h2>WORKSPACE</h2><button data-page="vendor">Home</button><button data-page="settings">Reference settings</button><button data-page="errors">Errors & warnings</button></div><div><h2>YOUR FILES</h2><p>Drafts stay in this browser.<br>Download a backup to keep them.</p><button id="backup-button">Save project backup</button></div><div><h2>INFORMATION</h2><a href="README.md" target="_blank" rel="noopener">User guide</a><a href="CHANGELOG.md" target="_blank" rel="noopener">Change history</a><span id="app-version"></span></div></div>
     <div class="footer-bottom"><span>© 2026 AI-Lampy</span><span>Available lengths only · No stock quantities</span></div>
   </footer>
   <dialog id="dialog"><div id="dialog-content"></div></dialog>
@@ -47,7 +47,7 @@
       if (!match) throw new Error('The published version file is incomplete. Please try again shortly.');
       const version = match[1];
       const asset = path => {const url = new URL(path, base);url.searchParams.set('release', version);return url.href;};
-      const imports = Object.fromEntries(['app', 'model', 'grid', 'excel', 'updates', 'version', 'vendor-projects', 'rigging', 'rigging-app', 'vendor-selector', 'vendor-workspace', 'rigging-settings', 'cable-weights'].map(name => {
+      const imports = Object.fromEntries(['app', 'model', 'grid', 'excel', 'updates', 'version', 'vendor-projects', 'rigging', 'rigging-app', 'vendor-selector', 'vendor-workspace', 'vendor-home', 'rigging-settings', 'cable-weights'].map(name => {
         const path = 'js/' + name + '.js';return [new URL(path, base).href, asset(path)];
       }));
       const map = document.createElement('script');map.type = 'importmap';map.textContent = JSON.stringify({imports});document.head.append(map);
