@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.0.5 — 2026-11-23
+
+Previous app version: v2.0.4. Local update; not uploaded or deployed.
+
+- Show Connection only in Motor Hoists / Motors category tables and the matching Settings Equipment Types sheets. Hide it in Motor controls, truss and other categories. Recognise singular/plural Motors, Hoists and Motor Hoists category names without renaming user categories.
+- Preserve all existing connection values, stock JSON, backups and JSON/Excel export fields; this changes table visibility only. Lampy Paperwork unchanged.
+- Files to upload: `js/rigging-app.js`, `js/version.js`, `README.md`, `UPDATES.md`, `CHANGELOG.md`. New files: none. Deleted disposable files: `.DS_Store`, `outputs/.DS_Store`.
+- Validation: all 303 automated regression tests passed, including JSON/Excel round trips. JavaScript syntax passed. Non-browser execution of stock column definitions passed for six categories; the matching Settings filter was inspected. Browser testing not run, as requested. Deployment not run. Existing specification and stock-review limitations remain in UPDATES.md.
+
 ## v2.0.4 — 2026-11-23
 
 Previous app version: v2.0.3. Deployed on 2026-11-23 with explicit user approval.
